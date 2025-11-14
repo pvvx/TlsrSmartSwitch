@@ -22,7 +22,7 @@
 
 ![sens_pl0937.gif](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/sens_pl0937.gif)
 
-## Настройки :
+## Настройки:
 
 ### Cluster 0x0b04: Electrical Measurement:
 
