@@ -210,7 +210,8 @@ void bl0937_new_dataCb(void *args) {
 		if(relay_settings.status_onoff[0]) {
 			if(tik_max_current == 0xffff)
 				return;
-        	if(++tik_max_current >= config_min_max.time_max_current) {
+			tik_max_current += 8;
+        	if(tik_max_current >= config_min_max.time_max_current) {
         		tik_max_current = 0xffff;
         		//cmdOnOff_off(dev_relay.unit_relay[0].ep);
         		set_relay_status(0, 0);

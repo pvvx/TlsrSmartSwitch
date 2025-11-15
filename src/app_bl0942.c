@@ -273,7 +273,7 @@ void monitoring_handler(void) {
             		if(relay_settings.status_onoff[0]) {
             			if(tik_max_current == 0xffff)
             				return;
-            			tik_max_current += 8;
+            			tik_max_current++;
                     	if(tik_max_current >= config_min_max.time_max_current) {
                     		tik_max_current = 0xffff;
                     		//cmdOnOff_off(dev_relay.unit_relay[0].ep);
