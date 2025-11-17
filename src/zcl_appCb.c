@@ -27,7 +27,9 @@
  * INCLUDES
  */
 #include "app_main.h"
-
+#if USE_SENSOR_MY18B20
+#include "my18b20.h"
+#endif
 /**********************************************************************
  * LOCAL CONSTANTS
  */
@@ -166,6 +168,14 @@ static void app_zclReadRspCmd(zclReadRspCmd_t *pReadRspCmd) {
 #endif
 
 #ifdef ZCL_WRITE
+
+enum {
+	NBIT_REALAY_CONFIG = 1,
+	NBIT_MIN_MAX_CONFIG,
+	NBIT_SENSOR_CONFIG,
+	NBIT_MY18B20_CONFIG,
+	NBIT_THERM_CONFIG
+};
 /*********************************************************************
  * @fn      app_zclWriteReqCmd
  *
@@ -193,9 +203,10 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
                 uint8_t startup = attr[i].attrData[0];
 //                printf("startup: 0x%02x, ep: %d\r\n", startup, epId);
                 relay_settings.startUpOnOff[idx] = startup;
-                save |= 1;
+                save |= BIT(NBIT_REALAY_CONFIG);
             }
         }
+#if USE_SWITCH
     } else if (clusterId == ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG) {
         for (uint32_t i = 0; i < numAttr; i++) {
             if (attr[i].attrID == CUSTOM_ATTRID_SWITCH_TYPE) {
@@ -208,12 +219,12 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
                     relay_settings.switch_decoupled[idx] = CUSTOM_SWITCH_DECOUPLED_ON;
                     pOnOffCfg->custom_decoupled = CUSTOM_SWITCH_DECOUPLED_ON;
                 }
-                save |= 1;
+                save |= BIT(NBIT_REALAY_CONFIG);
             } else if (attr[i].attrID == ZCL_ATTRID_SWITCH_ACTION) {
                 uint8_t action = attr[i].attrData[0];
 //                printf("action: 0x%02x, ep: %d\r\n", action, epId);
                 relay_settings.switchActions[idx] = action;
-                save |= 1;
+                save |= BIT(NBIT_REALAY_CONFIG);
             } else if (attr[i].attrID == CUSTOM_ATTRID_DECOUPLED) {
                 uint8_t decoupled = attr[i].attrData[0];
 //                printf("decoupled: 0x%02x\r\n", decoupled);
@@ -224,22 +235,65 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
 //                    app_forcedReport(epId, clusterId, CUSTOM_ATTRID_DECOUPLED);
                 }
                 relay_settings.switch_decoupled[idx] = decoupled;
-                save |= 1;
+                save |= BIT(NBIT_REALAY_CONFIG);
             }
         }
+#endif // USE_SWITCH
+#if USE_SENSOR_MY18B20
+#ifdef ZCL_THERMOSTAT
+    } else if (clusterId == ZCL_CLUSTER_HAVC_THERMOSTAT) {
+    	 for (uint32_t i = 0; i < numAttr; i++) {
+    		 switch(attr[i].attrID) {
+    		 case ZCL_ATTRID_HVAC_THERMOSTAT_LOCAL_TEMP_CALIBRATION:
+    			 save |= BIT(NBIT_THERM_CONFIG);
+    			 break;
+    		 case ZCL_ATTRID_HVAC_THERMOSTAT_OCCUPIED_COOLING_SETPOINT:
+    			 save |= BIT(NBIT_THERM_CONFIG);
+    			 break;
+    		 case ZCL_ATTRID_HVAC_THERMOSTAT_OCCUPIED_HEATING_SETPOINT:
+    			 save |= BIT(NBIT_THERM_CONFIG);
+    			 break;
+    		 case ZCL_ATTRID_HVAC_THERMOSTAT_SYS_MODE:
+    			 save |= BIT(NBIT_THERM_CONFIG);
+    			 break;
+    		 default:
+        		 if(attr[i].attrID >= 0x1000 && attr[i].attrID < 0x1100) {
+        			 save |= BIT(NBIT_MY18B20_CONFIG);
+        		 }
+    		 }
+    	 }
+
+#endif
+#ifdef ZCL_TEMPERATURE_MEASUREMENT
+    } else if (clusterId == ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT) {
+    	 for (uint32_t i = 0; i < numAttr; i++) {
+    		 if(attr[i].attrID >= 0x1000 && attr[i].attrID < 0x1100) {
+    			 save |= BIT(NBIT_MY18B20_CONFIG);
+    		 }
+    	 }
+
+#endif
+#endif // USE_SENSOR_MY18B20
     } else if (clusterId == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
     	 for (uint32_t i = 0; i < numAttr; i++) {
     		 if(attr[i].attrID >= 0x2200 && attr[i].attrID < 0x2300) {
-    			 save |= 2;
-    		 } else { // ZCL_ATTRID_RMS_VOLTAGE_SWELL_PERIOD, ZCL_ATTRID_RMS_EXTREME_OVER_VOLTAGE..ZCL_ATTRID_RMS_VOLTAGE_SWELL
-    			 save |= 4;
+    			 save |= BIT(NBIT_SENSOR_CONFIG);
+    		 } else {
+    			 // ZCL_ATTRID_RMS_VOLTAGE_SWELL_PERIOD, ZCL_ATTRID_RMS_EXTREME_OVER_VOLTAGE..ZCL_ATTRID_RMS_VOLTAGE_SWELL
+    			 save |= BIT(NBIT_MIN_MAX_CONFIG);
     		 }
     	 }
     }
 
-    if (save & 1) relay_settings_save();
-    if (save & 2) save_config_sensor();
-    if (save & 4) save_config_min_max();
+    if (save & BIT(NBIT_REALAY_CONFIG)) relay_settings_save();
+    if (save & BIT(NBIT_SENSOR_CONFIG)) save_config_sensor();
+    if (save & BIT(NBIT_MIN_MAX_CONFIG)) save_config_min_max();
+#if USE_SENSOR_MY18B20
+#ifdef ZCL_THERMOSTAT
+    if (save &  BIT(NBIT_THERM_CONFIG)) save_config_termostat();
+#endif
+    if (save &  BIT(NBIT_MY18B20_CONFIG)) save_config_my18b20();
+#endif // USE_SENSOR_MY18B20
 
 #ifdef ZCL_POLL_CTRL
     if(clusterId == ZCL_CLUSTER_GEN_POLL_CONTROL){

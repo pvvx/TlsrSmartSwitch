@@ -173,6 +173,10 @@ extern "C" {
 #include "boards/mzsw01_ztu_bl0942.h"
 #elif BOARD == BOARD_MZSW02_BL0937
 #include "boards/mzsw02_zt2s_bl0937.h"
+#elif BOARD == BOARD_MZSW01_BL0942_MY18B20
+#include "boards/mzsw01_ztu_bl0942_my18b20.h"
+#elif BOARD == BOARD_MZSW02_BL0937_MY18B20
+#include "boards/mzsw02_zt2s_bl0937_my18b20.h"
 #else
 #error "Define BOARD!"
 #endif
@@ -239,18 +243,6 @@ extern "C" {
 
 #define DEF_OCCUPANCY_DELAY     60 // sec
 
-#if USE_SENSOR_TH
-#define READ_SENSOR_TIMER_MIN_SEC   3 // second
-#define READ_SENSOR_TIMER_MAX_SEC   30 // second
-#define READ_SENSOR_TIMER_SEC       10 // default, second
-#define DEFAULT_POLL_RATE           (g_zcl_thermostatUICfgAttrs.measure_interval * (4 * POLL_RATE_QUARTERSECONDS)) //   (READ_SENSOR_TIMER_SEC * (4 * POLL_RATE_QUARTERSECONDS)) // msecond
-#else
-#define READ_SENSOR_TIMER_MIN_SEC   3 // second
-#define READ_SENSOR_TIMER_SEC       30 // default, second
-#define DEFAULT_POLL_RATE           (READ_SENSOR_TIMER_SEC * (4 * POLL_RATE_QUARTERSECONDS)) //   (READ_SENSOR_TIMER_SEC * (4 * POLL_RATE_QUARTERSECONDS)) // msecond
-#endif
-#define READ_SENSOR_TIMER_MS        DEFAULT_POLL_RATE // (READ_SENSOR_TIMER_SEC*1000) // msecond
-
 /**********************************************************************
  * NVM configuration
  */
@@ -268,7 +260,9 @@ typedef enum{
     NV_ITEM_APP_TRIGGER_UI_CFG,
 	NV_ITEM_APP_CFG_RELAY,
 	NV_ITEM_APP_CFG_MIN_MAX,
-	NV_ITEM_APP_CFG_SENSOR
+	NV_ITEM_APP_CFG_SENSOR_BL09xx,
+	NV_ITEM_APP_CFG_SENSOR_MY18B20,
+	NV_ITEM_APP_CFG_THERMOSTAT,
 } nv_item_app_t;
 
 /**********************************************************************
@@ -313,12 +307,16 @@ typedef enum{
 #define ZCL_POWER_CFG_SUPPORT                       OFF
 #define ZCL_GROUP_SUPPORT                           ON
 #define ZCL_SCENE_SUPPORT                           ON
-#define ZCL_ON_OFF_SWITCH_CFG_SUPPORT               ON
+#define ZCL_ON_OFF_SWITCH_CFG_SUPPORT               USE_SWITCH
 #define ZCL_OTA_SUPPORT                             ON
 #define ZCL_GP_SUPPORT                              ON
 #define ZCL_METERING_SUPPORT                        ON
 #define ZCL_ELECTRICAL_MEASUREMENT_SUPPORT          ON
-#define ZCL_MULTISTATE_INPUT_SUPPORT                ON
+#define ZCL_MULTISTATE_INPUT_SUPPORT                USE_SWITCH
+#define ZCL_THERMOSTAT_SUPPORT						USE_SENSOR_MY18B20
+//#define ZCL_TEMPERATURE_MEASUREMENT_SUPPORT			USE_SENSOR_MY18B20
+
+// TODO: ZCL_ALARMS_SUPPORT
 
 #endif
 
@@ -326,14 +324,6 @@ typedef enum{
 #define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
 #endif
 
-// for consistency
-#if ZCL_RELATIVE_HUMIDITY_SUPPORT
-#define ZCL_RELATIVE_HUMIDITY
-#define ZCL_RELATIVE_HUMIDITY_MEASUREMENT
-#endif
-#if ZCL_THERMOSTAT_UI_CFG_SUPPORT
-#define ZCL_THERMOSTAT_UI_CFG               1
-#endif
 /**********************************************************************
  * BLE configuration
  */

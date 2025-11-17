@@ -95,6 +95,8 @@
 */
 #define BOARD_MZSW01_BL0942			1 // Mini Zigbee Switch, ZTU, BL0942
 #define BOARD_MZSW02_BL0937			2 // Mini Zigbee Switch, ZT2S, BL0937
+#define BOARD_MZSW01_BL0942_MY18B20	3 // Mini Zigbee Switch, ZTU, BL0942 + MY18B20
+#define BOARD_MZSW02_BL0937_MY18B20	4 // Mini Zigbee Switch, ZTU, BL0942 + MY18B20
 
 
 /* Board define */
@@ -128,7 +130,7 @@
 #define APP_RELEASE				0x01	//BCD app release "0.0"
 #define APP_BUILD				0x00	//BCD app build "0.4"
 #else
-#define APP_RELEASE				0x02	//BCD app release "0.2"
+#define APP_RELEASE				0x03	//BCD app release "0.3"
 #define APP_BUILD				0x00	//BCD app build "0.0"
 #endif
 #define STACK_RELEASE			0x30	//BCD stack release 3.0

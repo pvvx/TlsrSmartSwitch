@@ -1,0 +1,18 @@
+[
+    {
+        "fileVersion": 50343937,
+        "fileSize": 200306,
+        "manufacturerCode": 4417,
+        "imageType": 4609,
+        "sha512": "c417f5df664a28ff11a8a801ddf9439987178a292b5f53783c2ee57977866f6d205ca7e05676a953ca5952c2d2c39e78734730d330930f963796477f325530de",
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/1141-1201-03003001-MZSW01.zigbee"
+    },
+    {
+        "fileVersion": 50343937,
+        "fileSize": 200258,
+        "manufacturerCode": 4417,
+        "imageType": 4610,
+        "sha512": "2129772d39d6cd0b80080fc08c2d9a6507575035f24346e5dbc5fc15c158adf222db9025abc8ceef76409deb5c204db4ec6eb5cf82025c3e7f776b7194a4fb92",
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/1141-1202-03003001-MZSW02.zigbee"
+    }
+]

@@ -1,5 +1,5 @@
-#ifndef SRC_INCLUDE_BOARD_TUYA_ZTU_H_
-#define SRC_INCLUDE_BOARD_TUYA_ZTU_H_
+#ifndef _MZSW01_BL0942_H_
+#define _MZSW01_BL0942_H_
 
 /* Enable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
@@ -14,11 +14,11 @@ extern "C" {
 #define ZCL_BASIC_MODEL_ID     {15,'M','Z','S','W','0','1','_','B','L','0','9','4','2','_','z'}
 
 /************************* Configure SWITCH GPIO ***************************************/
+#define USE_SWITCH				1
 #define SWITCH1_GPIO            GPIO_PD2
 #define PD2_INPUT_ENABLE        ON
 #define PD2_OUTPUT_ENABLE       OFF
 #define PD2_FUNC                AS_GPIO
-
 
 /************************* Configure KEY GPIO ***************************************/
 #define MAX_BUTTON_NUM  1
@@ -98,5 +98,5 @@ enum {
 
 #endif /* UART_PRINTF_MODE */
 
-#endif /* SRC_INCLUDE_BOARD_TUYA_ZTU_H_ */
+#endif /* _MZSW01_BL0942_H_ */
 

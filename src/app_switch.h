@@ -13,7 +13,10 @@ typedef enum {
     ACTION_EMPTY = 300,
 } switch_action_t;
 
+
+#if USE_SWITCH
 void switch_handler();
 bool switch_idle();
+#endif
 
 #endif /* SRC_INCLUDE_APP_SWITCH_H_ */

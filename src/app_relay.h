@@ -6,14 +6,17 @@
 typedef struct {
     uint8_t  status_onoff[AMT_RELAY];
     uint8_t  startUpOnOff[AMT_RELAY];
+#if USE_SWITCH
     uint8_t  switchType[AMT_RELAY];         // 0x00 - toggle, 0x01 - momentary, 0x02 - multifunction
     uint8_t  switchActions[AMT_RELAY];
     uint8_t  switch_decoupled[AMT_RELAY];
-//    uint8_t  crc;
+#endif
 } relay_settings_t;
 
 typedef struct {
+#if USE_SWITCH
     GPIO_PinTypeDef sw;
+#endif
     GPIO_PinTypeDef rl;
     uint8_t         ep;
 } unit_relay_t;

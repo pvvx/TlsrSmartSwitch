@@ -24,6 +24,7 @@ $(OUT_PATH)$(SRC_DIR)/app_arith64.o \
 $(OUT_PATH)$(SRC_DIR)/app_relay.o \
 $(OUT_PATH)$(SRC_DIR)/app_bl0942.o \
 $(OUT_PATH)$(SRC_DIR)/app_bl0937.o \
+$(OUT_PATH)$(SRC_DIR)/my18b20.o \
 $(OUT_PATH)$(SRC_DIR)/energy_save.o \
 $(OUT_PATH)$(SRC_DIR)/app_main.o \
 $(OUT_PATH)$(SRC_DIR)/patch_z_sdk/flash.o \

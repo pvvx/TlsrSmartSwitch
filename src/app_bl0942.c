@@ -77,7 +77,7 @@ static old_fract_t old_fract; // Remainder from the previous division
 
 nv_sts_t load_config_sensor(void) {
 #if NV_ENABLE
-	nv_sts_t ret = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_CFG_SENSOR, sizeof(sensor_pwr_coef), (uint8_t*)&sensor_pwr_coef);
+	nv_sts_t ret = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_CFG_SENSOR_BL09xx, sizeof(sensor_pwr_coef), (uint8_t*)&sensor_pwr_coef);
 	if(ret !=  NV_SUCC) {
 		memcpy(&sensor_pwr_coef, &sensor_pwr_coef_def, sizeof(sensor_pwr_coef));
 	}
@@ -93,7 +93,7 @@ nv_sts_t save_config_sensor(void) {
 	nv_sts_t ret = NV_SUCC;
 	if(memcmp(&sensor_pwr_coef_saved, &sensor_pwr_coef, sizeof(sensor_pwr_coef))) {
 		memcpy(&sensor_pwr_coef_saved, &sensor_pwr_coef, sizeof(sensor_pwr_coef));
-		ret = nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_CFG_SENSOR, sizeof(sensor_pwr_coef), (uint8_t*)&sensor_pwr_coef);
+		ret = nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_CFG_SENSOR_BL09xx, sizeof(sensor_pwr_coef), (uint8_t*)&sensor_pwr_coef);
 	}
     return ret;
 #else
@@ -132,7 +132,9 @@ static uint8_t checksum(uint8_t *data, uint16_t length) {
 
 // Initializing UART for BL0942
 void app_sensor_init(void) {
-
+	load_config_sensor();
+	load_config_min_max();
+	energy_restore();
 	if(!config_min_max.time_start)
 	    tik_start = 0xffff;
 	if(!config_min_max.time_reload)
@@ -215,7 +217,15 @@ void monitoring_handler(void) {
                 old_fract.power = tmp & 0xffffff;
                 power = tmp >> 24;
 
-                if(power > 327670) {
+                if(power > 32767000) {
+                	power = 32767;
+                	g_zcl_msAttrs.power_divisor = 1;
+                } else if(power > 3276700) {
+                    // x1: 3276.7..32767W
+                    power += 500;
+                    power /= 1000;
+                    g_zcl_msAttrs.power_divisor = 1;
+                } else if(power > 327670) {
                     // x10: 327.6..3276.7W
                     power += 50;
                     power /= 100;
@@ -235,17 +245,17 @@ void monitoring_handler(void) {
 
                 g_zcl_msAttrs.freq = (uint16_t)freq;
 
-                freq =  energy;
+                freq =  energy; // save energy
                 if(energy < old_fract.old_energy) {
-                	energy += 0x1000000 - old_fract.old_energy;
+                	energy += 0x1000000 - old_fract.old_energy; // 24 bits
                 } else {
                 	energy -= old_fract.old_energy;
                 }
-                old_fract.old_energy = freq;
+                old_fract.old_energy = freq; // restore energy
 
                	tmp = mul32x32_64(energy, sensor_pwr_coef.energy);
                 tmp += old_fract.energy;
-                old_fract.energy = tmp & 0xffffff;
+                old_fract.energy = tmp & 0xffffff; // 24 bits
                 energy = tmp >> 24;
 
               	if(energy) {
@@ -308,7 +318,9 @@ int32_t app_monitoringCb(void *arg) {
 		tik_reload++;
 	if(tik_start != 0xffff)
 		tik_start++;
-
+#if USE_SENSOR_MY18B20
+	my18b20.start_measure = 1;
+#endif
     return 0;
 }
 

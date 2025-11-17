@@ -24,6 +24,62 @@ typedef struct {
 } zcl_basicAttr_t;
 
 
+/* sys_mode:
+0 - Cooling Only
+1 - Cooling With Reheat
+2 - Heating Only
+3 - Heating With Reheat
+4 - Cooling and Heating 4-pipes
+5 - Cooling and Heating 4-pipes with Reheat */
+
+
+
+
+typedef struct {
+	int16_t temp_cooling;
+	int16_t temp_heating;
+	/* sys_mode:
+	0 - Off
+	1 - Auto
+	3 - Cool
+	4 - Heat
+	5 - Emergency heating
+	6 - Precooling
+	7 - Fan only
+	8 - Dry
+	9 - Sleep */
+	uint8_t sys_mode;
+	int8_t temp_z8;
+} zcl_thermostatAttr_save_t;
+
+typedef struct {
+	zcl_thermostatAttr_save_t cfg;
+	int16_t local_temp; // in 0.01 C
+	int16_t min_temp; // in 0.01 C
+	int16_t max_temp; // in 0.01 C
+	uint8_t cool_on;
+	uint8_t healt_on;
+	/* operation:
+	0 - Cooling Only
+	1 - Cooling With Reheat
+	2 - Heating Only
+	3 - Heating With Reheat
+	4 - Cooling and Heating 4-pipes
+	5 - Cooling and Heating 4-pipes with Reheat */
+	uint8_t operation; // = 5
+	/* run_mode:
+	0 - Off
+	3 - Cool
+	4 - Heat */
+	uint8_t run_mode;
+	// work
+	uint32_t errors; // AC_ERROR_CODE
+	int32_t summ_temp;
+	uint8_t summ_cnt;
+} zcl_thermostatAttr_t;
+
+extern zcl_thermostatAttr_t zcl_thermostat_attrs;
+
 /**
  *  @brief Defined for identify cluster attributes
  */
@@ -120,6 +176,18 @@ typedef struct {
 } zcl_config_min_max_t;
 
 extern zcl_config_min_max_t config_min_max;
+
+/**
+ *  @brief Defined for temperature cluster attributes
+ */
+typedef struct {
+	s16 measuredValue;
+	s16 minValue;
+	s16 maxValue;
+	u16 tolerance;
+}zcl_temperatureAttr_t;
+
+extern zcl_temperatureAttr_t g_zcl_temperatureAttrs;
 
 extern uint8_t APP_CB_CLUSTER_NUM1;
 //extern uint8_t APP_CB_CLUSTER_NUM2;

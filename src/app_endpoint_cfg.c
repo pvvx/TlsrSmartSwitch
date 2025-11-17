@@ -1,9 +1,17 @@
 #include "app_main.h"
 #include "energy_save.h"
+#if USE_SENSOR_MY18B20
+#include "my18b20.h"
+#endif
 
 #if !defined(ZCL_BASIC_MFG_NAME) || !defined(ZCL_BASIC_MODEL_ID)
 #error "defined ZCL_BASIC_MODEL_ID & ZCL_BASIC_MFG_NAME !"
 #endif
+
+// Custom Attr
+#define ZCL_TEMPERATURE_SENSOR_HYSTERESIS	0x2000
+#define ZCL_TEMPERATURE_SENSOR_MULTIPLER	0x2001
+#define ZCL_TEMPERATURE_SENSOR_ZERO			0x2002
 
 #ifndef ZCL_BASIC_SW_BUILD_ID
 
@@ -60,9 +68,6 @@ const uint16_t app_ep1_inClusterList[] = {
 #ifdef ZCL_SCENE
     ZCL_CLUSTER_GEN_SCENES,
 #endif
-#ifdef ZCL_ZLL_COMMISSIONING
-    ZCL_CLUSTER_TOUCHLINK_COMMISSIONING,
-#endif
 #ifdef ZCL_POLL_CTRL
     ZCL_CLUSTER_GEN_POLL_CONTROL,
 #endif
@@ -70,9 +75,20 @@ const uint16_t app_ep1_inClusterList[] = {
     ZCL_CLUSTER_GEN_ON_OFF,
     ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG,
 #endif
+#ifdef ZCL_MULTISTATE_INPUT
     ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC,
+#endif
+#ifdef ZCL_THERMOSTAT_SUPPORT
+	ZCL_CLUSTER_HAVC_THERMOSTAT,
+#endif
+#ifdef ZCL_TEMPERATURE_MEASUREMENT
+	ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
+#endif
     ZCL_CLUSTER_SE_METERING,
     ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
+#ifdef ZCL_ZLL_COMMISSIONING
+    ZCL_CLUSTER_TOUCHLINK_COMMISSIONING,
+#endif
 };
 
 /**
@@ -238,6 +254,80 @@ const zclAttrInfo_t identify_attrTbl[] =
 //
 //#define ZCL_TIME_ATTR_NUM    sizeof(time_attrTbl) / sizeof(zclAttrInfo_t)
 
+
+
+#ifdef ZCL_THERMOSTAT
+zcl_thermostatAttr_t zcl_thermostat_attrs = {
+		.local_temp = 0x8000, // in 0.01 C
+		.cfg.temp_cooling = 2400, // in 0.01 C
+		.cfg.temp_heating = 2100, // in 0.01 C
+		.min_temp = -5000, // in 0.01 C
+		.max_temp = 12500, // in 0.01 C
+		.operation = 5,
+};
+
+const zclAttrInfo_t thermostat_ui_cfg_attrTbl[] =
+{
+	{ZCL_ATTRID_HVAC_THERMOSTAT_LOCAL_TEMPERATURE,	ZCL_INT16,  RR,      (uint8_t*)&zcl_thermostat_attrs.local_temp },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_ABS_MIN_HEAT_SETPOINT_LIMIT, ZCL_INT16,  R,      (uint8_t*)&zcl_thermostat_attrs.min_temp },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_ABS_MAX_HEAT_SETPOINT_LIMIT, ZCL_INT16,  R,      (uint8_t*)&zcl_thermostat_attrs.max_temp },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_ABS_MIN_COOL_SETPOINT_LIMIT, ZCL_INT16,  R,      (uint8_t*)&zcl_thermostat_attrs.min_temp },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_ABS_MAX_COOL_SETPOINT_LIMIT, ZCL_INT16,  R,      (uint8_t*)&zcl_thermostat_attrs.max_temp },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_PI_COOLING_DEMAND, ZCL_UINT8,  RR,      (uint8_t*)&zcl_thermostat_attrs.cool_on  },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_PI_HEATING_DEMAND, ZCL_UINT8,  RR,      (uint8_t*)&zcl_thermostat_attrs.healt_on  },
+
+	{ZCL_ATTRID_HVAC_THERMOSTAT_LOCAL_TEMP_CALIBRATION, ZCL_INT8,  RW,      (uint8_t*)&zcl_thermostat_attrs.cfg.temp_z8  },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_OCCUPIED_COOLING_SETPOINT, ZCL_INT16,  RW,      (uint8_t*)&zcl_thermostat_attrs.cfg.temp_cooling },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_OCCUPIED_HEATING_SETPOINT, ZCL_INT16,  RW,      (uint8_t*)&zcl_thermostat_attrs.cfg.temp_heating },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_CTRL_SEQUENCE_OF_OPERATION, ZCL_ENUM8,  RW,      (uint8_t*)&zcl_thermostat_attrs.operation },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_SYS_MODE, ZCL_ENUM8,  RW,      (uint8_t*)&zcl_thermostat_attrs.cfg.sys_mode },
+
+	{ZCL_ATTRID_HVAC_THERMOSTAT_RUNNING_MODE, ZCL_ENUM8,  R,      (uint8_t*)&zcl_thermostat_attrs.run_mode },
+	{ZCL_ATTRID_HVAC_THERMOSTAT_AC_ERROR_CODE, ZCL_BITMAP32,  RW,      (uint8_t*)&zcl_thermostat_attrs.errors },
+
+#if USE_TRIGGER
+	{ ZCL_THERMOSTAT_UI_CFG_ATTRID_TRIGGER_TRH_T,   ZCL_INT16,    RW, (u8*)&trg.temp_threshold },
+	{ ZCL_THERMOSTAT_UI_CFG_ATTRID_TRIGGER_HST_T,   ZCL_INT16,    RW, (u8*)&trg.temp_hysteresis },
+#endif
+	// Custom Attr:
+	{ ZCL_TEMPERATURE_SENSOR_HYSTERESIS,	ZCL_INT16,	RW, (u8*)&my18b20.coef.temp_hysteresis },
+	{ ZCL_TEMPERATURE_SENSOR_MULTIPLER,     ZCL_UINT32, RW, (u8*)&my18b20.coef.temp_k },
+	{ ZCL_TEMPERATURE_SENSOR_ZERO,          ZCL_INT16,  RW, (u8*)&my18b20.coef.temp_z },
+
+	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, 	ZCL_UINT16,  	R, (u8*)&zcl_attr_global_clusterRevision},
+};
+
+#define	ZCL_THERMOSTAT_UI_CFG_ATTR_NUM		 sizeof(thermostat_ui_cfg_attrTbl) / sizeof(zclAttrInfo_t)
+#endif // ZCL_THERMOSTAT_UI_CFG
+
+#ifdef ZCL_TEMPERATURE_MEASUREMENT
+
+zcl_temperatureAttr_t g_zcl_temperatureAttrs =
+{
+	.measuredValue	= 0x8000,
+	.minValue 		= -5000,
+	.maxValue		= 17500,
+	.tolerance		= 0,
+};
+
+const zclAttrInfo_t temperature_measurement_attrTbl[] =
+{
+	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE,       	ZCL_INT16,    RR, (u8*)&g_zcl_temperatureAttrs.measuredValue },
+	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MINMEASUREDVALUE,      ZCL_INT16,    R,  (u8*)&g_zcl_temperatureAttrs.minValue },
+	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MAXMEASUREDVALUE,      ZCL_INT16,    R,  (u8*)&g_zcl_temperatureAttrs.maxValue },
+	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_TOLERANCE,       		ZCL_UINT16,   R,  (u8*)&g_zcl_temperatureAttrs.tolerance },
+	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_TRG_TRH_T,             ZCL_INT16,    RW, (u8*)&my18b20.coef.temp_threshold },
+	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_TRG_HST_T,				ZCL_INT16,    RW, (u8*)&my18b20.coef.temp_hysteresis },
+	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_CFC_T,                 ZCL_UINT32,   RW, (u8*)&my18b20.coef.temp_k },
+	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_ZR_T,                  ZCL_INT16,    RW, (u8*)&my18b20.coef.temp_z },
+
+	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, 	ZCL_DATA_TYPE_UINT16,  	ACCESS_CONTROL_READ,  						(u8*)&zcl_attr_global_clusterRevision},
+};
+
+#define	ZCL_TEMPERATURE_MEASUREMENT_ATTR_NUM		 sizeof(temperature_measurement_attrTbl) / sizeof(zclAttrInfo_t)
+#endif
+
+#ifdef ZCL_MULTISTATE_INPUT
 zcl_msInputAttr_t g_zcl_msInputAttrs[AMT_RELAY] = {
     {
         .value = ACTION_EMPTY,
@@ -276,6 +366,7 @@ const zclAttrInfo_t msInput1_attrTbl[] = {
 //};
 //
 //#define ZCL_MSINPUT2_ATTR_NUM   sizeof(msInput2_attrTbl) / sizeof(zclAttrInfo_t)
+#endif
 
 #ifdef ZCL_GROUP
 /* Group */
@@ -466,18 +557,34 @@ const zclAttrInfo_t se_attrTbl[] = {
 
 #define ZCL_SE_ATTR_NUM    sizeof(se_attrTbl) / sizeof(zclAttrInfo_t)
 
+#ifdef ZCL_ALARMS
+u16 zcl_attr_alarmCount = 0;
+
+/* Attribute record list */
+const zclAttrInfo_t alarm_attrTbl[] = {
+#ifdef ZCL_ATTR_ALARM_COUNT_ENABLE
+    { ZCL_ATTRID_ALARM_COUNT,             ZCL_DATA_TYPE_UINT16, ACCESS_CONTROL_READ, (u8*)&zcl_attr_alarmCount},
+#endif
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, ZCL_DATA_TYPE_UINT16, ACCESS_CONTROL_READ, (u8*)&zcl_attr_global_clusterRevision},
+};
+
+const u8 zcl_alarm_attrNum = (sizeof(alarm_attrTbl) / sizeof(zclAttrInfo_t));
+
+#endif /* ZCL_ALARMS */
+
+
 zcl_msAttr_t g_zcl_msAttrs = {
     .type = 0x09,               // bit0: Active measurement (AC). bit3: Phase A measurement
 #if USE_BL0942
-    .freq = 5000, // 0xffff,
+    .freq = 0xffff, // in 0.01 Hz (mutipler/divisor)
 #endif
-    .current = 0, // 0xffff
-    .voltage = 23000, // 0xffff,
-    .power = 0, // 0xffff,
-    .mutipler = 1, // for all
-    .divisor = 100, // voltage, freq
-    .power_divisor = 100,  // 10/100/1000: in 0.1, 0.01, 0.001 W
-    .current_divisor = 1000 // in 0.001A
+    .current = 0xffff, // in 0.001 A (mutipler/current_divisor)
+    .voltage = 0xffff, // in 0.01 V (mutipler/divisor)
+    .power = 0xffff, // in 0.1, 0.01, 0.001 W (mutipler/power_divisor)
+    .mutipler = 1, // mutipler for all
+    .divisor = 100, // voltage and freq div 100
+    .power_divisor = 100,  // power div 10,100,1000: in 0.1, 0.01, 0.001 W
+    .current_divisor = 1000 // current div 1000, in 0.001A
 };
 
 #ifndef MAX_VOLTAGE_DEF
@@ -566,7 +673,15 @@ const zcl_specClusterInfo_t g_appClusterList1[] =
 #ifdef ZCL_ON_OFF_SWITCH_CFG
     {ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG,  MANUFACTURER_CODE_NONE, ZCL_ON_OFF1_CFG_ATTR_NUM,   onOffCfg1_attrTbl,   zcl_onoffCfg_register,  NULL            },
 #endif
+#ifdef ZCL_MULTISTATE_INPUT
     {ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC,MANUFACTURER_CODE_NONE, ZCL_MSINPUT1_ATTR_NUM,      msInput1_attrTbl,    zcl_multistate_input_register,     app_msInputCb},
+#endif
+#ifdef ZCL_THERMOSTAT
+	{ZCL_CLUSTER_HAVC_THERMOSTAT, MANUFACTURER_CODE_NONE, ZCL_THERMOSTAT_UI_CFG_ATTR_NUM, thermostat_ui_cfg_attrTbl,	zcl_thermostat_register, 	NULL},
+#endif
+#ifdef ZCL_TEMPERATURE_MEASUREMENT
+	{ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,	MANUFACTURER_CODE_NONE, ZCL_TEMPERATURE_MEASUREMENT_ATTR_NUM, temperature_measurement_attrTbl, 	zcl_temperature_measurement_register, 	NULL},
+#endif
     {ZCL_CLUSTER_SE_METERING,               MANUFACTURER_CODE_NONE, ZCL_SE_ATTR_NUM,            se_attrTbl,          app_zcl_metering_register,         app_meteringCb  },
     {ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_MS_ATTR_NUM,            ms_attrTbl,          zcl_electricalMeasure_register,    NULL    },
 };

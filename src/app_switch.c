@@ -1,5 +1,7 @@
 #include "app_main.h"
 
+#if USE_SWITCH
+
 #define DEBOUNCE_SWITCH     128     /* number of polls for debounce                 */
 #define FR_COUNTER_MAX      10      /* number for factory reset                     */
 
@@ -326,3 +328,4 @@ bool switch_idle() {
     return false;
 }
 
+#endif // USE_SWITCH

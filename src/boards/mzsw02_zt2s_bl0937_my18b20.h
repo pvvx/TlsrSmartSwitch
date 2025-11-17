@@ -1,5 +1,5 @@
-#ifndef _MZSW01_BL0937_H_
-#define _MZSW01_BL0937_H_
+#ifndef _MZSW01_BL0937_MY18B20_H_
+#define _MZSW01_BL0937_MY18B20_H_
 
 /* Enable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
@@ -13,12 +13,22 @@ extern "C" {
 #define ZCL_BASIC_MFG_NAME     {11,'T','e','l','i','n','k','-','p','v','v','x'}
 #define ZCL_BASIC_MODEL_ID     {15,'M','Z','S','W','0','2','_','B','L','0','9','3','7','_','z'}
 
+#define USE_SENSOR_MY18B20		1
+
+/************************* Configure MY18B20 GPIO ***************************************/
+#if USE_SENSOR_MY18B20
+#define GPIO_ONEWIRE1           GPIO_PA1
+#endif
 /************************* Configure SWITCH GPIO ***************************************/
-#define USE_SWITCH				1
+#if USE_SWITCH
 #define SWITCH1_GPIO            GPIO_PA1
+#endif
+
+#define PA1_DATA_OUT            0
 #define PA1_INPUT_ENABLE        ON
 #define PA1_OUTPUT_ENABLE       OFF
 #define PA1_FUNC                AS_GPIO
+#define PULL_WAKEUP_SRC_PA1     PM_PIN_PULLUP_10K
 
 /************************* Configure KEY GPIO ***************************************/
 #define MAX_BUTTON_NUM  1
@@ -110,5 +120,5 @@ enum {
 
 #endif /* UART_PRINTF_MODE */
 
-#endif /* _MZSW01_BL0937_H_ */
+#endif /* _MZSW01_BL0937_MY18B20_H_ */
 
