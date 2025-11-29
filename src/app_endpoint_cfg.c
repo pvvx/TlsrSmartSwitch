@@ -378,21 +378,43 @@ const config_on_off_t cfg_on_off_def = {
 config_on_off_t cfg_on_off, cfg_on_off_saved;
 
 zcl_onOffAttr_t g_zcl_onOffAttrs = {
-        .globalSceneControl = 1,
-        .onTime             = 0x0000,
-        .offWaitTime        = 0x0000,
+        .globalSceneControl = TRUE,
+//        .onTime             = 0x0000,
+//        .offWaitTime        = 0x0000,
 };
 
 const zclAttrInfo_t onOff1_attrTbl[] = {
     { ZCL_ATTRID_ONOFF,                     ZCL_BOOLEAN,    RR,     (uint8_t*)&cfg_on_off.onOff               },
     { ZCL_ATTRID_GLOBAL_SCENE_CONTROL,      ZCL_BOOLEAN,    R,      (uint8_t*)&g_zcl_onOffAttrs.globalSceneControl  },
-    { ZCL_ATTRID_ON_TIME,                   ZCL_UINT16,     RW,     (uint8_t*)&g_zcl_onOffAttrs.onTime              },
-    { ZCL_ATTRID_OFF_WAIT_TIME,             ZCL_UINT16,     RW,     (uint8_t*)&g_zcl_onOffAttrs.offWaitTime         },
-    { ZCL_ATTRID_START_UP_ONOFF,            ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.startUpOnOff        },
+//    { ZCL_ATTRID_ON_TIME,                   ZCL_UINT16,     RW,     (uint8_t*)&g_zcl_onOffAttrs.onTime              },
+//    { ZCL_ATTRID_OFF_WAIT_TIME,             ZCL_UINT16,     RW,     (uint8_t*)&g_zcl_onOffAttrs.offWaitTime         },
+
+	{ ZCL_ATTRID_START_UP_ONOFF,            ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.startUpOnOff        },
+
 	// Custom Attr:
 	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
 	{ ZCL_ATTRID_CUSTOM_KEY_LOCK,           ZCL_BOOLEAN,    RW,     (uint8_t*)&cfg_on_off.key_lock        },
     { ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.led_control     },
+
+#if USE_CFG_GPIO
+    { ZCL_ATTRID_GPIO_RELAY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rl },
+    { ZCL_ATTRID_GPIO_LED1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.led1 },
+    { ZCL_ATTRID_GPIO_LED2,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.led2 },
+    { ZCL_ATTRID_GPIO_KEY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.key },
+    { ZCL_ATTRID_GPIO_SW1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.sw1 },
+#if USE_SENSOR_MY18B20
+    { ZCL_ATTRID_GPIO_SWIRE,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.swire },
+#endif
+#if USE_BL0937
+    { ZCL_ATTRID_GPIO_SEL,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.sel },
+    { ZCL_ATTRID_GPIO_CF,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.cf },
+    { ZCL_ATTRID_GPIO_CF1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.cf1 },
+#endif
+#if USE_BL0942
+    { ZCL_ATTRID_GPIO_RX,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rx },
+    { ZCL_ATTRID_GPIO_TX,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.tx },
+#endif
+#endif
 
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,      (uint8_t*)&zcl_attr_global_clusterRevision      },
 };
@@ -412,7 +434,7 @@ const zclAttrInfo_t onOffCfg1_attrTbl[] =
     { CUSTOM_ATTRID_SWITCH_TYPE,            ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchType  },
     { CUSTOM_ATTRID_DECOUPLED,              ZCL_ENUM8,    RWR,(u8*)&cfg_on_off.switchDecoupled   },
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,   R,  (u8*)&zcl_attr_global_clusterRevision           },
+	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,   R,  (u8*)&zcl_attr_global_clusterRevision           },
 };
 
 #define ZCL_ON_OFF1_CFG_ATTR_NUM       sizeof(onOffCfg1_attrTbl) / sizeof(zclAttrInfo_t)

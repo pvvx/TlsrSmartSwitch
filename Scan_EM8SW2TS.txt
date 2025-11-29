@@ -1,0 +1,1603 @@
+zha_toolkit_version: v1.1.33
+zigpy_version: 0.83.0
+zigpy_rf_version: 0.46.1
+ieee_org: update.telink_pvvx_em8sw2ts_z_firmware
+ieee: a4:c1:38:88:60:99:82:81
+command: scan_device
+params:
+  dir: 0
+  tries: 1
+  expect_reply: true
+  args: []
+  kwargs: {}
+  read_before_write: true
+  read_after_write: true
+scan:
+  ieee: a4:c1:38:88:60:99:82:81
+  nwk: "0x18c3"
+  model: EM8SW2TS_z
+  manufacturer: Telink-pvvx
+  manufacturer_id: "0x60000"
+  endpoints:
+    - id: 1
+      device_type: "0x0100"
+      profile: "0x0104"
+      in_clusters:
+        "0x0000":
+          cluster_id: "0x0000"
+          title: Basic
+          name: basic
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: zcl_version
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 3
+            "0x0001":
+              attribute_id: "0x0001"
+              attribute_name: app_version
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 3
+            "0x0002":
+              attribute_id: "0x0002"
+              attribute_name: stack_version
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 49
+            "0x0003":
+              attribute_id: "0x0003"
+              attribute_name: hw_version
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 15
+            "0x0004":
+              attribute_id: "0x0004"
+              attribute_name: manufacturer
+              value_type:
+                - "0x42"
+                - CharacterString
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: Telink-pvvx
+            "0x0005":
+              attribute_id: "0x0005"
+              attribute_name: model
+              value_type:
+                - "0x42"
+                - CharacterString
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: EM8SW2TS_z
+            "0x0006":
+              attribute_id: "0x0006"
+              attribute_name: date_code
+              value_type:
+                - "0x42"
+                - CharacterString
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: "20251129"
+            "0x0007":
+              attribute_id: "0x0007"
+              attribute_name: power_source
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+            "0x0012":
+              attribute_id: "0x0012"
+              attribute_name: device_enabled
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 1
+            "0x4000":
+              attribute_id: "0x4000"
+              attribute_name: sw_build_id
+              value_type:
+                - "0x42"
+                - CharacterString
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 8111-0301
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0003":
+          cluster_id: "0x0003"
+          title: Identify
+          name: identify
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: identify_time
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0004":
+          cluster_id: "0x0004"
+          title: Groups
+          name: groups
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: name_support
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0005":
+          cluster_id: "0x0005"
+          title: Scenes
+          name: scenes
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: count
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0x0001":
+              attribute_id: "0x0001"
+              attribute_name: current_scene
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0x0002":
+              attribute_id: "0x0002"
+              attribute_name: current_group
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0x0003":
+              attribute_id: "0x0003"
+              attribute_name: scene_valid
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0x0004":
+              attribute_id: "0x0004"
+              attribute_name: name_support
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0006":
+          cluster_id: "0x0006"
+          title: On/Off
+          name: on_off
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: on_off
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0x4000":
+              attribute_id: "0x4000"
+              attribute_name: global_scene_control
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+            "0x4003":
+              attribute_id: "0x4003"
+              attribute_name: start_up_on_off
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 255
+            "0xf000":
+              attribute_id: "0xf000"
+              attribute_name: "61440"
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0xf001":
+              attribute_id: "0xf001"
+              attribute_name: "61441"
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xf002":
+              attribute_id: "0xf002"
+              attribute_name: "61442"
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2
+            "0xf100":
+              attribute_id: "0xf100"
+              attribute_name: "61696"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 772
+            "0xf101":
+              attribute_id: "0xf101"
+              attribute_name: "61697"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 258
+            "0xf102":
+              attribute_id: "0xf102"
+              attribute_name: "61698"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xf103":
+              attribute_id: "0xf103"
+              attribute_name: "61699"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 896
+            "0xf104":
+              attribute_id: "0xf104"
+              attribute_name: "61700"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2
+            "0xf105":
+              attribute_id: "0xf105"
+              attribute_name: "61701"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2
+            "0xf106":
+              attribute_id: "0xf106"
+              attribute_name: "61702"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 776
+            "0xf107":
+              attribute_id: "0xf107"
+              attribute_name: "61703"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 272
+            "0xf108":
+              attribute_id: "0xf108"
+              attribute_name: "61704"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 288
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0007":
+          cluster_id: "0x0007"
+          title: On/Off Switch Configuration
+          name: on_off_config
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: switch_type
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 3
+            "0x0010":
+              attribute_id: "0x0010"
+              attribute_name: switch_actions
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 1
+            "0xf003":
+              attribute_id: "0xf003"
+              attribute_name: "61443"
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 3
+            "0xf004":
+              attribute_id: "0xf004"
+              attribute_name: "61444"
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE|REPORT
+              access_acl: 7
+              manf_id: 60000
+              attribute_value: 0
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0012":
+          cluster_id: "0x0012"
+          title: MultistateInput
+          name: multistate_input
+          attributes:
+            "0x004a":
+              attribute_id: "0x004a"
+              attribute_name: number_of_states
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 8
+            "0x0051":
+              attribute_id: "0x0051"
+              attribute_name: out_of_service
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0x0055":
+              attribute_id: "0x0055"
+              attribute_name: present_value
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE|REPORT
+              access_acl: 7
+              manf_id: 60000
+              attribute_value: 300
+            "0x006f":
+              attribute_id: "0x006f"
+              attribute_name: status_flags
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0201":
+          cluster_id: "0x0201"
+          title: Thermostat
+          name: thermostat
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: local_temperature
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 2312
+            "0x0002":
+              attribute_id: "0x0002"
+              attribute_name: occupancy
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+            "0x0003":
+              attribute_id: "0x0003"
+              attribute_name: abs_min_heat_setpoint_limit
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: -5000
+            "0x0004":
+              attribute_id: "0x0004"
+              attribute_name: abs_max_heat_setpoint_limit
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 12500
+            "0x0005":
+              attribute_id: "0x0005"
+              attribute_name: abs_min_cool_setpoint_limit
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: -5000
+            "0x0006":
+              attribute_id: "0x0006"
+              attribute_name: abs_max_cool_setpoint_limit
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 12500
+            "0x0007":
+              attribute_id: "0x0007"
+              attribute_name: pi_cooling_demand
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0x0008":
+              attribute_id: "0x0008"
+              attribute_name: pi_heating_demand
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0x0010":
+              attribute_id: "0x0010"
+              attribute_name: local_temperature_calibration
+              value_type:
+                - "0x28"
+                - int8s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0x0011":
+              attribute_id: "0x0011"
+              attribute_name: occupied_cooling_setpoint
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2400
+            "0x0012":
+              attribute_id: "0x0012"
+              attribute_name: occupied_heating_setpoint
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2600
+            "0x0013":
+              attribute_id: "0x0013"
+              attribute_name: unoccupied_cooling_setpoint
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2600
+            "0x0014":
+              attribute_id: "0x0014"
+              attribute_name: unoccupied_heating_setpoint
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2400
+            "0x001b":
+              attribute_id: "0x001b"
+              attribute_name: ctrl_sequence_of_oper
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 5
+            "0x001c":
+              attribute_id: "0x001c"
+              attribute_name: system_mode
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0x001e":
+              attribute_id: "0x001e"
+              attribute_name: running_mode
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0x0029":
+              attribute_id: "0x0029"
+              attribute_name: running_state
+              value_type:
+                - "0x19"
+                - bitmap16
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: "65533"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0402":
+          cluster_id: "0x0402"
+          title: Temperature Measurement
+          name: temperature
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: measured_value
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 2312
+            "0x0001":
+              attribute_id: "0x0001"
+              attribute_name: min_measured_value
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: -5000
+            "0x0002":
+              attribute_id: "0x0002"
+              attribute_name: max_measured_value
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 17500
+            "0x0003":
+              attribute_id: "0x0003"
+              attribute_name: tolerance
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0xf00c":
+              attribute_id: "0xf00c"
+              attribute_name: "61452"
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 878993704
+            "0xf00d":
+              attribute_id: "0xf00d"
+              attribute_name: "61453"
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0xf00e":
+              attribute_id: "0xf00e"
+              attribute_name: "61454"
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 409600
+            "0xf00f":
+              attribute_id: "0xf00f"
+              attribute_name: "61455"
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xf010":
+              attribute_id: "0xf010"
+              attribute_name: "61456"
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 15
+            "0xf011":
+              attribute_id: "0xf011"
+              attribute_name: "61457"
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: -5000
+            "0xf012":
+              attribute_id: "0xf012"
+              attribute_name: "61458"
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 819260536
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0702":
+          cluster_id: "0x0702"
+          title: Metering
+          name: smartenergy_metering
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: current_summ_delivered
+              value_type:
+                - "0x25"
+                - uint48_t
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 15
+            "0x0200":
+              attribute_id: "0x0200"
+              attribute_name: status
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0x0300":
+              attribute_id: "0x0300"
+              attribute_name: unit_of_measure
+              value_type:
+                - "0x20"
+                - uint8_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0x0301":
+              attribute_id: "0x0301"
+              attribute_name: multiplier
+              value_type:
+                - "0x22"
+                - uint24_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+            "0x0302":
+              attribute_id: "0x0302"
+              attribute_name: divisor
+              value_type:
+                - "0x22"
+                - uint24_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 100000
+            "0x0303":
+              attribute_id: "0x0303"
+              attribute_name: summation_formatting
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 250
+            "0x0306":
+              attribute_id: "0x0306"
+              attribute_name: metering_device_type
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: "65533"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0b04":
+          cluster_id: "0x0b04"
+          title: Electrical Measurement
+          name: electrical_measurement
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: measurement_type
+              value_type:
+                - "0x1b"
+                - bitmap32
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 9
+            "0x0505":
+              attribute_id: "0x0505"
+              attribute_name: rms_voltage
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 22542
+            "0x0508":
+              attribute_id: "0x0508"
+              attribute_name: rms_current
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 2
+            "0x050b":
+              attribute_id: "0x050b"
+              attribute_name: active_power
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0x0514":
+              attribute_id: "0x0514"
+              attribute_name: rms_extreme_over_voltage_period
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0x0515":
+              attribute_id: "0x0515"
+              attribute_name: rms_extreme_under_voltage_period
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0x0517":
+              attribute_id: "0x0517"
+              attribute_name: rms_voltage_swell_period
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 8
+            "0x0600":
+              attribute_id: "0x0600"
+              attribute_name: ac_voltage_multiplier
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+            "0x0601":
+              attribute_id: "0x0601"
+              attribute_name: ac_voltage_divisor
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 100
+            "0x0602":
+              attribute_id: "0x0602"
+              attribute_name: ac_current_multiplier
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+            "0x0603":
+              attribute_id: "0x0603"
+              attribute_name: ac_current_divisor
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1000
+            "0x0604":
+              attribute_id: "0x0604"
+              attribute_name: ac_power_multiplier
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+            "0x0605":
+              attribute_id: "0x0605"
+              attribute_name: ac_power_divisor
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 100
+            "0x0807":
+              attribute_id: "0x0807"
+              attribute_name: rms_extreme_over_voltage
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 26000
+            "0x0808":
+              attribute_id: "0x0808"
+              attribute_name: rms_extreme_under_voltage
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 18000
+            "0x080a":
+              attribute_id: "0x080a"
+              attribute_name: rms_voltage_swell
+              value_type:
+                - "0x29"
+                - int16s
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 25000
+            "0xf005":
+              attribute_id: "0xf005"
+              attribute_name: "61445"
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xf006":
+              attribute_id: "0xf006"
+              attribute_name: "61446"
+              value_type:
+                - "0x18"
+                - bitmap8
+                - Discrete
+              access: READ|WRITE|REPORT
+              access_acl: 7
+              manf_id: 60000
+              attribute_value: 0
+            "0xf007":
+              attribute_id: "0xf007"
+              attribute_name: "61447"
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 178060
+            "0xf008":
+              attribute_id: "0xf008"
+              attribute_name: "61448"
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 197732
+            "0xf009":
+              attribute_id: "0xf009"
+              attribute_name: "61449"
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 1081452
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+      out_clusters:
+        "0x0006":
+          cluster_id: "0x0006"
+          title: On/Off
+          name: on_off
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: on_off
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0x4000":
+              attribute_id: "0x4000"
+              attribute_name: global_scene_control
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+            "0x4003":
+              attribute_id: "0x4003"
+              attribute_name: start_up_on_off
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 255
+            "0xf000":
+              attribute_id: "0xf000"
+              attribute_name: "61440"
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ|REPORT
+              access_acl: 5
+              manf_id: 60000
+              attribute_value: 0
+            "0xf001":
+              attribute_id: "0xf001"
+              attribute_name: "61441"
+              value_type:
+                - "0x10"
+                - Bool
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xf002":
+              attribute_id: "0xf002"
+              attribute_name: "61442"
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2
+            "0xf100":
+              attribute_id: "0xf100"
+              attribute_name: "61696"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 772
+            "0xf101":
+              attribute_id: "0xf101"
+              attribute_name: "61697"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 258
+            "0xf102":
+              attribute_id: "0xf102"
+              attribute_name: "61698"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xf103":
+              attribute_id: "0xf103"
+              attribute_name: "61699"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 896
+            "0xf104":
+              attribute_id: "0xf104"
+              attribute_name: "61700"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2
+            "0xf105":
+              attribute_id: "0xf105"
+              attribute_name: "61701"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 2
+            "0xf106":
+              attribute_id: "0xf106"
+              attribute_name: "61702"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 776
+            "0xf107":
+              attribute_id: "0xf107"
+              attribute_name: "61703"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 272
+            "0xf108":
+              attribute_id: "0xf108"
+              attribute_name: "61704"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 288
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+        "0x0019":
+          cluster_id: "0x0019"
+          title: Ota
+          name: ota
+          attributes:
+            "0x0000":
+              attribute_id: "0x0000"
+              attribute_name: upgrade_server_id
+              value_type:
+                - "0xf0"
+                - EUI64
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value:
+                - 158
+                - 117
+                - 217
+                - 254
+                - 255
+                - 226
+                - 10
+                - 104
+            "0x0001":
+              attribute_id: "0x0001"
+              attribute_name: file_offset
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 4294967295
+            "0x0002":
+              attribute_id: "0x0002"
+              attribute_name: current_file_version
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 50409473
+            "0x0003":
+              attribute_id: "0x0003"
+              attribute_name: current_zigbee_stack_version
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 2
+            "0x0004":
+              attribute_id: "0x0004"
+              attribute_name: downloaded_file_version
+              value_type:
+                - "0x23"
+                - uint32_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 4294967295
+            "0x0005":
+              attribute_id: "0x0005"
+              attribute_name: downloaded_zigbee_stack_version
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 65535
+            "0x0006":
+              attribute_id: "0x0006"
+              attribute_name: image_upgrade_status
+              value_type:
+                - "0x30"
+                - enum8
+                - Discrete
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0x0007":
+              attribute_id: "0x0007"
+              attribute_name: manufacturer_id
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 60000
+            "0x0008":
+              attribute_id: "0x0008"
+              attribute_name: image_type_id
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 65535
+            "0x0009":
+              attribute_id: "0x0009"
+              attribute_name: minimum_block_req_delay
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 0
+            "0xfffd":
+              attribute_id: "0xfffd"
+              attribute_name: cluster_revision
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ
+              access_acl: 1
+              manf_id: 60000
+              attribute_value: 1
+          commands_received: {}
+          commands_generated: {}
+    - id: 242
+      device_type: "0x0061"
+      profile: "0xa1e0"
+success: true

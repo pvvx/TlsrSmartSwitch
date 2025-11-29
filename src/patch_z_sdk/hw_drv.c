@@ -55,10 +55,10 @@ u32 sysTimerPerUs;
  *
  * @return  None
  */
-static void internalFlashSizeCheck(void){
+static void internalFlashSizeCheck(void) {
 	u32 mid = flash_read_mid();
 	mid >>= 16;
-	mid &= 0xff;
+	mid &= 0xff; // mid >> 4 = size Flash in kb
 	if( mid < FLASH_SIZE_512K) {
 		mid = FLASH_SIZE_512K;
 	} else if(mid > FLASH_SIZE_4M) {
@@ -66,16 +66,16 @@ static void internalFlashSizeCheck(void){
 	}
 	switch(mid){
 		case FLASH_SIZE_1M:
-			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_1M;
-			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_1M;
+			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_1M;	 // MAC_BASE_ADD
+			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_1M; // FACTORY_CFG_BASE_ADD
 			break;
 		case FLASH_SIZE_2M:
-			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_2M;
-			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_2M;
+			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_2M;   // MAC_BASE_ADD
+			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_2M; // FACTORY_CFG_BASE_ADD
 			break;
 		case FLASH_SIZE_4M:
-			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_4M;
-			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_4M;
+			g_u32MacFlashAddr = FLASH_ADDR_OF_MAC_ADDR_4M;   // MAC_BASE_ADD
+			g_u32CfgFlashAddr = FLASH_ADDR_OF_F_CFG_INFO_4M; // FACTORY_CFG_BASE_ADD
 			break;
 		default:
 			break;

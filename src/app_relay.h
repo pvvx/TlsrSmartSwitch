@@ -34,6 +34,11 @@ void set_relay_status(bool status);
 void set_therm_relay_status(bool status);
 #endif
 
+#if USE_CFG_GPIO
+dev_gpios_t  dev_gpios_new;
+void save_config_gpio(void);
+#endif
+
 void dev_relay_init(void);
 
 #endif /* SRC_INCLUDE_APP_RELAY_H_ */

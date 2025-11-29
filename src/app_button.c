@@ -9,17 +9,21 @@ static int32_t net_steer_start_offCb(void *args) {
     return -1;
 }
 
+void factory_reset_start(void *args) {
+
+    zb_factoryReset();
+
+    g_appCtx.net_steer_start = true;
+    TL_ZB_TIMER_SCHEDULE(net_steer_start_offCb, NULL, TIMEOUT_1MIN30SEC);
+    light_blink_start(90, 250, 750);
+}
+
 static void buttonKeepPressed(u8 btNum) {
     g_appCtx.button[btNum-1].state = APP_FACTORY_NEW_DOING;
     g_appCtx.button[btNum-1].ctn = 0;
 
     if(btNum == VK_SW1) {
-
-    	zb_factoryReset();
-
-        g_appCtx.net_steer_start = true;
-        TL_ZB_TIMER_SCHEDULE(net_steer_start_offCb, NULL, TIMEOUT_1MIN30SEC);
-        light_blink_start(90, 250, 750);
+    	factory_reset_start(NULL);
     }
 }
 

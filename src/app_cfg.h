@@ -56,9 +56,9 @@ extern "C" {
 0x100000  ------------
          |  MAC_Addr  |
  0xFF000 |------------|
-         | F_CFG_Info |
+         | F_CFG_Info | // FACTORY_CFG_BASE_ADD
  0xFE000 |------------|
-         | U_Cfg_Info |
+         | U_Cfg_Info | // 0xFC000 CFG_FACTORY_RST_CNT
  0xFC000 |------------|
          | USER_DATA  |
  0x96000 |------------|
@@ -70,24 +70,24 @@ extern "C" {
          |            |
          |            |
  0x40000 |------------|
-         |            |
+         |            | // 0x32000 FLASH_ADDR_TAB_GPIOS
          |            |
          |  Firmware  | 256K
          |            |
          |            |
  0x00000  ------------
 */
-    #define BEGIN_USER_DATA_F1M            0x96000   // begin address for saving energy
-    #define END_USER_DATA_F1M              0xFC000   // end address for saving energy
+#define BEGIN_USER_DATA_F1M            0x96000   // begin address for saving energy
+#define END_USER_DATA_F1M              0xFC000   // end address for saving energy
 /*  Flash 512k map:
      0x80000  ------------
              |            |
              |    NV_2    |
              |            |
      0x7A000 |------------|
-             | U_Cfg_Info |
+             | U_Cfg_Info | // 0x79000 CFG_FACTORY_RST_CNT
      0x78000 |------------|
-             | F_CFG_Info |
+             | F_CFG_Info | // 0x77000 FACTORY_CFG_BASE_ADD
      0x77000 |------------|
              |  MAC_Addr  |
      0x76000 |------------|
@@ -101,19 +101,36 @@ extern "C" {
              |    NV_1    |
              |            |
      0x34000 |------------|
-             |   free     |
+             |   free     | // 0x32000 FLASH_ADDR_TAB_GPIOS
      0x32000 |------------|
              |            |
              |  Firmware  | 200k
              |            |
      0x00000  ------------
  */
-    #define BEGIN_USER_DATA_F512K             0x72000 // begin address for saving energy
-    #define END_USER_DATA_F512K               0x76000 // end address for saving energy
-
+#define BEGIN_USER_DATA_F512K             0x72000 // begin address for saving energy
+#define END_USER_DATA_F512K               0x76000 // end address for saving energy
+#define FLASH_ADDR_TAB_GPIOS		  	  0x32000
+/** Store zigbee information in flash:
+ ********************************************************************************************************
+ *   Module ID                  |          512K Flash               |              1M Flash             |
+ * -----------------------------|-----------------------------------|-----------------------------------|
+ * NV_MODULE_ZB_INFO            |        0x34000 - 0x36000          |	      0x80000 - 0x82000         |
+ * NV_MODULE_ADDRESS_TABLE      |        0x36000 - 0x38000          |         0x82000 - 0x84000         |
+ * NV_MODULE_APS                |        0x38000 - 0x3a000          |         0x84000 - 0x86000         |
+ * NV_MODULE_ZCL                |        0x3a000 - 0x3c000          |         0x86000 - 0x88000         |
+ * NV_MODULE_NWK_FRAME_COUNT	|        0x3c000 - 0x3e000          |         0x88000 - 0x8a000         |
+ * NV_MODULE_OTA                |        0x3e000 - 0x40000          |         0x8a000 - 0x8c000         |
+ * NV_MODULE_APP                |        0x7a000 - 0x7c000          |         0x8c000 - 0x8e000         |
+ * NV_MODULE_KEYPAIR            |        0x7c000 - 0x80000          |         0x8e000 - 0x96000         |
+ *                              |    *16K - can store 127 nodes     |     *32K - can store 302 nodes    |
+ * NV_MAX_MODULS
+ */
 #ifndef BOARD // in "version_cfg.h"
 #error "Define BOARD!"
 #endif
+
+#define USE_CFG_GPIO	1
 
 #define ZCL_BASIC_MFG_NAME     {11,'T','e','l','i','n','k','-','p','v','v','x'}
 
@@ -292,13 +309,8 @@ enum {
 /**********************************************************************
  * Battery & RF Power
  */
-#ifndef USE_BATTERY
-#define USE_BATTERY     BATTERY_DC_DC
-#endif
 
 /*** Configure  GPIO Vbat ***/
-
-#define USE_BATTERY			BATTERY_DC_DC
 
 #define SHL_ADC_VBAT        1  // "B0P" in adc.h
 #define GPIO_VBAT           GPIO_PB0 // missing pin on case TLSR8251F512ET24
@@ -306,6 +318,7 @@ enum {
 #define PB0_DATA_OUT        1
 #define PB0_OUTPUT_ENABLE   1
 #define PB0_FUNC            AS_GPIO
+#define PULL_WAKEUP_SRC_PB0 PM_PIN_PULLUP_10K
 
 /* Voltage detect module */
 #define VOLTAGE_DETECT_ENABLE       0 // always = 0!
@@ -369,7 +382,7 @@ typedef enum{
  * Modules configuration
  */
 
-#define ZB_DEFAULT_TX_POWER_IDX ZB_TX_POWER_IDX_DEF
+//#define ZB_DEFAULT_TX_POWER_IDX ZB_TX_POWER_IDX_DEF
 
 #define ON                  1
 #define OFF                 0
@@ -388,7 +401,6 @@ typedef enum{
 /**********************************************************************
  * Stack configuration
  */
-#include "includes/zb_config.h"
 #include "stack_cfg.h"
 
 /**********************************************************************

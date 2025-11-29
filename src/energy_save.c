@@ -64,7 +64,9 @@ static void save_dataCb(void *args) {
 	battery_detect(0);
 
 	energy_delta.delta = g_zcl_seAttrs.cur_sum_delivered - save_data.energy;
-	if(energy_delta.delta > 10) { // > 1 W
+	// if < 0.1/60 Wh (всё отключено) -> пропустить эту запись,
+	// будет записано в следующий раз, когда накопится больше
+	if(energy_delta.delta > 10) {
 		save_data.energy = g_zcl_seAttrs.cur_sum_delivered;
 	    if (energy_cons.flash_addr_save >= energy_cons.flash_addr_end) {
 	        energy_cons.flash_addr_save = energy_cons.flash_addr_start;
@@ -100,7 +102,7 @@ static void init_save_addr_drv(void) {
 	u32 mid = flash_read_mid();
 	mid >>= 16;
 	mid &= 0xff;
-	if(mid >= FLASH_SIZE_1M) {
+	if(mid == FLASH_SIZE_1M) {
         energy_cons.flash_addr_start = BEGIN_USER_DATA_F1M;
         energy_cons.flash_addr_end = END_USER_DATA_F1M;
     } else {

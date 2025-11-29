@@ -3,7 +3,7 @@ Alternative firmwares for Smart Switch on the TLSR925x chipset.
 
 ## The repository is under development!
 
-Current FW Version: 0.0.0.4 (for test)
+Current FW Version: 0.0.0.5 (for test)
 
 Supported device models:
 
@@ -33,6 +33,7 @@ Optimizations have been made:
 * The start and restart intervals are counted using threshold values. If any threshold is triggered, the countdown begins again.
 * Added thermometer and thermostat with MY18B20 sensor.
 * The flash memory's lifespan has been extended to maintain energy metering. Energy is recorded every minute. For 512 KB flash memory, the minimum write life is 77 years, and for 1 MB flash memory, it's over 1,000 years.
+* Added GPIOs modification.
 
 Further development:
 

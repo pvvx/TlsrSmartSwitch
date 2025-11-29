@@ -35,6 +35,25 @@
 #define ZCL_TEMPERATURE_MIN					0xF011 // emergency
 #define ZCL_TEMPERATURE_MAX					0xF012 // emergency
 
+#if USE_CFG_GPIO
+#define ZCL_ATTRID_GPIO_RELAY				0xF100
+#define ZCL_ATTRID_GPIO_LED1				0xF101
+#define ZCL_ATTRID_GPIO_LED2				0xF102
+#define ZCL_ATTRID_GPIO_KEY					0xF103
+#define ZCL_ATTRID_GPIO_SW1					0xF104
+#if USE_SENSOR_MY18B20
+#define ZCL_ATTRID_GPIO_SWIRE				0xF105
+#endif
+#if USE_BL0937
+#define ZCL_ATTRID_GPIO_SEL					0xF106
+#define ZCL_ATTRID_GPIO_CF					0xF107
+#define ZCL_ATTRID_GPIO_CF1					0xF108
+#endif
+#if USE_BL0942
+#define ZCL_ATTRID_GPIO_RX					0xF109
+#define ZCL_ATTRID_GPIO_TX					0xF10A
+#endif
+#endif
 
 /**
  *  @brief Defined for basic cluster attributes
@@ -176,8 +195,8 @@ typedef struct {
 extern config_on_off_t cfg_on_off, cfg_on_off_saved;
 
 typedef struct {
-    uint16_t onTime;
-    uint16_t offWaitTime;
+//    uint16_t onTime;
+//    uint16_t offWaitTime;
     bool     globalSceneControl;
 } zcl_onOffAttr_t;
 

@@ -51,8 +51,8 @@ extern app_ctx_t g_appCtx;
 extern bdb_commissionSetting_t g_bdbCommissionSetting;
 extern bdb_appCb_t g_zbBdbCb;
 
-extern uint8_t device_online;
-extern uint8_t resp_time;
+//extern uint8_t device_online;
+//extern uint8_t resp_time;
 
 status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
 status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);

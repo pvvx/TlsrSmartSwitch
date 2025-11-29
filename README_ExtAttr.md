@@ -10,6 +10,25 @@
 * Attribute 0xF001: _led_control_ - 0: LED OFF, 1: LED ON, 2: LED ON/OFF
 * Attribute 0xF002: _Switch_Type_ - 0: TOGGLE, 1: MOMENTARY, 2: MULTIFUNCTION, 3: TERMOSTAT
 
+* Attribute 0xF100: _gpio_realy_ - номер gpio дл€ подключени€ реле
+* Attribute 0xF101: _gpio_led1_ - номер gpio дл€ подключени€ светодиода состо€ни€
+* Attribute 0xF102: _gpio_led2_ - номер gpio дл€ подключени€ светодиода On/Off (=0 - не использетс€)
+* Attribute 0xF103: _gpio_key_ - номер gpio дл€ подключени€ кнопки
+* Attribute 0xF104: _gpio_switch_ - номер gpio дл€ подключени€ внешней кнопки (может совпадать с _gpio_swire_)
+* Attribute 0xF105: _gpio_swire_ - номер gpio дл€ подключени€ MY18B20 (может совпадать с _gpio_switch_)
+* Attribute 0xF106: _gpio_sel_ - номер gpio дл€ подключени€ BL0937 вывода SEL (8)
+* Attribute 0xF107: _gpio_cf_ - номер gpio дл€ подключени€ BL0937 вывода CF (6)
+* Attribute 0xF108: _gpio_cf1_ - номер gpio дл€ подключени€ BL0937 вывода CF1 (7)
+* Attribute 0xF109: _gpio_rx_ - номер gpio дл€ подключени€ BL0942 вывода TX (10), вариатны: [PA0,PB0,PB7,PC3,PC5,PD6]
+* Attribute 0xF10A: _gpio_tx_ - номер gpio дл€ подключени€ BL0942 вывода RX (9), вариатны: [PA2,PB1,PC2,PD0,PD3,PD7]
+
+(!) ≈сли номер GPIO не назначен, то устанавливливаетс€ номер GPIO по умолчанию (установленный в прошивке).
+
+(!) Ќазначенные номер GPIO не должны совпадать. ¬ыбор GPIO производитс€ по имеющимс€ у модул€ или чипа выводам.
+
+(!) ќбработка новых настроек GPIO обратываетс€ только при перезагрузке устройства.
+ѕосле перенастройки номеров GPIO следует перезапустить питание устройства. 
+
 ### Cluster 0x0007: _OnOff_ 
 
 * Attribute 0xF003: _Switch_Decoupled_ - 0: Off, 1: On

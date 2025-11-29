@@ -224,10 +224,6 @@ uint8_t *print_str_zcl(uint8_t *str_zcl) {
     return str;
 }
 
-#ifdef ZCL_OTA
-uint32_t mcuBootAddrGet(void);
-#endif
-
 void start_message() {
 
 #ifdef ZCL_OTA

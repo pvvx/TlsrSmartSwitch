@@ -154,7 +154,8 @@ enum {
 	NBIT_MIN_MAX_CONFIG,
 	NBIT_SENSOR_CONFIG,
 	NBIT_MY18B20_CONFIG,
-	NBIT_THERM_CONFIG
+	NBIT_THERM_CONFIG,
+	NBIT_GPIO_CONFIG
 };
 /*********************************************************************
  * @fn      app_zclWriteReqCmd
@@ -176,8 +177,12 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
     	data = attr[i].attrData[0];
     	attrID = attr[i].attrID;
 		if (clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
-			if (attrID == ZCL_ATTRID_START_UP_ONOFF) {
-				cfg_on_off.startUpOnOff = data;
+#if USE_CFG_GPIO
+			if(attrID >= ZCL_ATTRID_GPIO_RELAY) {
+				save |= BIT(NBIT_GPIO_CONFIG);
+			} else
+#endif
+			if (attrID >= ZCL_ATTRID_START_UP_ONOFF) {
 				save |= BIT(NBIT_ON_OFF_CONFIG);
 			}
 #if USE_SWITCH
@@ -263,6 +268,11 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
 		set_relay_status(cfg_on_off.onOff);
 #endif
     }
+#if USE_CFG_GPIO
+    if (save & BIT(NBIT_GPIO_CONFIG)) {
+    	save_config_gpio();
+    }
+#endif
 #ifdef ZCL_POLL_CTRL
     if(clusterId == ZCL_CLUSTER_GEN_POLL_CONTROL){
         for(int32_t i = 0; i < numAttr; i++){
@@ -755,87 +765,6 @@ status_t app_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdP
 #endif	/* ZCL_SCENE */
 
 
-/*********************************************************************
- * @fn      app_timeCb
- *
- * @brief   Handler for ZCL Identify command.
- *
- * @param   pAddrInfo
- * @param   cmdId
- * @param   cmdPayload
- *
- * @return  status_t
- */
-status_t app_timeCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
-
-    //printf("app_timeCb. cmd: 0x%x\r\n", cmdId);
-
-    return ZCL_STA_SUCCESS;
-}
-
-
-
-static int32_t checkRespTimeCb(void *arg) {
-
-    if (device_online) {
-        if (!resp_time) {
-            if (count_no_service++ == 3) {
-                device_online = false;
-#if UART_PRINTF_MODE// && DEBUG_LEVEL
-                printf("No service!\r\n");
-#endif
-            }
-        } else {
-            count_no_service = 0;
-        }
-    } else {
-        if (resp_time) {
-            device_online = true;
-            count_no_service = 0;
-#if UART_PRINTF_MODE// && DEBUG_LEVEL
-            printf("Device online\r\n");
-#endif
-        }
-    }
-
-    resp_time = false;
-
-    return -1;
-}
-
-
-int32_t getTimeCb(void *arg) {
-
-    if(zb_isDeviceJoinedNwk()){
-        epInfo_t dstEpInfo;
-        TL_SETSTRUCTCONTENT(dstEpInfo, 0);
-
-        dstEpInfo.profileId = HA_PROFILE_ID;
-#if FIND_AND_BIND_SUPPORT
-        dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
-#else
-        dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
-        dstEpInfo.dstEp = APP_ENDPOINT1;
-        dstEpInfo.dstAddr.shortAddr = 0x0;
-#endif
-        zclAttrInfo_t *pAttrEntry;
-        pAttrEntry = zcl_findAttribute(APP_ENDPOINT1, ZCL_CLUSTER_GEN_TIME, ZCL_ATTRID_TIME);
-
-        zclReadCmd_t *pReadCmd = (zclReadCmd_t *)ev_buf_allocate(sizeof(zclReadCmd_t) + sizeof(uint16_t));
-        if(pReadCmd){
-            pReadCmd->numAttr = 1;
-            pReadCmd->attrID[0] = ZCL_ATTRID_TIME;
-
-            zcl_read(APP_ENDPOINT1, &dstEpInfo, ZCL_CLUSTER_GEN_TIME, MANUFACTURER_CODE_NONE, 0, 0, 0, pReadCmd);
-
-            ev_buf_free((uint8_t *)pReadCmd);
-
-            TL_ZB_TIMER_SCHEDULE(checkRespTimeCb, NULL, TIMEOUT_2SEC);
-        }
-    }
-
-    return 0;
-}
 
 status_t app_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload) {
 
@@ -855,22 +784,11 @@ status_t app_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayloa
     		case ZCL_CMD_ONOFF_TOGGLE:
     			cmdOnOff_toggle();
     			break;
-//          case ZCL_CMD_OFF_WITH_EFFECT:
-//              if(pOnOff->globalSceneControl == TRUE)
-//   				/* TODO: store its settings in its global scene */
-//              	pOnOff->globalSceneControl = FALSE;
-//              }
-//              sampleLight_onoff_offWithEffectProcess((zcl_onoff_offWithEffectCmd_t *)cmdPayload);
-//              break;
     		case ZCL_CMD_ON_WITH_RECALL_GLOBAL_SCENE:
-    			if(pOnOff->globalSceneControl == FALSE){
-//              	app_onoff_onWithRecallGlobalSceneProcess();
-                    pOnOff->globalSceneControl = TRUE;
-    			}
+//    			if(pOnOff->globalSceneControl == FALSE){
+                pOnOff->globalSceneControl = TRUE;
+//    			}
     			break;
-//          case ZCL_CMD_ON_WITH_TIMED_OFF:
-//              sampleLight_onoff_onWithTimedOffProcess((zcl_onoff_onWithTimeOffCmd_t *)cmdPayload);
-//              break;
             default:
             	break;
             }

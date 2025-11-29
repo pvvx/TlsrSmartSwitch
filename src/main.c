@@ -4,18 +4,8 @@
  * @brief   This is the source file for main
  *
  *******************************************************************************************************/
-
-#include "zb_common.h"
+#include "app_main.h"
 #include "ext_ota.h"
-#if USE_BLE
-#include "stack/ble/ble_config.h"
-#include "stack/ble/ble_common.h"
-#include "stack/ble/ble.h"
-#include "zigbee_ble_switch.h"
-#include "zcl_include.h"
-#include "app_ui.h"
-#include "ble_cfg.h"
-#endif
 
 #define ID_BOOTABLE 0x544c4e4b
 

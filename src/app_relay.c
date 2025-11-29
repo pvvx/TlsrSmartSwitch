@@ -6,6 +6,12 @@ typedef struct {
 	dev_gpios_t gpios;
 } ext_tab_gpios_t;
 
+typedef struct {
+	uint32_t id[2];
+	dev_gpios_t gpios;
+	uint32_t crc;
+} flash_tab_gpios_t;
+
 const ext_tab_gpios_t  tab_gpios = {
 	.id = { 0x5F424154, 0x4F495047 }, // "TAB_GPIO"
 	.gpios = {
@@ -108,8 +114,49 @@ void gpio_output_init(GPIO_PinTypeDef pin, uint8_t value) {
 
 extern u32 scan_pins[1]; // in drv_keyboard.c
 
+#if USE_CFG_GPIO
+
+dev_gpios_t  dev_gpios_new;
+
+static void save_fgpio(flash_tab_gpios_t * pftab) {
+	pftab->id[0] = tab_gpios.id[0];
+	pftab->id[1] = tab_gpios.id[1];
+	pftab->crc = xcrc32((uint8_t *)&pftab->gpios, sizeof(tab_gpios.gpios), 0xffffffff);
+	flash_erase(FLASH_ADDR_TAB_GPIOS);
+	flash_write_page(FLASH_ADDR_TAB_GPIOS, sizeof(flash_tab_gpios_t), (uint8_t *) pftab);
+}
+
+void save_config_gpio(void) {
+	flash_tab_gpios_t ftab;
+	flash_read_page(FLASH_ADDR_TAB_GPIOS, sizeof(ftab), (uint8_t *)&ftab);
+	if(memcmp(&ftab.gpios, &dev_gpios, sizeof(ftab.gpios))) {
+		save_fgpio(&ftab);
+	}
+}
+
+static void flash_gpios_init(void) {
+	flash_tab_gpios_t ftab;
+	flash_read_page(FLASH_ADDR_TAB_GPIOS, sizeof(ftab), (uint8_t *)&ftab);
+	if(tab_gpios.id[0] == ftab.id[0]
+		&& tab_gpios.id[1] == ftab.id[1]
+		&& xcrc32((uint8_t *)&ftab.gpios, sizeof(ftab.gpios), 0xffffffff) == ftab.crc) {
+		memcpy(&dev_gpios, &ftab.gpios, sizeof(dev_gpios));
+	} else {
+		memcpy(&dev_gpios, &tab_gpios.gpios, sizeof(dev_gpios));
+		memcpy(&ftab.gpios, &tab_gpios.gpios, sizeof(dev_gpios));
+		save_fgpio(&ftab);
+		factory_reset_start(NULL);
+	}
+	memcpy(&dev_gpios_new, &dev_gpios, sizeof(dev_gpios));
+}
+#endif
+
 void dev_gpios_init(void) {
+#if USE_CFG_GPIO
+	flash_gpios_init();
+#else
 	memcpy(&dev_gpios, &tab_gpios.gpios, sizeof(dev_gpios));
+#endif
 	if(!dev_gpios.rl)
 		dev_gpios.rl = GPIO_RELAY1;
     gpio_output_init(dev_gpios.rl, RELAY_OFF);

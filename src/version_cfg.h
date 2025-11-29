@@ -58,7 +58,7 @@
 
 /* Board define */
 #ifndef BOARD
-#define BOARD				BOARD_EM8SW2TS
+#define BOARD				BOARD_EM8SW1TS
 #endif
 
 #if (BOARD & 8)
@@ -107,8 +107,8 @@
 #endif
 
 
-#define APP_RELEASE				0x03	//BCD app release "0.3"
-#define APP_BUILD				0x01	//BCD app build "0.0"
+#define APP_RELEASE				0x00	//0x12 -> BCD app release "1.2"
+#define APP_BUILD				0x05	//0x34 -> BCD app build "3.4"
 
 #define STACK_RELEASE			0x30	//BCD stack release 3.0
 #define STACK_BUILD				0x01	//BCD stack build 01

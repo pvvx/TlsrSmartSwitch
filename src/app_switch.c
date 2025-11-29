@@ -31,29 +31,10 @@ static app_switch_t app_switch = {
         .timerMfCounterEvt = NULL,
 };
 
-static int32_t net_steer_start_offCb(void *args) {
-
-    g_appCtx.net_steer_start = false;
-
-    light_blink_stop();
-
-    return -1;
-}
-
-static void switch_factory_reset_start(void *args) {
-
-    zb_factoryReset();
-
-    g_appCtx.net_steer_start = true;
-    TL_ZB_TIMER_SCHEDULE(net_steer_start_offCb, NULL, TIMEOUT_1MIN30SEC);
-    light_blink_start(90, 250, 750);
-}
-
-
 static int32_t switch_counterFrCb(void *args) {
 
     if (app_switch.counter >= FR_COUNTER_MAX) {
-        TL_SCHEDULE_TASK(switch_factory_reset_start, NULL);
+        TL_SCHEDULE_TASK(factory_reset_start, NULL);
     }
 
     if (app_switch.status == SWITCH_OFF
@@ -107,7 +88,7 @@ static int32_t switch_counterMfCb(void *args) {
                 break;
             default:
                 if (app_switch.counter >= FR_COUNTER_MAX) {
-                    TL_SCHEDULE_TASK(switch_factory_reset_start, NULL);
+                    TL_SCHEDULE_TASK(factory_reset_start, NULL);
                 }
                 break;
         }

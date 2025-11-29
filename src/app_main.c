@@ -4,8 +4,7 @@
 #include "my18b20.h"
 #endif
 
-//uint8_t device_online = false;
-uint8_t resp_time = false;
+//uint8_t resp_time = false;
 
 app_ctx_t g_appCtx = {
         .timerFactoryReset = NULL,
@@ -77,7 +76,7 @@ void test_nv_version(void) {
 		nv_resetModule(NV_MODULE_APP);
 		// energy_remove(); ?
 		nv_flashWriteNew(1, NV_MODULE_APP, NV_ITEM_APP_DEV_VER, sizeof(ver), (u8 *)&ver);
-		SYSTEM_RESET();
+		// SYSTEM_RESET();
 	}
 }
 #endif
@@ -172,9 +171,6 @@ void app_task(void) {
 		report_handler();
 #endif
 }
-
-
-extern volatile u16 T_evtExcept[4];
 
 static void app_sysException(void) {
 
