@@ -1,17 +1,15 @@
 # TlsrSmartSwitch
 Alternative firmwares for Smart Switch on the TLSR925x chipset.
 
-## *The repository is under development!*
+Current FW Version: 0.0.0.5
 
-Current FW Version: 0.0.0.5 (for test)
-
-Supported device models:
+## Supported device models:
 
 Default:
 * [Tuya ZigBee "Mini Zigbee Switch"](https://pvvx.github.io/TS0001_TZ3000_kqvb5akv/) (Sensor: **BL0942**), FW name: ***EM1SW**<**1**/**2**>[**T**/**TS**]*
 * [Tuya ZigBee "Mini Smart Switch"](https://pvvx.github.io/TS000F_TZ3000_xkap8wtb/) (Sensor: **BL0937**), FW name: ***EM8SW**<**1/2**>[**T**/**TS**]*
 
-And others, with sensors BL0942 or BL0937 (GPIOs are assigned by a separate utility, the all coefficients are set online)
+And others, with sensors BL0942 or BL0937 (GPIOs are assigned by a separate [utility](https://pvvx.github.io/TlsrSmartSwitch/zigbeeswconfig.html), the all coefficients are set online)
 
 ---
 
@@ -34,10 +32,7 @@ Optimizations have been made:
 * Added thermometer and thermostat with MY18B20 sensor.
 * The flash memory's lifespan has been extended to maintain energy metering. Energy is recorded every minute. For 512 KB flash memory, the minimum write life is 77 years, and for 1 MB flash memory, it's over 1,000 years.
 * Added GPIOs modification.
-
-Further development:
-
-* GPIOs modification utility for ready-made firmware.
+* [GPIOs modification utility for ready-made firmware](https://pvvx.github.io/TlsrSmartSwitch/zigbeeswconfig.html).
 
 ---
 
