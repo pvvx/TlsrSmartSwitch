@@ -1,7 +1,7 @@
 # TlsrSmartSwitch
 Alternative firmwares for Smart Switch on the TLSR925x chipset.
 
-Current FW Version: 0.0.0.5
+Current FW Version: 0.0.0.6 (beta)
 
 ## Supported device models:
 
@@ -86,7 +86,7 @@ Optimizations have been made:
 
 ![config.gif](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/config.gif)
 
-[Программа конфигурации GPIO](https://pvvx.github.io/TlsrSmartSwitch/zigbeeswconfig.html)  служит для конфигурации собственных  вариантов прошивок. 
+[Программа конфигурации GPIO](https://pvvx.github.io/TlsrSmartSwitch/zigbeeswconfig.html) служит для конфигурации собственных  вариантов прошивок. 
 Назначенная в FW  конфигурация GPIO  при первом запуске сохраняется во Flash.
 Далее это сохранение является приоритетным - изменить GPIO возможно только с помощью изменения значений в [кластере On/Off](https://github.com/pvvx/TlsrSmartSwitch/blob/master/README_ExtAttr.md#cluster-0x0006-onoff).
 
