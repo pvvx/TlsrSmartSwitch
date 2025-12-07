@@ -105,10 +105,7 @@ Optimizations have been made:
 ## Подключение датчика MY18B20
 
 
-![MY18B20.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/MY18B20.jpg)
-
-
-![Wire.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/Wire.jpg)
+![MY18B20.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/MY18B20.jpg) ![Wire.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/Wire.jpg)
 
 ---
 
