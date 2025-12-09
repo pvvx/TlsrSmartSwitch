@@ -6,9 +6,9 @@
 
 ### Cluster 0x0006: _OnOff_ 
 
-* Attribute ***0xF000:*** _key_lock_ - текущее состо€ние реле (On/Off), read only
-* Attribute ***0xF001:*** _led_control_ - 0: LED OFF, 1: LED ON, 2: LED ON/OFF
-* Attribute ***0xF002:*** _Switch_Type_ - 0: TOGGLE, 1: MOMENTARY, 2: MULTIFUNCTION, 3: TERMOSTAT
+* Attribute ***0xF000:*** _relay_state_ - текущее состо€ние реле (On/Off), read only
+* Attribute ***0xF001:*** _key_lock_ - отключение кнопки (в текущей версии не задействован)
+* Attribute ***0xF002:*** _led_control_ - 0: LED OFF, 1: LED ON, 2: LED ON/OFF
 
 * Attribute ***0xF100***: _gpio_realy_ - номер gpio дл€ подключени€ реле
 * Attribute ***0xF101***: _gpio_led1_ - номер gpio дл€ подключени€ светодиода состо€ни€ (LED1)
@@ -43,15 +43,16 @@
 | ***PA6*** | 0x0040 | ***PB6*** | 0x0140 | ***PC6*** | 0x0240 | ***PD6*** | 0x0340 |
 | ***PA7*** | 0x0080 | ***PB7*** | 0x0180 | ***PC7*** | 0x0280 | ***PD7*** | 0x0380 |
 
-
 ### Cluster 0x0007: _On/Off Switch Configuration_ 
 
-* Attribute ***0xF003***: _Switch_Decoupled_ - 0: Off, 1: On
-* Attribute ***0xF004***: _Emergency_off_mask_ - задать отключение побитно: bit0: Max voltage, bit1: Min voltage, bit2: Max current, bit3: Max temperature, bit4: Min temperature
-* Attribute ***0xF005***: _Alarm_EmOff_ - произошло отключение по _Emergency_off_mask_, reportable, write bitX=0 -> reset event
-
+* Attribute ***0xF003:*** _switch_type_ - тип внешней кнопки: 0: TOGGLE, 1: MOMENTARY, 2: MULTIFUNCTION, 3: THERMOSTAT
+* Attribute ***0xF004***: _switch_decoupled_ - внешн€€ кнопка работает отдельно от реле: 0: Off, 1: On
 
 ### Cluster 0x0b04: _Electrical Measurement_:
+
+* Attribute ***0xF005***: _alarm_mask_ - задать аварийные отключени€, побитно: bit0: Max voltage, bit1: Min voltage, bit2: Max current, bit3: Max temperature, bit4: Min temperature
+* Attribute ***0xF006***: _alarm_events_ - состо€ние аварийного отключени€ по _alarm_mask_, reportable, write 0 -> reset event
+
 
 * Attribute ***0xF007***: Coefficient for calculating _current_ Ц значение коэффициента множител€ дл€ счетчика тока. —м. описание дл€ конкретного варианта датчика: BL0937/BL0942
 * Attribute ***0xF008***: Coefficient for calculating _voltage_ Ц значение коэффициента множител€ дл€ счетчика напр€жени€. —м. описание дл€ конкретного варианта датчика: BL0937/BL0942
