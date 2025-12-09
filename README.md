@@ -80,10 +80,6 @@ Optimizations have been made:
 
 ![thermostat2.gif](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/thermostat2.gif)
 
-В ZHA по умолчанию задаются слишком большие интервалы для репорта, и возможность изменить значения в репортах у пользователя отсутствуют. В итоге, если температура меняется быстрее назначенных в репорте значений,  ZHA может пропускать переключения состояний термостата работающего в устройстве.
-
-![thermostat3.gif](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/thermostat3.gif)
-
 ## Программа конфигурации GPIO.
 
 ![config.gif](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/config.gif)
