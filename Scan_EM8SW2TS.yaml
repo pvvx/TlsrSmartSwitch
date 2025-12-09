@@ -1,8 +1,6 @@
 zha_toolkit_version: v1.1.33
-zigpy_version: 0.83.0
-zigpy_rf_version: 0.46.1
-ieee_org: update.telink_pvvx_em8sw2ts_z_firmware
-ieee: a4:c1:38:88:60:99:82:81
+zigpy_version: 0.86.0
+zigpy_rf_version: 0.47.2
 command: scan_device
 params:
   dir: 0
@@ -14,13 +12,13 @@ params:
   read_after_write: true
 scan:
   ieee: a4:c1:38:88:60:99:82:81
-  nwk: "0x18c3"
+  nwk: "0xcb2b"
   model: EM8SW2TS_z
   manufacturer: Telink-pvvx
   manufacturer_id: "0x60000"
   endpoints:
     - id: 1
-      device_type: "0x0100"
+      device_type: "0x0002"
       profile: "0x0104"
       in_clusters:
         "0x0000":
@@ -49,7 +47,7 @@ scan:
               access: READ
               access_acl: 1
               manf_id: 60000
-              attribute_value: 3
+              attribute_value: 0
             "0x0002":
               attribute_id: "0x0002"
               attribute_name: stack_version
@@ -104,7 +102,7 @@ scan:
               access: READ
               access_acl: 1
               manf_id: 60000
-              attribute_value: "20251129"
+              attribute_value: "20251209"
             "0x0007":
               attribute_id: "0x0007"
               attribute_name: power_source
@@ -137,7 +135,7 @@ scan:
               access: READ
               access_acl: 1
               manf_id: 60000
-              attribute_value: 8111-0301
+              attribute_value: 8111-0007
             "0xfffd":
               attribute_id: "0xfffd"
               attribute_name: cluster_revision
@@ -452,6 +450,17 @@ scan:
               access_acl: 3
               manf_id: 60000
               attribute_value: 288
+            "0xf10b":
+              attribute_id: "0xf10b"
+              attribute_name: "61707"
+              value_type:
+                - "0x19"
+                - bitmap16
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
             "0xfffd":
               attribute_id: "0xfffd"
               attribute_name: cluster_revision
@@ -604,7 +613,7 @@ scan:
               access: READ|REPORT
               access_acl: 5
               manf_id: 60000
-              attribute_value: 2312
+              attribute_value: 2281
             "0x0002":
               attribute_id: "0x0002"
               attribute_name: occupancy
@@ -703,7 +712,7 @@ scan:
               access: READ|WRITE
               access_acl: 3
               manf_id: 60000
-              attribute_value: 2400
+              attribute_value: 4000
             "0x0012":
               attribute_id: "0x0012"
               attribute_name: occupied_heating_setpoint
@@ -714,7 +723,7 @@ scan:
               access: READ|WRITE
               access_acl: 3
               manf_id: 60000
-              attribute_value: 2600
+              attribute_value: 2700
             "0x0013":
               attribute_id: "0x0013"
               attribute_name: unoccupied_cooling_setpoint
@@ -725,7 +734,7 @@ scan:
               access: READ|WRITE
               access_acl: 3
               manf_id: 60000
-              attribute_value: 2600
+              attribute_value: 2700
             "0x0014":
               attribute_id: "0x0014"
               attribute_name: unoccupied_heating_setpoint
@@ -736,7 +745,7 @@ scan:
               access: READ|WRITE
               access_acl: 3
               manf_id: 60000
-              attribute_value: 2400
+              attribute_value: 4000
             "0x001b":
               attribute_id: "0x001b"
               attribute_name: ctrl_sequence_of_oper
@@ -809,7 +818,7 @@ scan:
               access: READ|REPORT
               access_acl: 5
               manf_id: 60000
-              attribute_value: 2312
+              attribute_value: 2281
             "0x0001":
               attribute_id: "0x0001"
               attribute_name: min_measured_value
@@ -948,7 +957,7 @@ scan:
               access: READ|REPORT
               access_acl: 5
               manf_id: 60000
-              attribute_value: 15
+              attribute_value: 4163
             "0x0200":
               attribute_id: "0x0200"
               attribute_name: status
@@ -1054,7 +1063,7 @@ scan:
               access: READ|REPORT
               access_acl: 5
               manf_id: 60000
-              attribute_value: 22542
+              attribute_value: 23001
             "0x0508":
               attribute_id: "0x0508"
               attribute_name: rms_current
@@ -1065,7 +1074,7 @@ scan:
               access: READ|REPORT
               access_acl: 5
               manf_id: 60000
-              attribute_value: 2
+              attribute_value: 0
             "0x050b":
               attribute_id: "0x050b"
               attribute_name: active_power
@@ -1241,7 +1250,7 @@ scan:
               access: READ|WRITE
               access_acl: 3
               manf_id: 60000
-              attribute_value: 178060
+              attribute_value: 178472
             "0xf008":
               attribute_id: "0xf008"
               attribute_name: "61448"
@@ -1252,7 +1261,7 @@ scan:
               access: READ|WRITE
               access_acl: 3
               manf_id: 60000
-              attribute_value: 197732
+              attribute_value: 199868
             "0xf009":
               attribute_id: "0xf009"
               attribute_name: "61449"
@@ -1263,7 +1272,40 @@ scan:
               access: READ|WRITE
               access_acl: 3
               manf_id: 60000
-              attribute_value: 1081452
+              attribute_value: 1088587
+            "0xf080":
+              attribute_id: "0xf080"
+              attribute_name: "61568"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xf081":
+              attribute_id: "0xf081"
+              attribute_name: "61569"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
+            "0xf082":
+              attribute_id: "0xf082"
+              attribute_name: "61570"
+              value_type:
+                - "0x21"
+                - uint16_t
+                - Analog
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
             "0xfffd":
               attribute_id: "0xfffd"
               attribute_name: cluster_revision
@@ -1448,6 +1490,17 @@ scan:
               access_acl: 3
               manf_id: 60000
               attribute_value: 288
+            "0xf10b":
+              attribute_id: "0xf10b"
+              attribute_name: "61707"
+              value_type:
+                - "0x19"
+                - bitmap16
+                - Discrete
+              access: READ|WRITE
+              access_acl: 3
+              manf_id: 60000
+              attribute_value: 0
             "0xfffd":
               attribute_id: "0xfffd"
               attribute_name: cluster_revision
@@ -1477,14 +1530,14 @@ scan:
               access_acl: 1
               manf_id: 60000
               attribute_value:
-                - 158
-                - 117
-                - 217
-                - 254
                 - 255
-                - 226
-                - 10
-                - 104
+                - 255
+                - 255
+                - 255
+                - 255
+                - 255
+                - 255
+                - 255
             "0x0001":
               attribute_id: "0x0001"
               attribute_name: file_offset
@@ -1506,7 +1559,7 @@ scan:
               access: READ
               access_acl: 1
               manf_id: 60000
-              attribute_value: 50409473
+              attribute_value: 471041
             "0x0003":
               attribute_id: "0x0003"
               attribute_name: current_zigbee_stack_version

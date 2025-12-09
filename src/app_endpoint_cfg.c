@@ -113,7 +113,7 @@ const uint16_t app_ep1_outClusterList[] = {
 const af_simple_descriptor_t app_ep1_simpleDesc =
 {
     HA_PROFILE_ID,                          /* Application profile identifier */
-    HA_DEV_ONOFF_LIGHT,		                /* Application device identifier */
+	HA_DEV_ONOFF_OUTPUT,  					/* Application device identifier */
     APP_ENDPOINT1,                          /* Endpoint */
     1,                                      /* Application device version */
     0,                                      /* Reserved */
@@ -442,7 +442,7 @@ const zclAttrInfo_t onOffCfg1_attrTbl[] =
 #endif //ZCL_ON_OFF_SWITCH_CFG
 
 
-#ifdef ZCL_METERING_SUPPORT
+#ifdef ZCL_METERING
 
 zcl_seAttr_t g_zcl_seAttrs = {
     .unit_of_measure = 0x00,                                        // kWh
@@ -466,7 +466,7 @@ const zclAttrInfo_t se_attrTbl[] = {
 };
 
 #define ZCL_SE_ATTR_NUM    sizeof(se_attrTbl) / sizeof(zclAttrInfo_t)
-#endif // ZCL_METERING_SUPPORT
+#endif // ZCL_METERING
 
 #ifdef ZCL_ALARMS
 u16 zcl_attr_alarmCount = 0;
@@ -528,6 +528,8 @@ const zcl_config_min_max_t def_config_min_max = {
 	.time_start = PERIOD_START_DEF, // in sec, minimum 8, step 8, = 0 - off
 };
 
+zcl_sensor_calibrate_t sensor_calibrate;
+
 zcl_config_min_max_t config_min_max;
 zcl_config_min_max_t config_min_max_saved;
 
@@ -563,6 +565,11 @@ const zclAttrInfo_t ms_attrTbl[] = {
 #if USE_BL0942
 	{ZCL_ATTRID_ENERGY_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.energy		},
 	{ZCL_ATTRID_FGREQ_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.freq		},
+#endif
+#if USE_CALIBRATE_CVP
+	{ZCL_ATTRID_CURRENT_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.current	},
+	{ZCL_ATTRID_VOLTAGE_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.voltage	},
+	{ZCL_ATTRID_POWER_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.power		},
 #endif
     {ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,    ZCL_UINT16,   R,    (uint8_t*)&zcl_attr_global_clusterRevision  }
 };

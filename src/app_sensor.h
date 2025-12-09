@@ -23,4 +23,8 @@ void app_sensor_init(void);
 nv_sts_t load_config_sensor(void);
 nv_sts_t save_config_sensor(void);
 
+#if USE_CALIBRATE_CVP
+void check_start_calibrate(void);
+#endif
+
 #endif /* SRC_INCLUDE_APP_SENSOR_H_ */

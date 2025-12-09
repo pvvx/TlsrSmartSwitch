@@ -56,6 +56,12 @@
 #define ZCL_ATTRID_GPIO_FLG					0xF10B
 #endif
 
+/* Custom Attr for Electrical Measurement cluster */
+#define ZCL_ATTRID_CURRENT_CAL       		0xF080
+#define ZCL_ATTRID_VOLTAGE_CAL        		0xF081
+#define ZCL_ATTRID_POWER_CAL         		0xF082
+
+
 /**
  *  @brief Defined for basic cluster attributes
  */
@@ -260,6 +266,16 @@ typedef struct {
 
 extern zcl_config_min_max_t config_min_max;
 
+#if USE_CALIBRATE_CVP
+// Data for calibrate
+typedef struct {
+    uint16_t current; // in 0.001 A, max 25.000A
+    uint16_t voltage; // in 0.01V, max 300.00V
+    uint16_t power; // in 0.1 W, max 6250.0W (250V*25A)
+} zcl_sensor_calibrate_t;
+
+extern zcl_sensor_calibrate_t sensor_calibrate;
+#endif
 /**
  *  @brief Defined for temperature cluster attributes
  */

@@ -16,10 +16,10 @@ uint16_t tik_reload, tik_start; // step 1 sec, =0xFFFF - flag end
 
 // Pulse counters BL0937
 typedef struct {
-    uint32_t cnt_current;
-    uint32_t cnt_voltage;
-    uint32_t cnt_power;
-    uint32_t cnt_sel;
+    volatile uint32_t cnt_current;
+    volatile uint32_t cnt_voltage;
+    volatile uint32_t cnt_power;
+    volatile uint32_t cnt_sel;
 } bl0937_cnt_t;
 
 static bl0937_cnt_t bl0937_cnt; // Pulse counters BL0937
@@ -59,6 +59,82 @@ const sensor_pwr_coef_t sensor_pwr_coef_def = {
 
 sensor_pwr_coef_t sensor_pwr_coef;
 sensor_pwr_coef_t sensor_pwr_coef_saved;
+
+#if USE_CALIBRATE_CVP
+//--------- Data for calibrate BL09377 --------
+typedef struct {
+    uint32_t current;
+    uint32_t voltage;
+    uint32_t power;
+    uint8_t cnt;
+} cnt_calibrate_t;
+
+static cnt_calibrate_t cnt_calibrate;
+
+zcl_sensor_calibrate_t sensor_calibrate_old, sensor_calibrate;
+
+/* cnt4 max = 0x3fffffff
+   return fp(14.18) = x/cnt4 */
+static uint32_t _calk_coef(uint32_t cnt4, uint32_t x) {
+	uint32_t tmp, fract, val;
+	tmp = x << 16;
+	val = tmp / cnt4;
+	fract = tmp - (val * cnt4);
+	val <<= 2;
+	fract <<= 2;
+	fract /= cnt4;
+	val += fract;
+	return val;
+}
+
+/* Sensor Calibrate Coefficients */
+static void sensor_calibrate_coef(void) {
+	bool save_flg = false;
+	cnt_calibrate.cnt = 0;
+	if(sensor_calibrate.current) { // in 0.001 A, max 25.000A
+		if(cnt_calibrate.current) { // x4
+			// coef.current - fp(16.16)
+			sensor_pwr_coef.current =
+				_calk_coef(cnt_calibrate.current, sensor_calibrate.current);
+			save_flg = true;
+		}
+		sensor_calibrate.current = 0;
+	}
+	if(sensor_calibrate.voltage) { // in 0.01V, max 300.00V
+		if(cnt_calibrate.voltage) { // x4
+			// coef.voltage - fp(16.16)
+			sensor_pwr_coef.voltage =
+				_calk_coef(cnt_calibrate.voltage, sensor_calibrate.voltage);
+			save_flg = true;
+		}
+		sensor_calibrate.voltage = 0;
+	}
+	if(sensor_calibrate.power) { // in 0.1 W, max 6250.0W (250V*25A)
+		if(sensor_calibrate.power == 1) {
+			sensor_pwr_coef.power = mul32x32_64(sensor_pwr_coef.current, sensor_pwr_coef.voltage) >> 15;
+		} else if(cnt_calibrate.power) { // x4
+			// coef.power - fp(16.16)
+			sensor_pwr_coef.power =
+					_calk_coef(cnt_calibrate.power, sensor_calibrate.power);
+		}
+		// 0x100000000/(60*60/8)=9544371.76888
+		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power+225, 9544372) >> 32;
+		save_flg = true;
+		sensor_calibrate.power = 0;
+	}
+	if(save_flg) {
+		save_config_sensor();
+	}
+}
+
+void check_start_calibrate(void) {
+	cnt_calibrate.current = 0;
+	cnt_calibrate.voltage = 0;
+	cnt_calibrate.power = 0;
+	cnt_calibrate.cnt = 1;
+}
+
+#endif
 
 //--------- Initialization --------
 
@@ -149,12 +225,24 @@ void bl0937_new_dataCb(void *args) {
     uint64_t tmp;
 
 	current = bl0937_cnt.cnt_current;
-	bl0937_cnt.cnt_current = 0;
     voltage = bl0937_cnt.cnt_voltage;
-    bl0937_cnt.cnt_voltage = 0;
     power = bl0937_cnt.cnt_power;
+
+    bl0937_cnt.cnt_current = 0;
+    bl0937_cnt.cnt_voltage = 0;
     bl0937_cnt.cnt_power = 0;
 
+#if USE_CALIBRATE_CVP
+    if(cnt_calibrate.cnt) {
+        cnt_calibrate.cnt++;
+    	cnt_calibrate.current += current;
+    	cnt_calibrate.voltage += voltage;
+    	cnt_calibrate.power += power;
+    	if(cnt_calibrate.cnt > 4) {
+    		sensor_calibrate_coef();
+    	}
+    }
+#endif
 	current *= sensor_pwr_coef.current;
     current += old_fract.current;
     old_fract.current = current & 0xffff;
@@ -175,7 +263,7 @@ void bl0937_new_dataCb(void *args) {
     old_fract.power = tmp & 0xffff;
     power = tmp >> 16;
 
-   	if(power >= 3276700) {
+   	if(power >= 3276700) { // (max 32767.00W)
    		power = 32767;
         energy = 7282;
         g_zcl_msAttrs.power_divisor = 1;
@@ -324,7 +412,7 @@ nv_sts_t save_config_sensor(void) {
 #if NV_ENABLE
 	nv_sts_t ret = NV_SUCC;
 	if(memcmp(&sensor_pwr_coef_saved, &sensor_pwr_coef, sizeof(sensor_pwr_coef))) {
-		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power+220, 9544372) >> 32; // 0x100000000/(60*60/8)=9544371.76888
+		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power+225, 9544372) >> 32; // 0x100000000/(60*60/8)=9544371.76888
 		memcpy(&sensor_pwr_coef_saved, &sensor_pwr_coef, sizeof(sensor_pwr_coef));
 		ret = nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_CFG_SENSOR_BL09xx, sizeof(sensor_pwr_coef), (uint8_t*)&sensor_pwr_coef);
 	}

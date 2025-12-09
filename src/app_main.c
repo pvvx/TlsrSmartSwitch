@@ -187,6 +187,15 @@ static void app_sysException(void) {
 #endif
 }
 
+#if USE_BL0937
+#define REPORT_TIME_MIN_DEF			(8*2)	// 16 sec
+#else
+#define REPORT_TIME_MIN_DEF			10		// 10 sec
+#endif
+#define REPORT_TIME_MAX_DEF			600		// 10 min
+#define REPORT_TIME_STAT_DEF		3600	// 1 h
+#define REPORT_TIME_MAX				65000
+
 /*********************************************************************
  * @fn      user_init
  *
@@ -239,67 +248,72 @@ void user_init(bool isRetention)
 #ifdef ZCL_ON_OFF
     /* OnOff */
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_ON_OFF, ZCL_ATTRID_ONOFF,
-            0, 65000, (uint8_t *)&reportableChange_tmp);
+            0, REPORT_TIME_MAX, (uint8_t *)&reportableChange_tmp);
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_ON_OFF, ZCL_ATTRID_RELAY_STATE,
-            0, 65000, (uint8_t *)&reportableChange_tmp);
+            0, REPORT_TIME_MAX, (uint8_t *)&reportableChange_tmp);
 #endif
 #ifdef ZCL_ON_OFF_SWITCH_CFG
     /* OnOffCfg */
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_ON_OFF_SWITCH_CONFIG, CUSTOM_ATTRID_DECOUPLED,
-            0, 65000, (uint8_t *)&reportableChange_tmp);
+            0, REPORT_TIME_MAX, (uint8_t *)&reportableChange_tmp);
 #endif
 #ifdef  ZCL_MULTISTATE_INPUT
     /* MultistateInput */
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_MULTISTATE_INPUT_BASIC,
-            ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE, 0, 9000, (uint8_t *)&reportableChange_tmp);
+            ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE, 0, REPORT_TIME_STAT_DEF, (uint8_t *)&reportableChange_tmp);
 #endif
 #ifdef ZCL_METERING
-    /* Energy */
-    reportableChange_u64 = 0x10;
+    //reportableChange_tmp = 1;
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING,
-            ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, 10, 9000, (uint8_t *)&reportableChange_u64);
+    		ZCL_ATTRID_STATUS, 0, REPORT_TIME_MAX, (uint8_t *)&reportableChange_u64);
+    /* Energy */
+    reportableChange_u64 = 1000; // 1Wh
+    bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING,
+            ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, REPORT_TIME_MIN_DEF, REPORT_TIME_STAT_DEF, (uint8_t *)&reportableChange_u64);
 #endif
 #ifdef ZCL_THERMOSTAT
+    reportableChange_tmp = 10; // 0.1C
+	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_HAVC_THERMOSTAT,
+			ZCL_ATTRID_HVAC_THERMOSTAT_LOCAL_TEMPERATURE, 10, 6000, (u8 *)&reportableChange_tmp);
     reportableChange_tmp = 1;
 	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_HAVC_THERMOSTAT,
-			ZCL_ATTRID_HVAC_THERMOSTAT_LOCAL_TEMPERATURE, 2, 180, (u8 *)&reportableChange_tmp);
-	//reportableChange_tmp = 1;
+			ZCL_ATTRID_HVAC_THERMOSTAT_PI_COOLING_DEMAND, 0, REPORT_TIME_STAT_DEF, (u8 *)&reportableChange_tmp);
 	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_HAVC_THERMOSTAT,
-			ZCL_ATTRID_HVAC_THERMOSTAT_PI_COOLING_DEMAND, 0, 9000, (u8 *)&reportableChange_tmp);
-	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_HAVC_THERMOSTAT,
-			ZCL_ATTRID_HVAC_THERMOSTAT_PI_HEATING_DEMAND, 0, 9000, (u8 *)&reportableChange_tmp);
+			ZCL_ATTRID_HVAC_THERMOSTAT_PI_HEATING_DEMAND, 0, REPORT_TIME_STAT_DEF, (u8 *)&reportableChange_tmp);
 #endif
 #ifdef ZCL_ELECTRICAL_MEASUREMENT
     /* Voltage */
-    reportableChange_tmp = 500;
+    reportableChange_tmp = 100; // 1V
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
-            ZCL_ATTRID_RMS_VOLTAGE, 10, 9000, (uint8_t *)&reportableChange_tmp);
-
+            ZCL_ATTRID_RMS_VOLTAGE, REPORT_TIME_MIN_DEF, REPORT_TIME_MAX_DEF, (uint8_t *)&reportableChange_tmp);
     /* Current */
     reportableChange_tmp = 5; // 5 mA
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
-            ZCL_ATTRID_RMS_CURRENT, 10, 9000, (uint8_t *)&reportableChange_tmp);
-
+            ZCL_ATTRID_RMS_CURRENT, REPORT_TIME_MIN_DEF, REPORT_TIME_MAX_DEF, (uint8_t *)&reportableChange_tmp);
     /* Power */
-    reportableChange_tmp = 100;
+    reportableChange_tmp = 50; // 0.05W, 0.5W, 5W
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
-            ZCL_ATTRID_ACTIVE_POWER, 10, 9000, (uint8_t *)&reportableChange_tmp);
- #if USE_BL0942
+            ZCL_ATTRID_ACTIVE_POWER, REPORT_TIME_MIN_DEF, REPORT_TIME_MAX_DEF, (uint8_t *)&reportableChange_tmp);
+    /* Power divisor */
+    reportableChange_tmp = 1; // [1, 10, 100, 1000]
+    bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
+    		ZCL_ATTRID_AC_POWER_DIVISOR, 0, REPORT_TIME_STAT_DEF, (uint8_t *)&reportableChange_tmp);
+#if USE_BL0942
     /* Freq */
-    reportableChange_tmp = 100;
+    reportableChange_tmp = 10; // 0.1Hz
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
-            ZCL_ATTRID_AC_FREQUENCY, 10, 9000, (uint8_t *)&reportableChange_tmp);
- #endif
+            ZCL_ATTRID_AC_FREQUENCY, REPORT_TIME_MIN_DEF, REPORT_TIME_MAX_DEF, (uint8_t *)&reportableChange_tmp);
+#endif
     /* Alarm */
-    reportableChange_tmp = 0;
+    reportableChange_tmp = 1;
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
-    		ZCL_ATTRID_ALARM_FLAGS, 0, 9000, (uint8_t *)&reportableChange_tmp);
+    		ZCL_ATTRID_ALARM_FLAGS, 0, REPORT_TIME_STAT_DEF, (uint8_t *)&reportableChange_tmp);
 #endif // ZCL_ELECTRICAL_MEASUREMENT
 
 #ifdef ZCL_TEMPERATURE_MEASUREMENT
-    reportableChange_tmp = 5;
+    reportableChange_tmp = 10; // 0.1C
 	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
-		ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE, 10, 180, (u8 *)&reportableChange_tmp);
+		ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE, 10, 6000, (u8 *)&reportableChange_tmp);
 #endif
 
     /* Initialize BDB */

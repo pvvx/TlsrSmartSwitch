@@ -130,7 +130,8 @@ extern "C" {
 #error "Define BOARD!"
 #endif
 
-#define USE_CFG_GPIO	1
+#define USE_CFG_GPIO		1
+#define USE_CALIBRATE_CVP	1 // Calibrate current, voltage, power
 
 #define ZCL_BASIC_MFG_NAME     {11,'T','e','l','i','n','k','-','p','v','v','x'}
 

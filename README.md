@@ -1,7 +1,7 @@
 # TlsrSmartSwitch
 Alternative firmwares for Smart Switch on the TLSR925x chipset.
 
-Current FW Version: 0.0.0.6 (beta)
+Current FW Version: 0.0.0.7
 
 ## Supported device models:
 
@@ -35,6 +35,7 @@ Optimizations have been made:
 * The flash memory's lifespan has been extended to maintain energy metering. Energy is recorded every minute. For 512 KB flash memory, the minimum write life is 777 years (100K Program-Erase cycles), and for 1 MB flash memory, it's over 19,813.5 years.
 * Added GPIOs modification.
 * [GPIOs modification utility for ready-made firmware](https://pvvx.github.io/TlsrSmartSwitch/zigbeeswconfig.html).
+* Added calibrations based on the input of current values of voltage, current, and power.
 
 ---
 

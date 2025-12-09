@@ -153,6 +153,7 @@ enum {
 	NBIT_ON_OFF_CONFIG = 1,
 	NBIT_MIN_MAX_CONFIG,
 	NBIT_SENSOR_CONFIG,
+	NBIT_SENSOR_CALIBRATE,
 	NBIT_MY18B20_CONFIG,
 	NBIT_THERM_CONFIG,
 	NBIT_GPIO_CONFIG
@@ -230,11 +231,21 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
 			if (attrID >= ZCL_ATTRID_CURRENT_COEF
 				&& attrID <= ZCL_ATTRID_FGREQ_COEF) {
 				save |= BIT(NBIT_SENSOR_CONFIG);
+#if USE_CALIBRATE_CVP
+			} else if (attrID >= ZCL_ATTRID_CURRENT_CAL
+				&& attrID <= ZCL_ATTRID_POWER_CAL) {
+				save |= BIT(NBIT_SENSOR_CALIBRATE);
+#endif
 			} else {
 				save |= BIT(NBIT_MIN_MAX_CONFIG);
 			}
 		}
 	}
+#if USE_CALIBRATE_CVP
+    if (save & BIT(NBIT_SENSOR_CALIBRATE)) {
+    	check_start_calibrate();
+    }
+#endif
     if (save & BIT(NBIT_SENSOR_CONFIG)) {
     	save_config_sensor();
     }

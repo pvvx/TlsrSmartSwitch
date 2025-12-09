@@ -45,20 +45,21 @@ static uint8_t first_start = true;     // flag
 //--------- Data for calculating BL0942 --------
 
 
-// This REF get from https://github.com/esphome/esphome/blob/dev/esphome/components/bl0942/bl0942.h
 #ifndef BL0942_CURRENT_REF
-#define BL0942_CURRENT_REF      16860520 // 2pow32/251.21346469622 // x1000: 0..65.535A
+#define BL0942_CURRENT_REF      16860520 // current x1000: 0..65.535A
 #endif
 #ifndef BL0942_VOLTAGE_REF
-#define BL0942_VOLTAGE_REF      26927694 // 2pow32/159.5 // x100: 0..655.35V
+#define BL0942_VOLTAGE_REF      26927694 // voltage x100: 0..655.35V
 #endif
 // POWER_REF = (2pow32/VOLTAGE_REF)*(2pow32/CURRENT_REF)*353700/305978/73989 = 0.63478593422
 #ifndef BL0942_POWER_REF
-#define BL0942_POWER_REF        27060025 // 2pow24/0.620  // x1000: x1000: 0..327.67W, x100 32.767..327.67W, x10: 327.67..3276.7W
+#define BL0942_POWER_REF        27060025 // poewr x1000: x1000: 0..32.767W, x100 32.767..327.67W, x10: 327.67..3276.7W
 #endif
-// ENERGY_REF = ((2pow24/POWER_REF)*36000)/419430.4 = 0.053215
+// This REF get from https://github.com/esphome/esphome/blob/dev/esphome/components/bl0942
+// this->energy_reference_ = this->power_reference_ * 3600000 / 419430.4
+// ENERGY_REF = ((2pow32/POWER_REF)*3600000)/419430.4
 #ifndef BL0942_ENERGY_REF
-#define BL0942_ENERGY_REF       315272310 // 2pow24/0.053215 // x100000
+#define BL0942_ENERGY_REF       315272310 // energy x100000
 #endif
 //
 #ifndef BL0942_FREQ_REF
@@ -114,6 +115,86 @@ nv_sts_t save_config_sensor(void) {
     return NV_ENABLE_PROTECT_ERROR;
 #endif
 }
+
+#if USE_CALIBRATE_CVP
+//--------- Data for calibrate calculating BL09377 --------
+
+typedef struct {
+    uint32_t current;
+    uint32_t voltage;
+    uint32_t power;
+    uint8_t cnt;
+} reg_calibrate_t;
+
+static reg_calibrate_t reg_calibrate;
+
+static void sensor_calibrate_coef(void);
+
+zcl_sensor_calibrate_t sensor_calibrate;
+
+/* cnt max 0x1ffffff
+ return: fix_point(9.23) = x / cnt */
+static uint32_t _calk_coef(uint32_t cnt, uint16_t x) {
+	uint32_t tmp, fract, val;
+	tmp = x << 16;
+	val = tmp / cnt;
+	fract = tmp - (val * cnt);
+	val <<= 7;
+	fract <<= 7;
+	fract /= cnt;
+	val += fract;
+	return val;
+}
+
+/* Sensor Calibrate Coefficients */
+static void sensor_calibrate_coef(void) {
+	bool save_flg = false;
+	reg_calibrate.cnt = 0;
+	if(sensor_calibrate.current) { // in 0.001 A, max 25.000A
+		if(reg_calibrate.current) { // x4
+			// coef.current - fp(0.32)
+			sensor_pwr_coef.current =
+				_calk_coef(reg_calibrate.current, sensor_calibrate.current) << (32+2-23); // << 11
+			save_flg = true;
+		}
+		sensor_calibrate.current = 0;
+	}
+	if(sensor_calibrate.voltage) { // in 0.01V, max 300.00V
+		if(reg_calibrate.voltage) { // x4
+			// coef.voltage - fp(0.32)
+			sensor_pwr_coef.voltage =
+				_calk_coef(reg_calibrate.voltage, sensor_calibrate.voltage) << (32+2-23); // << 11
+			save_flg = true;
+		}
+		sensor_calibrate.voltage = 0;
+	}
+	if(sensor_calibrate.power) { // in 0.1 W, max 6250.0W (250V*25A)
+		if(sensor_calibrate.power == 1) {
+			sensor_pwr_coef.power = mul32x32_64(sensor_pwr_coef.current, sensor_pwr_coef.voltage) >> 24;
+		} else if(reg_calibrate.power) { // x4
+			// coef.power - fp(8.24)
+			sensor_pwr_coef.power =
+				_calk_coef(reg_calibrate.power, sensor_calibrate.power) << (24+2-23); // << 3
+		}
+		// energy = power * 3600000 / 419430.4
+		// 2pow32/(419430.4*100/3600000) = 368640000
+		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power, 368640000) >> 32;
+		save_flg = true;
+		sensor_calibrate.power = 0;
+	}
+	if(save_flg) {
+		save_config_sensor();
+	}
+}
+
+void check_start_calibrate(void) {
+	reg_calibrate.current = 0;
+	reg_calibrate.voltage = 0;
+	reg_calibrate.power = 0;
+	reg_calibrate.cnt = 1;
+}
+
+#endif
 
 //--------------------------------
 
@@ -213,6 +294,20 @@ void monitoring_handler(void) {
                 power = pkt->watt;
                 freq = pkt->freq;
 
+                if(power < 0)
+                    power = -power;
+
+#if USE_CALIBRATE_CVP
+                if(reg_calibrate.cnt) {
+                	reg_calibrate.cnt++;
+                	reg_calibrate.current += current;
+                	reg_calibrate.voltage += voltage;
+                	reg_calibrate.power += power;
+                	if(reg_calibrate.cnt > 4) {
+                		sensor_calibrate_coef();
+                	}
+                }
+#endif
                 tmp = mul32x32_64(current, sensor_pwr_coef.current);
                 tmp += old_fract.current;
                 old_fract.current = tmp & 0xffffffff;
@@ -226,15 +321,13 @@ void monitoring_handler(void) {
                 g_zcl_msAttrs.voltage = (uint16_t)voltage;
 
                 // power x1000 0..3276.750W
-                if(power < 0)
-                    power = -power;
 
                 tmp = mul32x32_64(power, sensor_pwr_coef.power);
                 tmp += old_fract.power;
                 old_fract.power = tmp & 0xffffff;
                 power = tmp >> 24;
 
-                if(power > 32767000) {
+                if(power > 32767000) { // (max 32767.000W)
                 	power = 32767;
                 	g_zcl_msAttrs.power_divisor = 1;
                 } else if(power > 3276700) {
