@@ -507,7 +507,7 @@ _CODE_ZCL_ void reportAttrs(void) {
 
             dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
             dstEpInfo.profileId = profileID;
-
+#ifdef ZCL_MULTISTATE_INPUT
             if (report.attr[0].attrID == ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE &&
                     !clock_time_exceed(last_timeReportMsi, TIMEOUT_TICK_250MS)) {
 
@@ -516,7 +516,9 @@ _CODE_ZCL_ void reportAttrs(void) {
 
 //                printf("zcl_report. msi 0x%04x repeat. seqNum: %d\r\n", clusterID, last_seqNum[i]);
 
-            } else {
+            } else
+#endif
+            {
 //                printf("zcl_report. clusterId: 0x%04x\r\n", clusterID);
                 zcl_sendReportAttrsCmd(endpoint, &dstEpInfo, TRUE, ZCL_FRAME_SERVER_CLIENT_DIR, clusterID, (zclReportCmd_t* )&report);
             }

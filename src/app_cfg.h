@@ -203,7 +203,7 @@ extern "C" {
 #define GPIO_LED2       0
 
 #define RELAY_ON        1
-#define GPIO_RELAY1     GPIO_PC3
+#define GPIO_RELAY1     GPIO_PC2
 
 #define GPIO_SWITCH_ON 	0
 #define GPIO_SWITCH1    GPIO_PD2
@@ -363,7 +363,7 @@ typedef enum{
 //#define ZCL_POLL_CTRL_SUPPORT                      1 ?
 #define ZCL_POWER_CFG_SUPPORT                       OFF
 #define ZCL_GROUP_SUPPORT                           ON
-#define ZCL_SCENE_SUPPORT                           ON
+#define ZCL_SCENE_SUPPORT                           OFF // ON
 #define ZCL_ON_OFF_SWITCH_CFG_SUPPORT               USE_SWITCH
 #define ZCL_OTA_SUPPORT                             ON
 #define ZCL_GP_SUPPORT                              ON

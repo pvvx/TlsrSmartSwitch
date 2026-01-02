@@ -16,10 +16,12 @@ uint16_t tik_reload, tik_start; // step 1 sec, =0xFFFF - flag end
 
 // Pulse counters BL0937
 typedef struct {
-    volatile uint32_t cnt_current;
-    volatile uint32_t cnt_voltage;
-    volatile uint32_t cnt_power;
-    volatile uint32_t cnt_sel;
+    uint32_t sum_current;
+    uint32_t sum_voltage;
+    uint32_t cnt_current;
+    uint32_t cnt_voltage;
+    uint32_t cnt_power;
+    uint32_t cnt_sel;
 } bl0937_cnt_t;
 
 static bl0937_cnt_t bl0937_cnt; // Pulse counters BL0937
@@ -228,10 +230,6 @@ void bl0937_new_dataCb(void *args) {
     voltage = bl0937_cnt.cnt_voltage;
     power = bl0937_cnt.cnt_power;
 
-    bl0937_cnt.cnt_current = 0;
-    bl0937_cnt.cnt_voltage = 0;
-    bl0937_cnt.cnt_power = 0;
-
 #if USE_CALIBRATE_CVP
     if(cnt_calibrate.cnt) {
         cnt_calibrate.cnt++;
@@ -360,10 +358,10 @@ int32_t app_monitoringCb(void *arg) {
 
 	if(bl0937_cnt.cnt_sel & 1) {
 		gpio_write(dev_gpios.sel, 1);
-		bl0937_cnt.cnt_current += reg; // add count current
+		bl0937_cnt.sum_current += reg; // add count current
 	} else {
 		gpio_write(dev_gpios.sel, 0);
-		bl0937_cnt.cnt_voltage += reg; // add count voltage
+		bl0937_cnt.sum_voltage += reg; // add count voltage
 	}
 
 	reg_tmr2_tick = 0; // clear timer count
@@ -380,6 +378,10 @@ int32_t app_monitoringCb(void *arg) {
 		reg_tmr_sta = FLD_TMR_STA_TMR1; //clear irq status
 		reg_tmr_ctrl |= FLD_TMR1_EN; // start timer
 		irq_restore(r);
+		bl0937_cnt.cnt_current = bl0937_cnt.sum_current;
+		bl0937_cnt.sum_current = 0;
+		bl0937_cnt.cnt_voltage = bl0937_cnt.sum_voltage;
+		bl0937_cnt.sum_voltage = 0;
 		TL_SCHEDULE_TASK(bl0937_new_dataCb, NULL);
 	}
 

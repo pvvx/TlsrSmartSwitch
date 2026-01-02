@@ -61,7 +61,7 @@
 #include "drivers/drv_keyboard.h"
 #include "drivers/drv_nv.h"
 #undef FLASH_OTA_IMAGE_MAX_SIZE    
-#define FLASH_OTA_IMAGE_MAX_SIZE    (NV_BASE_ADDRESS - FLASH_ADDR_OF_APP_FW - 8192)
+#define FLASH_OTA_IMAGE_MAX_SIZE    FLASH_ADDR_TAB_GPIOS // (NV_BASE_ADDRESS - FLASH_ADDR_OF_APP_FW - 8192)
 #include "drivers/drv_putchar.h"
 #include "drivers/drv_usb.h"
 #include "drivers/drv_calibration.h"

@@ -82,7 +82,7 @@
         "fileSize": 193890,
         "manufacturerCode": 60000,
         "imageType": 32768,
-        "sha512": "0020a3f37637452e4d7e355098f6f7867deefa64977d738b8e7a02b2c35c07cce0e294e1e046a5f6bbfc75553b5d111610f55b66a3cdb9af9925e4c2969da921",
+        "sha512": "8af81d0947c2d8b5ef4fc0a087ac99dd8bffa6d593fb918cab85eba223fb265e8d3083bb4e14ff1309c0d8547a57b6907d6b198da7fc193b0dfb049b7ae1cd11",
         "otaHeaderString": "Telink-pvvx:EM8SW1_z",
         "modelId": "EM8SW1_z",
         "manufacturerName": [
@@ -95,7 +95,7 @@
         "fileSize": 195826,
         "manufacturerCode": 60000,
         "imageType": 32769,
-        "sha512": "21e89812bde5cea87687f5b57cc55449950e5ba1181430f70f5445c0aa6e44fc02df8bfbd48b497592a2575ab47b0cfaee3a493ba64d7b86dec20cd3b7abb1d1",
+        "sha512": "f64cdd06387865b417f4efc59c36474aad4fbf54401878925a4897a883ebb4d8de2a09625cd4e72d9047efb7a7b72dab60606096e3e9d3533f3119dbbc834812",
         "otaHeaderString": "Telink-pvvx:EM8SW2_z",
         "modelId": "EM8SW2_z",
         "manufacturerName": [
@@ -108,7 +108,7 @@
         "fileSize": 195666,
         "manufacturerCode": 60000,
         "imageType": 32784,
-        "sha512": "3b830c9989672a43a8f8d80325f7036901a888e3a402ec4e8646e278f36e892bdc16618dd091c16c9378262f4af75aa59be7d4dd285c8913b393e7134a6ab6eb",
+        "sha512": "3404c95f791e01d13b251b7b4a24d6d7b59eceb36551ec9406ef8bdc6470b9aadda4b0bf0c6d2eb9293acdc5808308c908590177c4af204aa54162e2933582ab",
         "otaHeaderString": "Telink-pvvx:EM8SW1T_z",
         "modelId": "EM8SW1T_z",
         "manufacturerName": [
@@ -121,7 +121,7 @@
         "fileSize": 197650,
         "manufacturerCode": 60000,
         "imageType": 32785,
-        "sha512": "4753000a56bedd7d3a3e6d638b8a2c0896776f716b065b02101f9d5d0c0241c45095cf61f612ca330e6ea31859cb11438e5f5b3047cf4f81d5319146bbd85f0e",
+        "sha512": "8abf7bc82ed929c1a5ad143cf93bcb7fa3afe476e926b21c5393021ce8fa4cc5ac84b820d2c8d34123cfa210c5dde03f4cdd25d1737552413984592df1515fad",
         "otaHeaderString": "Telink-pvvx:EM8SW2T_z",
         "modelId": "EM8SW2T_z",
         "manufacturerName": [
@@ -134,7 +134,7 @@
         "fileSize": 197154,
         "manufacturerCode": 60000,
         "imageType": 33040,
-        "sha512": "4360be43e2b8cfe8ca83f32a45f18704650ee4eb1fb7f133e2493339c6eb40cc3b2b8b0757285b3d8c8313c4b0b8f08765af0abd4f5164090b131a398720d390",
+        "sha512": "fb506881026483193e5bb6b96b4719cb725d2981dd496b4bb3bca6bf44f3dfeec29510d4c609ad9a614b582913243113383f3f3100982650855dffd6a2554c35",
         "otaHeaderString": "Telink-pvvx:EM8SW1TS_z",
         "modelId": "EM8SW1TS_z",
         "manufacturerName": [
@@ -147,7 +147,7 @@
         "fileSize": 199138,
         "manufacturerCode": 60000,
         "imageType": 33041,
-        "sha512": "a33328a3458b1740e6516bc734d8976d1ef31d71c0c529e3d9ad075f68eec0a97aa4bef54293e7a7ed50ebd02aed54ded12e28dd3393a8c1d5025a0b093b43ed",
+        "sha512": "a96be446197d809c2d8088ae110a85b4decf02a76480a76819a32d093424c5981f89fc283be8559e5e20ab7c39111b5fda4dec076d5cd6a420ee9d8430df493b",
         "otaHeaderString": "Telink-pvvx:EM8SW2TS_z",
         "modelId": "EM8SW2TS_z",
         "manufacturerName": [

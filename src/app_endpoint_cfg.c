@@ -310,7 +310,7 @@ const zclAttrInfo_t msInput1_attrTbl[] = {
 	{ ZCL_MULTISTATE_INPUT_ATTRID_NUM_OF_STATES,    ZCL_UINT16,     RW,      (uint8_t*)&g_zcl_msInputAttrs.num            },
 	{ ZCL_MULTISTATE_INPUT_ATTRID_OUT_OF_SERVICE,   ZCL_BOOLEAN,    RW,     (uint8_t*)&g_zcl_msInputAttrs.out_of_service },
 	{ ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE,    ZCL_UINT16,     RWR,    (uint8_t*)&g_zcl_msInputAttrs.value          },
-//	{ ZCL_MULTISTATE_INPUT_ATTRID_RELIABLILITY,		ZCL_ENUM8,		R,		(uint8_t*)&g_zcl_msInputAttrs.value          },
+//	{ ZCL_MULTISTATE_INPUT_ATTRID_RELIABLILITY,		ZCL_ENUM8,		R,		(uint8_t*)&g_zcl_msInputAttrs.reliablility   },
 	{ ZCL_MULTISTATE_INPUT_ATTRID_STATUS_FLAGS,     ZCL_BITMAP8,    RR,     (uint8_t*)&g_zcl_msInputAttrs.status_flag    },
 
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_UINT16,     R,      (uint8_t*)&zcl_attr_global_clusterRevision      },
