@@ -1,7 +1,7 @@
 # TlsrSmartSwitch
 Alternative firmwares for Smart Switch on the TLSR925x chipset.
 
-Current FW Version: 0.0.0.8 (pre-release)
+Current FW Version: 0.0.0.9 (pre-release)
 
 ## Supported device models:
 
