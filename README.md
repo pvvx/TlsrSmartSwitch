@@ -11,7 +11,7 @@ Default:
 * [Tuya ZigBee "Mini Zigbee Switch"](https://pvvx.github.io/TS0001_TZ3000_kqvb5akv/) (Sensor: **BL0942**), FW name: ***EM1SW**<**1**/**2**>[**T**/**TS**]*
 * [Tuya ZigBee "Mini Smart Switch"](https://pvvx.github.io/TS000F_TZ3000_xkap8wtb/) (Sensor: **BL0937**), FW name: ***EM8SW**<**1/2**>[**T**/**TS**]*
 
-And others, with sensors BL0942 or BL0937 (GPIOs are assigned by a separate [utility](https://pvvx.github.io/TlsrSmartSwitch/zigbeeswconfig.html), the all coefficients are set online)
+And others - GPIOs are assigned by a separate [utility](https://pvvx.github.io/TlsrSmartSwitch/zigbeeswconfig.html), the all coefficients are set online.
 
 ---
 
@@ -25,7 +25,7 @@ Optimizations have been made:
 * Firmware size for compatibility with chips with 512K flash memory.
 * Chip hardware usage.
 * Firmware loader for compatibility with OTA BLE and Zigbee variants.
-* Added a variant with the BL0937 sensor.
+* Added a version with BL0937 sensor and without energy monitoring sensor.
 * Custom settings of coefficients for the sensor.
 * Disabling the relay based on voltage or current threshold values.
 * Setting the relay restart interval after tripping based on thresholds.
