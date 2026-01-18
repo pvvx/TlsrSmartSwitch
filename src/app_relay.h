@@ -1,9 +1,8 @@
 #ifndef SRC_INCLUDE_APP_RELAY_H_
 #define SRC_INCLUDE_APP_RELAY_H_
 
-//#define AMT_RELAY   1
-
-#define GPIOS_FLG_LED1_POL	1 // not change! -> see get_led()
+// bits dev_gpios flags:
+#define GPIOS_FLG_LED1_POL	1 // not change! -> see get_led() -> return 0 or 1
 #define GPIOS_FLG_LED2_POL	2
 
 typedef struct {

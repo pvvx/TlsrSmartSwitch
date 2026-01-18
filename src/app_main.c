@@ -128,7 +128,9 @@ void user_app_init(void)
 #if USE_SENSOR_MY18B20
     init_my18b20();
 #endif
+#if USE_METERING
     app_sensor_init();
+#endif
     dev_relay_init();
 
 
@@ -208,7 +210,7 @@ static void app_sysException(void) {
 //__attribute__((optimize("-Os")))
 void user_init(bool isRetention)
 {
-#ifdef ZCL_METERING_SUPPORT
+#ifdef ZCL_METERING
 	uint64_t reportableChange_u64;
 #endif
 	int32_t reportableChange_tmp;
@@ -249,8 +251,10 @@ void user_init(bool isRetention)
     /* OnOff */
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_ON_OFF, ZCL_ATTRID_ONOFF,
             0, REPORT_TIME_MAX, (uint8_t *)&reportableChange_tmp);
+#if USE_SWITCH
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_ON_OFF, ZCL_ATTRID_RELAY_STATE,
             0, REPORT_TIME_MAX, (uint8_t *)&reportableChange_tmp);
+#endif
 #endif
 #ifdef ZCL_ON_OFF_SWITCH_CFG
     /* OnOffCfg */

@@ -131,18 +131,15 @@ extern "C" {
 #endif
 
 #define USE_CFG_GPIO		1
-#define USE_CALIBRATE_CVP	1 // Calibrate current, voltage, power
 
 #define ZCL_BASIC_MFG_NAME     {11,'T','e','l','i','n','k','-','p','v','v','x'}
 
 #if USE_BL0937
 #define _MODEL_EM	'8'
+#elif USE_BL0942
+#define _MODEL_EM	'1'
 #else
- #if USE_BL0942
-	#define _MODEL_EM	'1'
- #else
-	#error "Config error!"
- #endif
+#define _MODEL_EM	'0'
 #endif
 
 #if USE_SWITCH
@@ -165,6 +162,7 @@ extern "C" {
 
 #ifdef MY_DEVICE
 
+/*** Configure GPIOS for my device BL0937 ***/
 #if USE_BL0937
 
 #define BUTTON_ON		0
@@ -191,9 +189,9 @@ extern "C" {
 #define BL0937_POWER_REF          (1161624) 	// x100 0..327.67W, x10: 327.67..3276.7W (divisor = 10, 100 - > W)
 #define BL0937_ENERGY_REF         ((BL0937_POWER_REF + 225)/450) //(=2403) x100 Wh (divisor = 100000 - > kWh)
 
-#endif // USE_BL0937
 
-#if	USE_BL0942
+/*** Configure GPIOS for my device BL0942 ***/
+#elif	USE_BL0942
 
 #define BUTTON_ON		0
 #define GPIO_BUTTON     GPIO_PB5
@@ -248,11 +246,9 @@ extern "C" {
 #define GPIO_CF1        GPIO_PB5
 #define GPIO_SEL        GPIO_PD3
 
-#endif
-
 /*** Configure GPIOS for device BL0942 ***/
 
-#if	USE_BL0942
+#elif USE_BL0942
 
 #define BUTTON_ON		0
 #define GPIO_BUTTON     GPIO_PB5
@@ -271,6 +267,24 @@ extern "C" {
 
 #define GPIO_UART_TX    UART_TX_PB1
 #define GPIO_UART_RX    UART_RX_PB7
+
+/*** Configure GPIOS for device ns  ***/
+#else
+
+#define BUTTON_ON		0
+#define GPIO_BUTTON     GPIO_PB1
+
+#define LED_ON          0
+#define GPIO_LED1       GPIO_PB4
+#define GPIO_LED2       0
+
+#define RELAY_ON        1
+#define GPIO_RELAY1     GPIO_PD3
+
+#define GPIO_SWITCH_ON  0
+#define GPIO_SWITCH1    GPIO_PD2
+
+#define GPIO_ONEWIRE1   GPIO_PD2
 
 #endif
 
@@ -352,6 +366,8 @@ typedef enum{
  * ZCL cluster support setting
  */
 
+#define USE_CALIBRATE_CVP	USE_METERING // Calibrate current, voltage, power
+
 /* BDB */
 #define TOUCHLINK_SUPPORT               ON
 #define FIND_AND_BIND_SUPPORT           OFF
@@ -367,8 +383,8 @@ typedef enum{
 #define ZCL_ON_OFF_SWITCH_CFG_SUPPORT               USE_SWITCH
 #define ZCL_OTA_SUPPORT                             ON
 #define ZCL_GP_SUPPORT                              ON
-#define ZCL_METERING_SUPPORT                        ON
-#define ZCL_ELECTRICAL_MEASUREMENT_SUPPORT          ON
+#define ZCL_METERING_SUPPORT                        USE_METERING
+#define ZCL_ELECTRICAL_MEASUREMENT_SUPPORT          USE_METERING
 #define ZCL_MULTISTATE_INPUT_SUPPORT                USE_SWITCH
 #define ZCL_THERMOSTAT_SUPPORT						USE_THERMOSTAT
 #define ZCL_TEMPERATURE_MEASUREMENT_SUPPORT			USE_SENSOR_MY18B20

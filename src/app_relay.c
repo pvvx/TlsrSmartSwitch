@@ -70,18 +70,38 @@ bool get_relay_status(void) {
 
 /* Set relay and led, if not emergency */
 void set_relay_status(bool status) {
+#if USE_METERING
 	if(relay_off || tik_reload != 0xffff || tik_start != 0xffff)
 		status = false;
+#endif
 	if(status)
 		light_on();
 	else
 		light_off();
-	relay_state = status;
 #if RELAY_ON
 	gpio_write(dev_gpios.rl, status);
 #else
 	gpio_write(dev_gpios.rl, !status);
 #endif
+#if !USE_SWITCH
+	if(relay_state != status) {
+		if(status)
+		{
+#if RELAY_ON
+			remoteCmdOnOff(ZCL_CMD_ONOFF_ON);
+#else
+			remoteCmdOnOff(ZCL_CMD_ONOFF_OFF);
+#endif
+		} else {
+#if RELAY_ON
+			remoteCmdOnOff(ZCL_CMD_ONOFF_OFF);
+#else
+			remoteCmdOnOff(ZCL_CMD_ONOFF_ON);
+#endif
+		}
+	}
+#endif // !USE_SWITCH
+	relay_state = status;
 }
 
 #if USE_THERMOSTAT // USE_SENSOR_MY18B20

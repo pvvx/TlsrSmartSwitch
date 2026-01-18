@@ -81,8 +81,12 @@ const uint16_t app_ep1_inClusterList[] = {
 #ifdef ZCL_TEMPERATURE_MEASUREMENT
 	ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,
 #endif
+#ifdef ZCL_METERING
     ZCL_CLUSTER_SE_METERING,
+#endif
+#ifdef ZCL_ELECTRICAL_MEASUREMENT
     ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
+#endif
 #ifdef ZCL_ZLL_COMMISSIONING
     ZCL_CLUSTER_TOUCHLINK_COMMISSIONING,
 #endif
@@ -92,7 +96,7 @@ const uint16_t app_ep1_inClusterList[] = {
  *  @brief Definition for Outgoing cluster / Client Cluster
  */
 const uint16_t app_ep1_outClusterList[] = {
-#if USE_SWITCH
+#if 1 // USE_SWITCH
     ZCL_CLUSTER_GEN_ON_OFF,
 #endif
 #ifdef ZCL_OTA
@@ -394,7 +398,11 @@ const zclAttrInfo_t onOff1_attrTbl[] = {
 	{ ZCL_ATTRID_START_UP_ONOFF,            ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.startUpOnOff        },
 
 	// Custom Attr:
+#if USE_SWITCH
 	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
+#else
+	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    R,     (uint8_t*)&relay_state },
+#endif
 	{ ZCL_ATTRID_CUSTOM_KEY_LOCK,           ZCL_BOOLEAN,    RW,     (uint8_t*)&cfg_on_off.key_lock        },
     { ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.led_control     },
 
@@ -608,7 +616,7 @@ const zcl_specClusterInfo_t g_appClusterList1[] =
 #ifdef ZCL_TEMPERATURE_MEASUREMENT
 	{ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,	MANUFACTURER_CODE_NONE, ZCL_TEMPERATURE_MEASUREMENT_ATTR_NUM, temperature_measurement_attrTbl, 	zcl_temperature_measurement_register, 	NULL},
 #endif
-#ifdef ZCL_METERING_SUPPORT
+#ifdef ZCL_METERING
     {ZCL_CLUSTER_SE_METERING,               MANUFACTURER_CODE_NONE, ZCL_SE_ATTR_NUM,            se_attrTbl,          app_zcl_metering_register,         app_meteringCb  },
 #endif
 #ifdef ZCL_ELECTRICAL_MEASUREMENT

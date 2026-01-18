@@ -1,6 +1,7 @@
 #ifndef SRC_INCLUDE_APP_SENSOR_H_
 #define SRC_INCLUDE_APP_SENSOR_H_
 
+#if USE_METERING
 // Sensor coefficients
 typedef struct {
     uint32_t current;
@@ -25,6 +26,8 @@ nv_sts_t save_config_sensor(void);
 
 #if USE_CALIBRATE_CVP
 void check_start_calibrate(void);
+#endif
+
 #endif
 
 #endif /* SRC_INCLUDE_APP_SENSOR_H_ */

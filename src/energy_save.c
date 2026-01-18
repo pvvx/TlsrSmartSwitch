@@ -21,6 +21,7 @@
  */
 
 #include "app_main.h"
+#ifdef ZCL_METERING
 #include "energy_save.h"
 #include "battery.h"
 #include "utility.h"
@@ -257,4 +258,4 @@ int32_t energy_timerCb(void *args) {
     }
     return 0;
 }
-
+#endif // ZCL_METERING

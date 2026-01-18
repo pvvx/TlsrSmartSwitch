@@ -290,8 +290,9 @@ void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf)
     if(pLeaveCnf->status == SUCCESS) {
 
         //relay_settints_default();
+#if USE_METERING
         energy_remove();
-
+#endif
         zb_deviceFactoryNewSet(true);
 
         heartInterval = 500;

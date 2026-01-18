@@ -42,33 +42,48 @@
 #endif
 
 /* Board ID */
-#define BOARD_EM1SW1		0 // ZTU, BL0942
-#define BOARD_EM1SW2		1 // ZTU, BL0942, ext.switch
-#define BOARD_EM1SW1T		2 // ZTU, BL0942, MY18B20
-#define BOARD_EM1SW2T		3 // ZTU, BL0942, ext.switch, MY18B20
-#define BOARD_EM1SW1TS		6 // ZTU, BL0942, MY18B20, TERMOSTAT
-#define BOARD_EM1SW2TS		7 // ZTU, BL0942, ext.switch, MY18B20, TERMOSTAT
+#define BOARD_EM0SW1		0 // key only
+#define BOARD_EM0SW2		1 // ext.switch
+#define BOARD_EM0SW1T		2 // MY18B20
+#define BOARD_EM0SW2T		3 // ext.switch, MY18B20
+#define BOARD_EM0SW1TS		6 // MY18B20, TERMOSTAT
+#define BOARD_EM0SW2TS		7 // ext.switch, MY18B20, TERMOSTAT
+
+#define BOARD_EM1SW1		8  // BL0942
+#define BOARD_EM1SW2		9  // BL0942, ext.switch
+#define BOARD_EM1SW1T		10 // BL0942, MY18B20
+#define BOARD_EM1SW2T		11 // BL0942, ext.switch, MY18B20
+#define BOARD_EM1SW1TS		14 // BL0942, MY18B20, TERMOSTAT
+#define BOARD_EM1SW2TS		15 // BL0942, ext.switch, MY18B20, TERMOSTAT
                     
-#define BOARD_EM8SW1		8 // ZTU, BL0942
-#define BOARD_EM8SW2		9 // ZTU, BL0942, ext.switch
-#define BOARD_EM8SW1T		10 // ZTU, BL0942, MY18B20
-#define BOARD_EM8SW2T		11 // ZTU, BL0942, ext.switch, MY18B20
-#define BOARD_EM8SW1TS		14 // ZTU, BL0942, MY18B20, TERMOSTAT
-#define BOARD_EM8SW2TS		15 // ZTU, BL0942, ext.switch, MY18B20, TERMOSTAT
+#define BOARD_EM8SW1		16 // BL0937
+#define BOARD_EM8SW2		17 // BL0937, ext.switch
+#define BOARD_EM8SW1T		18 // BL0937, MY18B20
+#define BOARD_EM8SW2T		19 // BL0937, ext.switch, MY18B20
+#define BOARD_EM8SW1TS		22 // BL0937, MY18B20, TERMOSTAT
+#define BOARD_EM8SW2TS		23 // BL0937, ext.switch, MY18B20, TERMOSTAT
+
+
 
 /* Board define */
 #ifndef BOARD
-#define BOARD				BOARD_EM8SW1
+#define BOARD				BOARD_EM1SW1
 #endif
 
 // #define MY_DEVICE	1
 
-#if (BOARD & 8)
+#if (BOARD & 16)
 #define USE_BL0937			1
 #define USE_BL0942			0
-#else
+#define USE_METERING		1
+#elif (BOARD & 8)
 #define USE_BL0937			0
 #define USE_BL0942			1
+#define USE_METERING		1
+#else
+#define USE_BL0937			0
+#define USE_BL0942			0
+#define USE_METERING		0
 #endif
 #if (BOARD & 1)
 #define USE_SWITCH			1
@@ -108,9 +123,8 @@
 		#define CHIP_TYPE		TLSR_B91
 #endif
 
-
 #define APP_RELEASE				0x00	//0x12 -> BCD app release "1.2"
-#define APP_BUILD				0x09	//0x34 -> BCD app build "3.4"
+#define APP_BUILD				0x10	//0x34 -> BCD app build "3.4"
 
 #define STACK_RELEASE			0x30	//BCD stack release 3.0
 #define STACK_BUILD				0x01	//BCD stack build 01
@@ -121,7 +135,8 @@
  */
 //#define MANUFACTURER_CODE_TELINK           	0x1141	// Telink ID
 #define MANUFACTURER_CODE_TELINK           	0xEA60	// 60000 Telink-pvvx
-#define	IMAGE_TYPE							((USE_BL0937 << 15) | (USE_BL0942 << 12) | (USE_THERMOSTAT << 8) | (USE_SENSOR_MY18B20 << 4)  | USE_SWITCH)
+//#define	IMAGE_TYPE							((USE_BL0937 << 15) | (USE_BL0942 << 12) | (USE_THERMOSTAT << 8) | (USE_SENSOR_MY18B20 << 4)  | USE_SWITCH)
+#define	IMAGE_TYPE							(0x0100 | BOARD)
 #define	FILE_VERSION					  	((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
 
 /* Pre-compiled link configuration. */

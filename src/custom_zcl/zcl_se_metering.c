@@ -1,5 +1,6 @@
 #include "tl_common.h"
 #include "zcl_include.h"
+#ifdef ZCL_METERING
 #include "smart_energy/zcl_metering.h"
 #include "zcl_se_metering.h"
 #include "app_sensor.h"
@@ -227,3 +228,4 @@ _CODE_ZCL_ status_t app_zcl_metering_register(u8 endpoint, u16 manuCode, u8 attr
     return zcl_registerCluster(endpoint, ZCL_CLUSTER_SE_METERING, manuCode, attrNum, attrTbl, app_zcl_metering_cmdHandler, cb);
 }
 
+#endif // ZCL_METERING

@@ -209,6 +209,7 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
        		save |= BIT(NBIT_MY18B20_CONFIG);
  #endif // ZCL_TEMPERATURE_MEASUREMENT
 #endif // USE_SENSOR_MY18B20
+#ifdef ZCL_ELECTRICAL_MEASUREMENT
 		} else if (clusterId == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
 			if (attrID >= ZCL_ATTRID_CURRENT_COEF
 				&& attrID <= ZCL_ATTRID_FGREQ_COEF) {
@@ -221,6 +222,7 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
 			} else {
 				save |= BIT(NBIT_MIN_MAX_CONFIG);
 			}
+#endif // ZCL_ELECTRICAL_MEASUREMENT
 		}
 	}
 #if USE_CALIBRATE_CVP
@@ -228,12 +230,14 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
     	check_start_calibrate();
     }
 #endif
+#if USE_METERING
     if (save & BIT(NBIT_SENSOR_CONFIG)) {
     	save_config_sensor();
     }
     if (save & BIT(NBIT_MIN_MAX_CONFIG)) {
     	save_config_min_max();
     }
+#endif
 #if USE_SENSOR_MY18B20
  #ifdef ZCL_THERMOSTAT
     if (save &  BIT(NBIT_THERM_CONFIG)) {
@@ -805,7 +809,7 @@ status_t app_msInputCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cm
     return status;
 }
 
-
+#ifdef ZCL_METERING
 /*********************************************************************
  * @fn      app_meteringCb
  *
@@ -823,5 +827,5 @@ status_t app_meteringCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *c
 //    printf("app_meteringCb\r\n");
     return ZCL_STA_SUCCESS;
 }
-
+#endif
 

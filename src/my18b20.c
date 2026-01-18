@@ -313,9 +313,11 @@ static void error_my18b20(void) {
 #ifdef ZCL_THERMOSTAT
 		zcl_thermostat_attrs.local_temp = 0x8000;
 #endif
+#if USE_METERING
 		if (config_min_max.emergency_off & BIT(BIT_ERR_TS_OFF)) {
 			relay_off |= BIT(BIT_ERR_TS_OFF);
 		}
+#endif
 	}
 }
 
@@ -361,12 +363,14 @@ void task_my18b20(void) {
 			if(onewire_write(0x0becc, 16) >= 0 // cmd read
 				&& onewire_16bit_read(&my18b20.rtemp) >= 0) { // read measure
 				temp = ((int)(my18b20.rtemp * my18b20.coef.temp_k) >> 16) + my18b20.coef.temp_z; // x 0.01 C
+#if USE_METERING
 				if ((config_min_max.emergency_off & BIT(BIT_MAX_TEMP_OFF))
 					&& temp > my18b20.coef.max_temp)
 					relay_off |= BIT(BIT_MAX_TEMP_OFF);
 				if ((config_min_max.emergency_off & BIT(BIT_MIN_TEMP_OFF))
 					&& temp > my18b20.coef.min_temp)
 					relay_off |= BIT(BIT_MIN_TEMP_OFF);
+#endif
 #ifdef ZCL_THERMOSTAT
 				set_thermostat(temp);
 #endif
