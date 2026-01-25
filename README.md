@@ -13,6 +13,9 @@ Default:
 
 And others Smart Switch - GPIOs are assigned by a separate [utility](https://pvvx.github.io/TlsrSmartSwitch/zigbeeswconfig.html), the all coefficients are set online.
 
+![SMxSW1a.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/SMxSW1a.jpg) ![SMxSW1b.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/SMxSW1b.jpg)
+
+
 ---
 
 ## *Story:*
