@@ -2,7 +2,9 @@
 //#include "sensors.h"
 
 #define USE_READ_ADC_CALIBRATION	0
-#define ADC_CALIBRATION_VREF		1175
+#ifndef ADC_CALIBRATION_VREF
+#define ADC_CALIBRATION_VREF		1175 // default ADC ref voltage (unit:mV)
+#endif
 
 #define ADC_BUF_COUNT	8
 

@@ -55,9 +55,9 @@ static uint8_t first_start = true;     // flag
 #ifndef BL0942_POWER_REF
 #define BL0942_POWER_REF        27060025 // poewr x1000: x1000: 0..32.767W, x100 32.767..327.67W, x10: 327.67..3276.7W
 #endif
-// This REF get from https://github.com/esphome/esphome/blob/dev/esphome/components/bl0942
-// this->energy_reference_ = this->power_reference_ * 3600000 / 419430.4
-// ENERGY_REF = ((2pow32/POWER_REF)*3600000)/419430.4
+// energy = power * 3600000 / 419430.4
+// 2pow24*419430.4/36000 = 195468733.8
+#define BL0942_COEF_P2E			195468734
 #ifndef BL0942_ENERGY_REF
 #define BL0942_ENERGY_REF       315272310 // energy x100000
 #endif
@@ -170,15 +170,19 @@ static void sensor_calibrate_coef(void) {
 	}
 	if(sensor_calibrate.power) { // in 0.1 W, max 6250.0W (250V*25A)
 		if(sensor_calibrate.power == 1) {
+			u8 r = irq_disable();
 			sensor_pwr_coef.power = mul32x32_64(sensor_pwr_coef.current, sensor_pwr_coef.voltage) >> 24;
+			irq_restore(r);
 		} else if(reg_calibrate.power) { // x4
 			// coef.power - fp(8.24)
 			sensor_pwr_coef.power =
 				_calk_coef(reg_calibrate.power, sensor_calibrate.power) << (24+2-23); // << 3
 		}
 		// energy = power * 3600000 / 419430.4
-		// 2pow32/(419430.4*100/3600000) = 368640000
-		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power, 368640000) >> 32;
+		// 2pow24*419430.4/36000 = 195468733.8
+		u8 r = irq_disable();
+		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power, BL0942_COEF_P2E) >> 24;
+		irq_restore(r);
 		save_flg = true;
 		sensor_calibrate.power = 0;
 	}
@@ -308,6 +312,7 @@ void monitoring_handler(void) {
                 	}
                 }
 #endif
+                u8 r = irq_disable();
                 tmp = mul32x32_64(current, sensor_pwr_coef.current);
                 tmp += old_fract.current;
                 old_fract.current = tmp & 0xffffffff;
@@ -321,8 +326,9 @@ void monitoring_handler(void) {
                 g_zcl_msAttrs.voltage = (uint16_t)voltage;
 
                 // power x1000 0..3276.750W
-
                 tmp = mul32x32_64(power, sensor_pwr_coef.power);
+    			irq_restore(r);
+
                 tmp += old_fract.power;
                 old_fract.power = tmp & 0xffffff;
                 power = tmp >> 24;
@@ -363,7 +369,10 @@ void monitoring_handler(void) {
                 }
                 old_fract.old_energy = freq; // restore energy
 
+                u8 x = irq_disable();
                	tmp = mul32x32_64(energy, sensor_pwr_coef.energy);
+    			irq_restore(x);
+
                 tmp += old_fract.energy;
                 old_fract.energy = tmp & 0xffffff; // 24 bits
                 energy = tmp >> 24;

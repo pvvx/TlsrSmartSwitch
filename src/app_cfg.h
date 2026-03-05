@@ -47,7 +47,8 @@ extern "C" {
 
 /* PA */
 #define PA_ENABLE                       OFF
-
+//#define PA_TX                   GPIO_PC4
+//#define PA_RX                   GPIO_PC3
 
 #define CLOCK_SYS_CLOCK_HZ          48000000 // 32000000    // 24000000 //48000000
 
@@ -344,8 +345,8 @@ enum {
  */
 
 // ID compatible NV, and flag used NV_MODULE_APP
-#define USE_NV_APP  ((APP_RELEASE << 24) | (APP_BUILD << 16) | (0x1000 | (CHIP_TYPE << 8) | BOARD))    // ID, not change!
-#define USE_NV_APP_OK  ((0 << 24) | (0x02 << 16) | (0x1000 | (CHIP_TYPE << 8) | BOARD))  // Test for compatible version of saved settings formats
+#define USE_NV_APP  ((APP_RELEASE << 24) | (APP_BUILD << 16) | IMAGE_TYPE)    // ID, not change!
+#define USE_NV_APP_OK  ((0 << 24) | (0x02 << 16) | IMAGE_TYPE)  // Test for compatible version of saved settings formats
 
 typedef enum{
     NV_ITEM_APP_DEV_VER = 0x60, // see sdk/proj/drivers/drv_nv.h

@@ -24,16 +24,17 @@ ota_preamble_t app_otaInfo = {
 
 //Must declare the application call back function which used by ZDO layer
 const zdo_appIndCb_t appCbLst = {
-    bdb_zdoStartDevCnf,//start device cnf cb
-    NULL,//reset cnf cb
-    NULL,//device announce indication cb
-    app_leaveIndHandler,//leave ind cb
-    app_leaveCnfHandler,//leave cnf cb
+    bdb_zdoStartDevCnf,		//start device cnf cb
+    NULL,					//reset cnf cb
+    NULL,					//device announce indication cb
+    app_leaveIndHandler,	//leave ind cb
+    app_leaveCnfHandler,	//leave cnf cb
     app_nwkUpdateIndicateHandler,//nwk update ind cb
-    NULL,//permit join ind cb
-    NULL,//nlme sync cnf cb
-    NULL,//tc join ind cb
-    NULL,//tc detects that the frame counter is near limit
+    NULL,					//permit join ind cb
+    NULL,					//nlme sync cnf cb
+    NULL,					//tc join ind cb
+    NULL,					//tc detects that the frame counter is near limit
+	NULL					//nwk status ind cb
 };
 
 
@@ -66,15 +67,14 @@ bdb_commissionSetting_t g_bdbCommissionSetting = {
 void test_nv_version(void) {
 	u32 ver = 0;
 	if(nv_flashReadNew(1, NV_MODULE_APP, NV_ITEM_APP_DEV_VER, sizeof(ver), (u8 *)&ver) == NV_SUCC
-		&& (ver & 0xFFFF) == (USE_NV_APP & 0xFFFF)
+		&& (ver & 0xFFFF) != (USE_NV_APP & 0xFFFF)
 		&& ver >= USE_NV_APP_OK // compatible ?
 		) {
-
 	} else {
-		ver = USE_NV_APP;
 		nv_resetAll();
 		nv_resetModule(NV_MODULE_APP);
 		// energy_remove(); ?
+		ver = USE_NV_APP;
 		nv_flashWriteNew(1, NV_MODULE_APP, NV_ITEM_APP_DEV_VER, sizeof(ver), (u8 *)&ver);
 		// SYSTEM_RESET();
 	}
@@ -222,7 +222,9 @@ void user_init(bool isRetention)
 
     /* Initialize GPIO led, key, relay, switch, ... */
     dev_gpios_init();
-
+#if PA_ENABLE
+    rf_paInit(PA_TX, PA_RX);
+#endif
     /* Initialize Stack */
     stack_init();
 

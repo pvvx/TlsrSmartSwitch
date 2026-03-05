@@ -23,7 +23,7 @@
 #define TEST_CONST_FLASH		0x33CC55AA
 static const u32 flag_addr_ok = TEST_CONST_FLASH;
 
-extern int flash_main(void);
+//extern int flash_main(void);
 
 /* Reformat low OTA to big OTA, Zigbee BootLoader to Zigbee no BootLoader */
 

@@ -291,7 +291,7 @@ void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf)
 
         //relay_settints_default();
 #if USE_METERING
-        energy_remove();
+        //energy_remove();
 #endif
         zb_deviceFactoryNewSet(true);
 

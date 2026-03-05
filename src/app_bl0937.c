@@ -75,6 +75,7 @@ static cnt_calibrate_t cnt_calibrate;
 
 zcl_sensor_calibrate_t sensor_calibrate_old, sensor_calibrate;
 
+
 /* cnt4 max = 0x3fffffff
    return fp(14.18) = x/cnt4 */
 static uint32_t _calk_coef(uint32_t cnt4, uint32_t x) {
@@ -113,14 +114,18 @@ static void sensor_calibrate_coef(void) {
 	}
 	if(sensor_calibrate.power) { // in 0.1 W, max 6250.0W (250V*25A)
 		if(sensor_calibrate.power == 1) {
+			u8 r = irq_disable();
 			sensor_pwr_coef.power = mul32x32_64(sensor_pwr_coef.current, sensor_pwr_coef.voltage) >> 15;
+			irq_restore(r);
 		} else if(cnt_calibrate.power) { // x4
 			// coef.power - fp(16.16)
 			sensor_pwr_coef.power =
 					_calk_coef(cnt_calibrate.power, sensor_calibrate.power);
 		}
 		// 0x100000000/(60*60/8)=9544371.76888
+		u8 r = irq_disable();
 		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power+225, 9544372) >> 32;
+		irq_restore(r);
 		save_flg = true;
 		sensor_calibrate.power = 0;
 	}
@@ -256,7 +261,9 @@ void bl0937_new_dataCb(void *args) {
 
     energy = power;
 
+    u8 r = irq_disable();
    	tmp = mul32x32_64(power, sensor_pwr_coef.power);
+   	irq_restore(r);
     tmp += old_fract.power;
     old_fract.power = tmp & 0xffff;
     power = tmp >> 16;
@@ -282,7 +289,9 @@ void bl0937_new_dataCb(void *args) {
    	    }
    		g_zcl_msAttrs.power = (int16_t)power;
 
+   		u8 r = irq_disable();
    		tmp = mul32x32_64(energy, sensor_pwr_coef.energy);
+   		irq_restore(r);
    		tmp += old_fract.energy;
    		old_fract.energy = tmp & 0xffff;
    		energy = tmp >> 16;
@@ -414,7 +423,9 @@ nv_sts_t save_config_sensor(void) {
 #if NV_ENABLE
 	nv_sts_t ret = NV_SUCC;
 	if(memcmp(&sensor_pwr_coef_saved, &sensor_pwr_coef, sizeof(sensor_pwr_coef))) {
+		u8 r = irq_disable();
 		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power+225, 9544372) >> 32; // 0x100000000/(60*60/8)=9544371.76888
+		irq_restore(r);
 		memcpy(&sensor_pwr_coef_saved, &sensor_pwr_coef, sizeof(sensor_pwr_coef));
 		ret = nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_CFG_SENSOR_BL09xx, sizeof(sensor_pwr_coef), (uint8_t*)&sensor_pwr_coef);
 	}

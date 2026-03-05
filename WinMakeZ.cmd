@@ -8,6 +8,7 @@ set PROJECT_NAME=EM0SW1
 make -s -j clean
 make -s -j VERSION_BIN=%SWVER% PROJECT_NAME=%PROJECT_NAME% POJECT_DEF="-DBOARD=BOARD_%PROJECT_NAME%"
 @if not exist "bin\%PROJECT_NAME%%SWVER%.bin" goto :error
+python3 make_z\zb_bin_ota.py bin\%PROJECT_NAME%%SWVER%.bin bin\Zbeacon_TS0001%SWVER% -m0x100B -i0x020A -v0x10993607 -s"Hue to Telink-pvvx"
 set PROJECT_NAME=EM1SW1
 make -s -j clean
 make -s -j VERSION_BIN=%SWVER% PROJECT_NAME=%PROJECT_NAME% POJECT_DEF="-DBOARD=BOARD_%PROJECT_NAME%"
@@ -79,6 +80,7 @@ make -s -j VERSION_BIN=%SWVER% PROJECT_NAME=%PROJECT_NAME% POJECT_DEF="-DBOARD=B
 cd .\zigpy_ota
 call update.cmd %SWVER%
 cd ..
+
 @exit
 :error
 echo "Error!"
