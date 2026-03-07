@@ -265,7 +265,7 @@ nv_sts_t nv_write_item(u8 single, u16 id, u8 itemId, u8 opSect, u16 opItemIdx, u
 	u32 crcOri = 0xffffffff;
 	u32 crcDst = 0xffffffff;
 	itemHdr_t hdr;
-
+	sws_printf("nv_write_item(%02x:%02x#%d)\n", id, itemId, len);
 	if(opItemIdx == 0){
 		offset = MODULE_CONTEXT_START(id, opSect, len);
 	}else{

@@ -15,6 +15,7 @@ typedef struct {
 const ext_tab_gpios_t  tab_gpios = {
 	.id = { 0x5F424154, 0x4F495047 }, // "TAB_GPIO"
 	.gpios = {
+		.flg = LED1_ON | (LED2_ON<<1) | (BUTTON_ON<<2) | (GPIO_SWITCH_ON<<3),
 		.rl = GPIO_RELAY1,
 		.led1 = GPIO_LED1,
 		.led2 = GPIO_LED2,
@@ -70,6 +71,7 @@ bool get_relay_status(void) {
 
 /* Set relay and led, if not emergency */
 void set_relay_status(bool status) {
+	sws_printf("set_relay_status(%d)\n", status);
 #if USE_METERING
 	if(relay_off || tik_reload != 0xffff || tik_start != 0xffff)
 		status = false;
@@ -181,19 +183,14 @@ void dev_gpios_init(void) {
 	if(!dev_gpios.led1)
 		dev_gpios.led1 = GPIO_LED1;
     gpio_output_init(dev_gpios.led1,
-    		(dev_gpios.flg & GPIOS_FLG_LED1_POL)? LED_ON : LED_OFF);
+    		(dev_gpios.flg & GPIOS_FLG_LED1_POL)? LED1_ON : LED1_OFF);
     if(dev_gpios.led2)
     	gpio_output_init(dev_gpios.led2,
-    			(dev_gpios.flg & GPIOS_FLG_LED2_POL)? LED_ON : LED_OFF);
-#if USE_SWITCH
-	if(!dev_gpios.sw1)
-		dev_gpios.sw1 = GPIO_SWITCH1;
-    gpio_input_init(dev_gpios.sw1, PM_PIN_PULLUP_10K);
-#endif
-	if(!dev_gpios.key)
-		dev_gpios.key = GPIO_BUTTON;
-    scan_pins[0] = dev_gpios.key;
-    gpio_input_init(dev_gpios.key, PM_PIN_PULLUP_10K);
+    			(dev_gpios.flg & GPIOS_FLG_LED2_POL)? LED2_ON : LED2_OFF);
+    sws_puts("dev_gpios_init:");
+    sws_print_hex_dump((u8 *)&dev_gpios, sizeof(dev_gpios));
+    sws_putchar('\n');
+    buttonInit();
 }
 
 void dev_relay_init(void) {

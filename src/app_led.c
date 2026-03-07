@@ -4,17 +4,17 @@
 void led_on(void)
 {
 	gpio_write(dev_gpios.led1,
-			(dev_gpios.flg & GPIOS_FLG_LED1_POL)? LED_OFF : LED_ON);
+			(dev_gpios.flg & GPIOS_FLG_LED1_POL)? LED1_OFF : LED1_ON);
 }
 
 void led_off(void)
 {
 	gpio_write(dev_gpios.led1,
-			(dev_gpios.flg & GPIOS_FLG_LED1_POL)? LED_ON : LED_OFF);
+			(dev_gpios.flg & GPIOS_FLG_LED1_POL)? LED1_ON : LED1_OFF);
 }
 
 bool get_led(void) {
-#if LED_ON
+#if LED1_ON
 	bool ret = gpio_read(dev_gpios.led1)? 0 : 1;
 #else
 	bool ret = gpio_read(dev_gpios.led1)? 1 : 0;

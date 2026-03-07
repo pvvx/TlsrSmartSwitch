@@ -5,6 +5,7 @@
 
 
 void cmdOnOff_set(bool status) {
+	sws_printf("cmdOnOff_set(%d)\n", status);
     if(cfg_on_off_saved.onOff != status) {
     	cfg_on_off.onOff = status;
     	if(cfg_on_off.startUpOnOff != ZCL_START_UP_ONOFF_SET_ONOFF_TO_OFF
@@ -26,26 +27,31 @@ void cmdOnOff_toggle(void) {
 }
 
 void remoteCmdOnOff(uint8_t cmd) {
-    epInfo_t dstEpInfo;
-    TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+	if (zb_isDeviceJoinedNwk()) {
 
-    dstEpInfo.profileId = HA_PROFILE_ID;
+		epInfo_t dstEpInfo;
+		TL_SETSTRUCTCONTENT(dstEpInfo, 0);
 
-    dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
+		dstEpInfo.profileId = HA_PROFILE_ID;
 
-    /* command 0x00 - off, 0x01 - on, 0x02 - toggle */
+		dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
 
-    switch(cmd) {
-        case ZCL_CMD_ONOFF_OFF:
-            zcl_onOff_offCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
-            break;
-        case ZCL_CMD_ONOFF_ON:
-            zcl_onOff_onCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
-            break;
-        case ZCL_CMD_ONOFF_TOGGLE:
-            zcl_onOff_toggleCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
-            break;
-        default:
-            break;
-    }
+		/* command 0x00 - off, 0x01 - on, 0x02 - toggle */
+
+		sws_printf("remoteCmdOnOff(%d)\n", cmd);
+
+		switch (cmd) {
+		case ZCL_CMD_ONOFF_OFF:
+			zcl_onOff_offCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
+			break;
+		case ZCL_CMD_ONOFF_ON:
+			zcl_onOff_onCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
+			break;
+		case ZCL_CMD_ONOFF_TOGGLE:
+			zcl_onOff_toggleCmd(APP_ENDPOINT1, &dstEpInfo, FALSE);
+			break;
+		default:
+			break;
+		}
+	}
 }

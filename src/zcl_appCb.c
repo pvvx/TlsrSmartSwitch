@@ -177,6 +177,7 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
     for (uint32_t i = 0; i < numAttr; i++) {
     	data = attr[i].attrData[0];
     	attrID = attr[i].attrID;
+        sws_printf("app_zclWriteReqCmd(%04:%04x)\n", clusterId, attrID);
 		if (clusterId == ZCL_CLUSTER_GEN_ON_OFF) {
 #if USE_CFG_GPIO
 			if(attrID >= ZCL_ATTRID_GPIO_RELAY) {
@@ -601,8 +602,7 @@ static void app_zclGetGroupMembershipRspCmdHandler(zcl_getGroupMembershipRsp_t *
  */
 status_t app_groupCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
 
-//    printf("app_groupCb. ep: %d\r\n", pAddrInfo->dstEp);
-
+	sws_printf("app_groupCb(%d#%04)\n", pAddrInfo->dstEp, cmdId);
 	if(pAddrInfo->dstEp == APP_ENDPOINT1) {
 		if(pAddrInfo->dirCluster == ZCL_FRAME_SERVER_CLIENT_DIR){
 			switch(cmdId){
@@ -769,6 +769,8 @@ status_t app_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayloa
 
     zcl_onOffAttr_t *pOnOff = zcl_onOffAttrsGet();
 //    pOnOff += pAddrInfo->dstEp - 1;
+
+    sws_printf("app_onOffCb(%d#%04x)\n", pAddrInfo->dstEp, cmdId);
 
     if(pAddrInfo->dstEp == APP_ENDPOINT1 || pAddrInfo->dstEp == APP_ENDPOINT2) {
     	switch(cmdId){

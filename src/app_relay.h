@@ -4,6 +4,8 @@
 // bits dev_gpios flags:
 #define GPIOS_FLG_LED1_POL	1 // not change! -> see get_led() -> return 0 or 1
 #define GPIOS_FLG_LED2_POL	2
+#define GPIOS_FLG_KEY_ON	4
+#define GPIOS_FLG_BTN_ON	8
 
 typedef struct {
     uint16_t		flg;	// LED1-2 inversion bits, ...

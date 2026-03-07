@@ -8,12 +8,11 @@ $(OUT_PATH)$(SRC_DIR)/patch_z_sdk/cstartup_8258.o \
 $(OUT_PATH)$(SRC_DIR)/div_mod.o \
 $(OUT_PATH)$(SRC_DIR)/main.o \
 $(OUT_PATH)$(SRC_DIR)/battery.o \
-$(OUT_PATH)$(SRC_DIR)/custom_zcl/zcl_reporting.o \
 $(OUT_PATH)$(SRC_DIR)/custom_zcl/zcl_onoffSwitchCfg.o \
 $(OUT_PATH)$(SRC_DIR)/custom_zcl/zcl_se_metering.o \
 $(OUT_PATH)$(SRC_DIR)/zb_appCb.o \
 $(OUT_PATH)$(SRC_DIR)/zcl_appCb.o \
-$(OUT_PATH)$(SRC_DIR)/app_endpoint_cfg.o \
+$(OUT_PATH)$(SRC_DIR)/app_ep_cfg.o \
 $(OUT_PATH)$(SRC_DIR)/app_reporting.o \
 $(OUT_PATH)$(SRC_DIR)/app_onoff.o \
 $(OUT_PATH)$(SRC_DIR)/app_led.o \
@@ -26,6 +25,8 @@ $(OUT_PATH)$(SRC_DIR)/app_bl0937.o \
 $(OUT_PATH)$(SRC_DIR)/my18b20.o \
 $(OUT_PATH)$(SRC_DIR)/energy_save.o \
 $(OUT_PATH)$(SRC_DIR)/app_main.o \
+$(OUT_PATH)$(SRC_DIR)/sws_printf.o \
+$(OUT_PATH)$(SRC_DIR)/patch_z_sdk/zcl_reporting.o \
 $(OUT_PATH)$(SRC_DIR)/patch_z_sdk/flash.o \
 $(OUT_PATH)$(SRC_DIR)/patch_z_sdk/flash_drv.o \
 $(OUT_PATH)$(SRC_DIR)/patch_z_sdk/adc_drv.o \

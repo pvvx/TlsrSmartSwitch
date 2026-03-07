@@ -2,6 +2,9 @@
 #define _INCLUDE_APP_UTILITY_H_
 
 /* for clock_time_exceed() */
+#define TIMEOUT_TICK_100MS  (100*1000)          /* timeout 100 ms   */
+#define TIMEOUT_TICK_150MS  (150*1000)          /* timeout 150 ms   */
+#define TIMEOUT_TICK_200MS  (200*1000)          /* timeout 200 ms   */
 #define TIMEOUT_TICK_250MS  (250*1000)          /* timeout 250 ms   */
 #define TIMEOUT_TICK_500MS  (500*1000)          /* timeout 500 ms   */
 #define TIMEOUT_TICK_1SEC   (1000*1000)         /* timeout 1 sec    */

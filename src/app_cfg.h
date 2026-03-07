@@ -169,8 +169,9 @@ extern "C" {
 #define BUTTON_ON		0
 #define GPIO_BUTTON     GPIO_PD7
 
-#define LED_ON          0
+#define LED1_ON         0
 #define GPIO_LED1       GPIO_PB1
+#define LED2_ON         0
 #define GPIO_LED2       GPIO_PB2
 
 #define RELAY_ON        1
@@ -197,8 +198,9 @@ extern "C" {
 #define BUTTON_ON		0
 #define GPIO_BUTTON     GPIO_PB5
 
-#define LED_ON          0
+#define LED1_ON         0
 #define GPIO_LED1       GPIO_PB4
+#define LED2_ON         0
 #define GPIO_LED2       0
 
 #define RELAY_ON        1
@@ -231,8 +233,9 @@ extern "C" {
 #define BUTTON_ON		0
 #define GPIO_BUTTON     GPIO_PD7
 
-#define LED_ON          0
+#define LED1_ON         0
 #define GPIO_LED1       GPIO_PB1
+#define LED2_ON         0
 #define GPIO_LED2       0
 
 #define RELAY_ON        1
@@ -254,8 +257,9 @@ extern "C" {
 #define BUTTON_ON		0
 #define GPIO_BUTTON     GPIO_PB5
 
-#define LED_ON          0
+#define LED1_ON         0
 #define GPIO_LED1       GPIO_PB4
+#define LED2_ON         0
 #define GPIO_LED2       0
 
 #define RELAY_ON        1
@@ -275,8 +279,9 @@ extern "C" {
 #define BUTTON_ON		0
 #define GPIO_BUTTON     GPIO_PB1
 
-#define LED_ON          0
+#define LED1_ON         0
 #define GPIO_LED1       GPIO_PB4
+#define LED2_ON         0
 #define GPIO_LED2       0
 
 #define RELAY_ON        1
@@ -291,9 +296,10 @@ extern "C" {
 
 #endif // MY_DEVICE
 
-#define KB_LINE_HIGH_VALID BUTTON_ON
+//#define KB_LINE_HIGH_VALID BUTTON_ON
 #define BUTTON_OFF 		(!BUTTON_ON)
-#define LED_OFF         (!LED_ON)
+#define LED1_OFF        (!LED1_ON)
+#define LED2_OFF        (!LED2_ON)
 #define RELAY_OFF   	(!RELAY_ON)
 #define GPIO_SWITCH_OFF	(!GPIO_SWITCH_ON)
 
@@ -309,18 +315,12 @@ extern "C" {
 /*** Configure button ***/
 
 enum {
-    VK_SW1 = 0x01,
+    VK_SW1 = 0,
+    VK_SW2,
+    VK_SW3
 };
 
-#define MAX_BUTTON_NUM  1
-
-#define KB_MAP_NORMAL   {{VK_SW1,}}
-
-#define KB_MAP_NUM      KB_MAP_NORMAL
-#define KB_MAP_FN       KB_MAP_NORMAL
-
-#define KB_DRIVE_PINS  {NULL}
-#define KB_SCAN_PINS   {GPIO_BUTTON}
+#define MAX_BUTTON_NUM  2
 
 /**********************************************************************
  * Battery & RF Power
@@ -430,6 +430,28 @@ typedef enum{
     EV_POLL_IDLE,
     EV_POLL_MAX,
 }ev_poll_e;
+
+/* Debug mode config (sws_printf()) */
+// DEBUG
+#define SWS_PRINTF_MODE	0
+#if UART_PRINTF_MODE
+	#define	DEBUG_INFO_TX_PIN	    GPIO_PD0//print
+#endif
+#ifndef UART_PRINTF_MODE
+#define	UART_PRINTF_MODE				0	// pin: DEBUG_INFO_TX_PIN, soft UART 1Mb/s
+#endif
+#ifndef SWS_PRINTF_MODE
+#define SWS_PRINTF_MODE         		0   // pin: SWS, Telink SWire
+#endif
+#define USE_DEBUG_PRINTF		(UART_PRINTF_MODE || SWS_PRINTF_MODE)
+#if USE_DEBUG_PRINTF
+#include "sws_printf.h"
+#else
+#define sws_printf(...)
+#define sws_puts(...)
+#define sws_putchar(...)
+#define sws_print_hex_dump(...)
+#endif
 
 /* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)

@@ -15,7 +15,7 @@
 #include "zcl_onoffSwitchCfg.h"
 #include "zcl_se_metering.h"
 #include "app_reporting.h"
-#include "app_endpoint_cfg.h"
+#include "app_ep_cfg.h"
 #include "app_button.h"
 #include "app_led.h"
 #include "app_utility.h"
@@ -32,27 +32,21 @@ typedef struct{
     ev_timer_event_t *timerFactoryReset;
     ev_timer_event_t *timerLedEvt;
 
-    bool net_steer_start;
-
-    button_t button[MAX_BUTTON_NUM];
-    u8  keyPressed;
-
     uint16_t ledOnTime;
     uint16_t ledOffTime;
     uint8_t  oriSta;     //original state before blink
     uint8_t  sta;        //current state in blink
     uint8_t  times;      //blink times
 
+    bool net_steer_start;
+
     app_linkKey_info_t tcLinkKey;
 } app_ctx_t;
 
-
 extern app_ctx_t g_appCtx;
+
 extern bdb_commissionSetting_t g_bdbCommissionSetting;
 extern bdb_appCb_t g_zbBdbCb;
-
-//extern uint8_t device_online;
-//extern uint8_t resp_time;
 
 status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
 status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
@@ -67,8 +61,10 @@ void app_leaveIndHandler(nlme_leave_ind_t *pLeaveInd);
 void app_otaProcessMsgHandler(uint8_t evt, uint8_t status);
 bool app_nwkUpdateIndicateHandler(nwkCmd_nwkUpdate_t *pNwkUpdate);
 void app_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg);
+void app_nwkStatusIndHandler(zdo_nwk_status_ind_t *pNwkStatusInd);
 
+void factory_reset_start(void *args);
 
-int32_t getTimeCb(void *arg);
+//int32_t getTimeCb(void *arg);
 
 #endif /* SRC_INCLUDE_APP_MAIN_H_ */

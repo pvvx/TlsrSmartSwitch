@@ -87,17 +87,6 @@ int flash_main(void){
 
     os_init(isRetention);
 
-
-    /* reduce power consumption, disable CLK disable CLK of unused peripherals*/
-/*
-    reg_clk_en0 = 0 // FLD_CLK0_SPI_EN
-
-#if UART_PRINTF_MODE
-            | FLD_CLK0_UART_EN
-#endif
-			| FLD_CLK0_PWM_EN
-            | FLD_CLK0_SWIRE_EN;
-*/
 #if PA_ENABLE
     rf_paInit(PA_TX, PA_RX);
 #endif
@@ -167,10 +156,7 @@ int flash_main(void){
 _attribute_ram_code_
 int main(void) {
     // Проверка на старт из Tuya boot_loder (старт с 0x20000 не проверяется)
-	if(flag_addr_ok != TEST_CONST_FLASH
-//		|| (*(u32 *)(ZIGBEE_BOOT_OTA1_FADDR + 8) == ID_BOOTABLE)
-//	    || (*(u32 *)(ZIGBEE_BOOT_OTA2_FADDR + 8) == ID_BOOTABLE)
-		) {
+	if(flag_addr_ok != TEST_CONST_FLASH) {
 		// clock_init(SYS_CLK_24M_Crystal);
 		tuya_zigbee_ota();
 	}

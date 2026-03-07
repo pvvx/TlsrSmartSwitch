@@ -11,12 +11,18 @@ typedef enum {
     ACTION_CLEAR = 250,
     ACTION_RELEASE = 255,
     ACTION_EMPTY = 300,
+} switch_zb_action_t;
+
+typedef enum {
+    SW_ACTION_OFF = 0,	// = ZCL_ONOFF_STATUS_OFF
+	SW_ACTION_ON,		// = ZCL_ONOFF_STATUS_ON
+	SW_ACTION_END
 } switch_action_t;
 
 
 #if USE_SWITCH
-void switch_handler();
-bool switch_idle();
+void switchAction(switch_action_t action, u8 count);
+void switchFirstStart(void);
 #endif
 
 #endif /* SRC_INCLUDE_APP_SWITCH_H_ */

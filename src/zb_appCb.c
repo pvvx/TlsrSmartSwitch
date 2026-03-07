@@ -31,7 +31,6 @@
 /**********************************************************************
  * LOCAL CONSTANTS
  */
-#define DEBUG_HEART     0
 
 /**********************************************************************
  * TYPEDEFS
@@ -44,6 +43,7 @@
 void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork);
 void zb_bdbCommissioningCb(uint8_t status, void *arg);
 void zb_bdbIdentifyCb(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime);
+void zb_bdbFindBindSuccessCb(findBindDst_t *pDstInfo);
 
 /**********************************************************************
  * GLOBAL VARIABLES
@@ -52,7 +52,7 @@ bdb_appCb_t g_zbBdbCb = {
     zb_bdbInitCb,
     zb_bdbCommissioningCb,
     zb_bdbIdentifyCb,
-    NULL
+	zb_bdbFindBindSuccessCb
 };
 
 #ifdef ZCL_OTA
@@ -64,31 +64,13 @@ ota_callBack_t app_otaCb = {
 /**********************************************************************
  * LOCAL VARIABLES
  */
-u32 heartInterval = 0;
-
-#if DEBUG_HEART
-ev_timer_event_t *heartTimerEvt = NULL;
-#endif
-ev_timer_event_t *steerTimerEvt = NULL;
+static ev_timer_event_t *rejoinBackoffTimerEvt = NULL;
+static ev_timer_event_t *steerTimerEvt = NULL;
 
 /**********************************************************************
  * FUNCTIONS
  */
-#if DEBUG_HEART
-static s32 heartTimerCb(void *arg)
-{
-    if (heartInterval == 0) {
-        heartTimerEvt = NULL;
-        return -1;
-    }
-
-    gpio_toggle(LED_POWER);
-
-    return heartInterval;
-}
-#endif
-
-s32 app_bdbNetworkSteerStart(void *arg)
+static s32 app_bdbNetworkSteerStart(void *arg)
 {
     bdb_networkSteerStart();
 
@@ -97,13 +79,32 @@ s32 app_bdbNetworkSteerStart(void *arg)
 }
 
 #if FIND_AND_BIND_SUPPORT
-s32 app_bdbFindAndBindStart(void *arg)
+static s32 app_bdbFindAndBindStart(void *arg)
 {
     bdb_findAndBindStart(BDB_COMMISSIONING_ROLE_TARGET);
 
     return -1;
 }
 #endif
+
+static s32 app_rejoinBackoff(void *arg)
+{
+    static bool rejoinMode = REJOIN_SECURITY;
+
+    if (zb_isDeviceFactoryNew()) {
+        rejoinBackoffTimerEvt = NULL;
+        return -1;
+    }
+
+    //printf("rejoin mode = %d\n", rejoinMode);
+
+    zb_rejoinSecModeSet(rejoinMode);
+    zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
+
+    rejoinMode = !rejoinMode;
+
+    return 0;
+}
 
 /*********************************************************************
  * @fn      zb_bdbInitCb
@@ -116,7 +117,7 @@ s32 app_bdbFindAndBindStart(void *arg)
  *
  * @return  None
  */
-void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork)
+void zb_bdbInitCb(u8 status, u8 joinedNetwork)
 {
     //printf("bdbInitCb: sta = %x, joined = %x\n", status, joinedNetwork);
 
@@ -125,18 +126,14 @@ void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork)
          * start bdb commissioning
          * */
         if (joinedNetwork) {
-            heartInterval = 1000;
-
-            g_appCtx.net_steer_start = false;
 
 #ifdef ZCL_OTA
             ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
 #endif
         } else {
-            heartInterval = 500;
 
 #if (!ZBHCI_EN)
-            uint16_t jitter = 0;
+            u16 jitter = 0;
             do {
                 jitter = zb_random() % 0x0fff;
             } while (jitter == 0);
@@ -148,17 +145,9 @@ void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork)
 #endif
         }
     } else {
-        heartInterval = 200;
-    }
 
-#if DEBUG_HEART
-    if (heartTimerEvt) {
-        TL_ZB_TIMER_CANCEL(&heartTimerEvt);
     }
-    heartTimerEvt = TL_ZB_TIMER_SCHEDULE(heartTimerCb, NULL, heartInterval);
-#endif
 }
-
 /*********************************************************************
  * @fn      zb_bdbCommissioningCb
  *
@@ -172,19 +161,17 @@ void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork)
  */
 void zb_bdbCommissioningCb(uint8_t status, void *arg)
 {
-    //printf("bdbCommCb: sta = %x\n", status);
-
     switch (status) {
     case BDB_COMMISSION_STA_SUCCESS:
-        heartInterval = 1000;
-
-        g_appCtx.net_steer_start = false;
-
-        light_blink_start(2, 200, 200);
 
         if (steerTimerEvt) {
             TL_ZB_TIMER_CANCEL(&steerTimerEvt);
         }
+
+        if (rejoinBackoffTimerEvt) {
+            TL_ZB_TIMER_CANCEL(&rejoinBackoffTimerEvt);
+        }
+
 
 #ifdef ZCL_OTA
         ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
@@ -196,6 +183,8 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg)
             TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 1000);
         }
 #endif
+        sws_printf("bdb:bind\n");
+        light_blink_start(7, 200, 200);
         break;
     case BDB_COMMISSION_STA_IN_PROGRESS:
         break;
@@ -205,6 +194,7 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg)
     case BDB_COMMISSION_STA_TCLK_EX_FAILURE:
     case BDB_COMMISSION_STA_TARGET_FAILURE:
         {
+            sws_printf("bdb:fault\n");
             uint16_t jitter = 0;
             do {
                 jitter = zb_random() % 0x2710;
@@ -214,6 +204,7 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg)
                 TL_ZB_TIMER_CANCEL(&steerTimerEvt);
             }
             steerTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbNetworkSteerStart, NULL, jitter);
+            light_blink_start(5, 500, 500);
         }
         break;
     case BDB_COMMISSION_STA_FORMATION_FAILURE:
@@ -227,7 +218,11 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg)
     case BDB_COMMISSION_STA_NOT_PERMITTED:
         break;
     case BDB_COMMISSION_STA_REJOIN_FAILURE:
-        zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
+        sws_printf("bdb:rejion1\n");
+        if (!rejoinBackoffTimerEvt) {
+            rejoinBackoffTimerEvt = TL_ZB_TIMER_SCHEDULE(app_rejoinBackoff, NULL, 60 * 1000);
+        }
+        light_blink_start(5, 500, 500);
         break;
     case BDB_COMMISSION_STA_FORMATION_DONE:
 #ifndef ZBHCI_EN
@@ -238,12 +233,35 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg)
         break;
     }
 }
-
 void zb_bdbIdentifyCb(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime)
 {
 #if FIND_AND_BIND_SUPPORT
     extern void app_zclIdentifyCmdHandler(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime);
     app_zclIdentifyCmdHandler(endpoint, srcAddr, identifyTime);
+#endif
+}
+
+/*********************************************************************
+ * @fn      zb_bdbFindBindSuccessCb
+ *
+ * @brief   application callback for finding & binding
+ *
+ * @param   pDstInfo
+ *
+ * @return  None
+ */
+void zb_bdbFindBindSuccessCb(findBindDst_t *pDstInfo)
+{
+#if FIND_AND_BIND_SUPPORT
+    epInfo_t dstEpInfo;
+    TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+
+    dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
+    dstEpInfo.dstAddr.shortAddr = pDstInfo->addr;
+    dstEpInfo.dstEp = pDstInfo->endpoint;
+    dstEpInfo.profileId = HA_PROFILE_ID;
+
+    zcl_identify_identifyCmd(APP_ENDPOINT, &dstEpInfo, FALSE, 0, 0);
 #endif
 }
 
@@ -284,32 +302,11 @@ s32 app_softReset(void *arg)
  */
 void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf)
 {
+    if(pLeaveCnf->status == SUCCESS){
+    	light_blink_start(3, 200, 200);
 
-//    printf("app_leaveCnfHandler\r\n");
-
-    if(pLeaveCnf->status == SUCCESS) {
-
-        //relay_settints_default();
-#if USE_METERING
-        //energy_remove();
-#endif
-        zb_deviceFactoryNewSet(true);
-
-        heartInterval = 500;
-
-#if (!ZBHCI_EN)
-        uint16_t jitter = 0;
-        do {
-            jitter = zb_random() % 0x0fff;
-        } while (jitter == 0);
-
-        if (steerTimerEvt) {
-            TL_ZB_TIMER_CANCEL(&steerTimerEvt);
-        }
-        steerTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbNetworkSteerStart, NULL, jitter);
-#endif
-
-        if (!g_appCtx.net_steer_start) light_blink_start(90, 250, 750);
+    	//waiting blink over
+    	TL_ZB_TIMER_SCHEDULE(app_softReset, NULL, 2 * 1000);
     }
 }
 
@@ -327,7 +324,53 @@ void app_leaveIndHandler(nlme_leave_ind_t *pLeaveInd)
 
 }
 
-bool app_nwkUpdateIndicateHandler(nwkCmd_nwkUpdate_t *pNwkUpdate){
-    return FAILURE;
+/*********************************************************************
+ *
+ * @brief   Receive notification of PAN ID conflict.
+ *
+ * @param   pNwkUpdateCmd - Conflicting PAN ID information
+ *
+ * @return  TRUE  - Allow PAN ID conflict handling
+ *          FALSE - Truncate the execution of PAN ID conflict handling
+ */
+bool app_nwkUpdateIndicateHandler(nwkCmd_nwkUpdate_t *pNwkUpdate)
+{
+    return FALSE;
+}
+
+/*********************************************************************
+ * @fn      app_nwkStatusIndHandler
+ *
+ * @brief   Handler for NWK status indication message.
+ *
+ * @param   pInd - parameter of NWK status indication
+ *
+ * @return  None
+ */
+void app_nwkStatusIndHandler(zdo_nwk_status_ind_t *pNwkStatusInd)
+{
+    //printf("nwkStatusIndHandler: addr = %x, status = %x\n", pNwkStatusInd->shortAddr, pNwkStatusInd->status);
+
+    if (pNwkStatusInd->status == NWK_COMMAND_STATUS_BAD_FRAME_COUNTER) {
+        tl_zb_normal_neighbor_entry_t *nbe = nwk_neTblGetByShortAddr(pNwkStatusInd->shortAddr);
+        if (nbe) {
+            //printf("curFC = %d, rcvFC = %d, failCnt = %d\n", nbe->incomingFrameCnt, nbe->receivedFrameCnt, nbe->frameCounterFailCnt);
+
+            /*
+             * When the network does not support the network key update feature,
+             * this is a barbaric method to solve the decryption failure problem
+             * caused by Frame Counter overflow, but it may also brings
+             * the hidden danger of being attacked.
+             */
+#if 1
+            if ((nbe->frameCounterFailCnt >= 10) && (nbe->receivedFrameCnt < nbe->incomingFrameCnt)) {
+                nbe->incomingFrameCnt = 0;
+            }
+#endif
+        }
+    } else if (pNwkStatusInd->status == NWK_COMMAND_STATUS_BAD_KEY_SEQUENCE_NUMBER) {
+        zb_rejoinSecModeSet(REJOIN_INSECURITY);
+        zb_rejoinReq(zb_apsChannelMaskGet(), g_bdbAttrs.scanDuration);
+    }
 }
 
