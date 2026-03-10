@@ -1,7 +1,7 @@
 # TlsrSmartSwitch
 Alternative firmwares for Smart Switch on the TLSR825x/TLSR8656 chipset.
 
-Current FW Version: 0.0.1.0 (pre-release)
+Current FW Version: 0.1.0.0 (первый release)
 
 ## Supported device models:
 
