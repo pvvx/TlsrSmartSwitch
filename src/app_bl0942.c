@@ -88,6 +88,36 @@ typedef struct {
 
 static old_fract_t old_fract; // Remainder from the previous division
 
+/*********************************************************************
+ * @fn      app_set_report_power_div
+ *
+ * @brief	set clusterID:attrID is report.
+ *
+ * @param   NULL
+ *
+ * @return	NULL
+ */
+void app_set_report_power_div(void) {
+	if(reportingTab.reportNum) {
+		for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++){
+			reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
+			if(pEntry->used && pEntry->clusterID == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
+				if(pEntry->attrID == ZCL_ATTRID_AC_POWER_DIVISOR) {
+					pEntry->minIntCnt = 0;
+					wrk_rpt.extraSend = 1;
+				} else if(pEntry->attrID == ZCL_ATTRID_POWER_COEF) {
+					if(pEntry->minIntCnt == 0) {
+						pEntry->minIntCnt = 1;
+					}
+					if(pEntry->maxIntCnt == 0) {
+						pEntry->maxIntCnt = 1;
+					}
+				}
+			}
+		}
+	}
+}
+
 //--------- Loading/Saving Sensor Coefficients --------
 
 nv_sts_t load_config_sensor(void) {
@@ -276,6 +306,7 @@ void monitoring_handler(void) {
     int32_t  power;
     uint32_t current, voltage, energy, freq;
     uint64_t tmp;
+    uint16_t pwr_div;
 
     app_monitoring_t *pkt = (app_monitoring_t*)urxb.data;
     if(reg_dma_rx_rdy0 & FLD_DMA_IRQ_UART_RX) { // new data ?
@@ -332,30 +363,69 @@ void monitoring_handler(void) {
                 tmp += old_fract.power;
                 old_fract.power = tmp & 0xffffff;
                 power = tmp >> 24;
-
-                if(power > 32767000) { // (max 32767.000W)
-                	power = 32767;
-                	g_zcl_msAttrs.power_divisor = 1;
-                } else if(power > 3276700) {
-                    // x1: 3276.7..32767W
-                    power += 500;
-                    power /= 1000;
-                    g_zcl_msAttrs.power_divisor = 1;
-                } else if(power > 327670) {
-                    // x10: 327.6..3276.7W
-                    power += 50;
-                    power /= 100;
-                    g_zcl_msAttrs.power_divisor = 10;
-                } else if(power > 32767) {
-                    // x100 32.767..327.67W
-                    power += 5;
-                    power /= 10;
-                    g_zcl_msAttrs.power_divisor = 100;
-                } else {
-                    // x1000: x1000: 0..32.767W
-                    g_zcl_msAttrs.power_divisor = 1000;
+            	pwr_div = 1;
+                if(!config_min_max.power_fix_div) {
+                    if(power > 32767000) { // (max 32767.000W)
+                    	power = 0x8000;
+                    } else if(power > 3276700) {
+                        // x1: 3276.7..32767W
+                        power += 500;
+                        power /= 1000;
+                    } else if(power > 327670) {
+                        // x10: 327.6..3276.7W
+                        power += 50;
+                        power /= 100;
+                    	pwr_div = 10;
+                    } else if(power > 32767) {
+                        // x100 32.767..327.67W
+                        power += 5;
+                        power /= 10;
+                    	pwr_div = 100;
+                    } else {
+                        // x1000: x1000: 0..32.767W
+                    	pwr_div = 1000;
+                    }
+                } else if(config_min_max.power_fix_div == 1) {
+                    if(power > 32767000) { // (max 32767W)
+                    	power = 0x8000;
+                    } else {
+                    	// x1: 3276.7..32767W
+                    	power += 500;
+                    	power /= 1000;
+                    }
+//                	pwr_div = 1;
+                } else if(config_min_max.power_fix_div == 3) {
+                    if(power > 327670) { // (max 327.67W)
+                    	power = 0x8000;
+                    } else {
+                    	// x100 32.767..327.67W
+                    	power += 5;
+                    	power /= 10;
+                    }
+                	pwr_div = 100;
+                } else if(config_min_max.power_fix_div == 4) {
+                    if(power > 32767) { // (max 32.767W)
+                    	power = 0x8000;
+                    } else {
+                    	// x1000: x1000: 0..32.767W
+                    	g_zcl_msAttrs.power_divisor = 1000;
+                    }
+                } else { // if(g_zcl_msAttrs.power_fix_div == 2)
+                    if(power > 3276700) { // (max 3276.7W)
+                    	power = 0x8000;
+                    } else {
+                    	// x10: 327.6..3276.7W
+                    	power += 50;
+                    	power /= 100;
+                    }
+                	pwr_div = 10;
                 }
+
                 g_zcl_msAttrs.power = (int16_t)power;
+                if(g_zcl_msAttrs.power_divisor != pwr_div) {
+                	g_zcl_msAttrs.power_divisor = pwr_div;
+                	app_set_report_power_div();
+                }
 
                 freq = (sensor_pwr_coef.freq + (freq >> 1))/ freq;
 

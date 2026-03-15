@@ -1,9 +1,5 @@
 #include "app_main.h"
 
-typedef enum {
-	BUTTON_FLAG_WAIT_LONG_OFF =	0xff,
-	BUTTON_FLAG_WAIT_TST_OFF =	0xfe
-} BUTTON_FLAG_t;
 
 app_button_t app_button[MAX_BUTTON_NUM];
 
@@ -17,16 +13,6 @@ static void buttonKeepPressed(u8 btNum) {
     }
 }
 
-/*******************************************************************
- * @brief	Button Single Pressed
- *
-static void buttonSinglePressed(u8 btNum) {
-    if(btNum == VK_SW1
-    	&& !cfg_on_off.key_lock) {
-   		cmdOnOff_toggle();
-    }
-}
-*/
 /*******************************************************************
  * @brief	MultiKey / Button Pressed
  */
@@ -76,47 +62,53 @@ static void buttonReleased(u8 btNum, u8 count) {
 void buttonTask(void) {
 	u8 state;
 	app_button_t * pbt;
+	u32 tt;
 	for(int i = 0; i < MAX_BUTTON_NUM; i++) {
 		pbt = &app_button[i];
 		if(!pbt->gpio_name)
 			continue;
 		state = (((gpio_read(pbt->gpio_name)) != 0) == pbt->gpio_on);
+		tt = clock_time();
 		if(state) {
 			// button on
 			if (!pbt->pressed) { // кнопка была отпущена?
 				// event button on
-				pbt->event_time = clock_time();
+				pbt->event_time = tt;
 			} else // кнопка была нажата
-			// обработка остановлена до ожидания интервала отжатой кнопки на BUTTON_OFF_TIME_MS мс?
+			// обработка остановлена до ожидания интервала отжатой кнопки на BUTTON_OFF_TIME_TICK мс?
 			if (pbt->wait_off != BUTTON_FLAG_WAIT_LONG_OFF) {
 				// обработка не остановлена, кнопка нажата, проверка на дребезг
-				if (clock_time() - pbt->event_time
-						> BUTTON_BOUNCE_TIME_MS * CLOCK_16M_SYS_TIMER_CLK_1MS) {
-					if (!pbt->key_count_on) { // первое нажатие?
-						// первое срабатывание после паузы более BUTTON_OFF_TIME_MS мс
-						// pbt->key_count_on = 0;
-						pbt->wait_off = 1; // далее вызвать условие запуска buttonPressed()
-						// buttonSinglePressed(i);
+				if (tt - pbt->event_time > BUTTON_BOUNCE_TIME_TICK) {
+					if (pbt->key_count_on == BUTTON_CNT_NONE) { // первое нажатие?
+						// первое срабатывание после паузы более BUTTON_OFF_TIME_TICK мс
+						// далее вызвать условие запуска buttonPressed()
+						pbt->wait_off = BUTTON_CNT_SINGLE_PRESS;
 					}
 					// кнопка нажата повторно или удержана
-					if (pbt->key_count_on != pbt->wait_off) {
+					if (pbt->key_count_on != BUTTON_CNT_LONG_PRESS
+						&& pbt->key_count_on != pbt->wait_off) {
 						// кнопка нажата впервые или повторно, счет нажатий
 						// если счет переполнен, установить кол-во нажатий для factory_reset
-						if (++pbt->key_count_on > BUTTON_FR_COUNTER_MAX)
-							pbt->key_count_on = BUTTON_FR_COUNTER_MAX;
+						if (++pbt->key_count_on > BUTTON_CNT_FACTORY_RESET)
+							pbt->key_count_on = BUTTON_CNT_FACTORY_RESET;
 						// фиксация нового нажатия от повторного вызова buttonPressed()
 						pbt->wait_off = pbt->key_count_on;
 						buttonPressed(i, pbt->key_count_on);
 					} else {
 						// кнопка удержана
-						if (clock_time() - pbt->event_time
-							> BUTTON_KEEP_TIME_MS * CLOCK_16M_SYS_TIMER_CLK_1MS) {
+						if (tt - pbt->event_time > BUTTON_KEEP_TIME_TICK) {
 							// кнопка удержана более 5 секунд
-							pbt->key_count_on = 0;
+							// pbt->key_count_on = BUTTON_CNT_LONG_PRESS; // уже = 0xff
 							// отключить последующую обработку до истечения интервала
-							// с отжатой кнопкой в течении BUTTON_OFF_TIME_MS
+							// с отжатой кнопкой в течении BUTTON_OFF_TIME_TICK
 							pbt->wait_off = BUTTON_FLAG_WAIT_LONG_OFF;
 							buttonKeepPressed(i);
+						} else if(pbt->key_count_on != BUTTON_CNT_LONG_PRESS
+							// небыло срабатывания по долгому нажатию
+							&& tt - pbt->event_time > BUTTON_LONG_PRESS_TIME_TICK) {
+							// кнопка удержана более 750 ms
+							pbt->key_count_on = BUTTON_CNT_LONG_PRESS; // долгое нажатие
+							buttonPressed(i, pbt->key_count_on);
 						}
 					}
 				}
@@ -125,7 +117,7 @@ void buttonTask(void) {
 			// button off
 			if (pbt->pressed) { // кнопка была нажата?
 				// event button off
-				pbt->event_time = clock_time();
+				pbt->event_time = tt;
 			} else
 			// кнопка отпущена
 			if (pbt->wait_off) {
@@ -133,23 +125,22 @@ void buttonTask(void) {
 				if (pbt->wait_off >= BUTTON_FLAG_WAIT_TST_OFF) {
 				// тест дребезга контакта пройден,
 				// ждем длительного интервала отжатой кнопки для завершения серии нажатий
-					if(clock_time() - pbt->event_time
-						> BUTTON_OFF_TIME_MS * CLOCK_16M_SYS_TIMER_CLK_1MS) {
-						// кнопка отжата уже более BUTTON_OFF_TIME_MS мс
+					if(tt - pbt->event_time	> BUTTON_OFF_TIME_TICK) {
+						// кнопка отжата уже более BUTTON_OFF_TIME_TICK мс
 						// отключить последующие ожидания интервалов отжатой кнопки
-						pbt->wait_off = 0;
+						pbt->wait_off = BUTTON_FLAG_OFF;
 						if(pbt->key_count_on) {
 							// вызов проуцедуры обработки завершения серии нажатий со счетом нажатий
 							buttonSeriesEnd(i, pbt->key_count_on);
-							pbt->key_count_on = 0;
+							pbt->key_count_on = BUTTON_CNT_NONE;
 						}
 					}
 				} else
 				// кнопка отпущена, проверка на дребезг
-				if (clock_time() - pbt->event_time
-					> BUTTON_BOUNCE_TIME_MS * CLOCK_16M_SYS_TIMER_CLK_1MS) {
+				if (tt - pbt->event_time > BUTTON_BOUNCE_TIME_TICK) {
 					// кнопка отпущена, тест дребезга пройден
 					pbt->wait_off = BUTTON_FLAG_WAIT_TST_OFF;
+					// тут возможен вызов с pbt->key_count_on = 0, если небыл пройден дребезг нажатия
 					buttonReleased(i, pbt->key_count_on);
 				}
 			}
@@ -163,7 +154,8 @@ void buttonTask(void) {
  */
 void buttonInit(void) {
 	app_button_t * pbt;
-
+// специальные установки GPIO
+// для данного варианта прошивки (из спец.таблицы)
 	if(!dev_gpios.key)
 		dev_gpios.key = GPIO_BUTTON;
 	app_button[0].gpio_name = dev_gpios.key;
@@ -181,11 +173,12 @@ void buttonInit(void) {
 #endif
 	}
 #endif
+// типовой buttonInit()
     for(int i = 0; i < MAX_BUTTON_NUM; i++) {
 		pbt = &app_button[i];
 		if(pbt->gpio_name) {
 			gpio_input_init(pbt->gpio_name, PM_PIN_PULLUP_10K);
-			sleep_us(64);
+			sleep_us(32);
 			pbt->event_time = clock_time();
 			pbt->pressed = (((gpio_read(pbt->gpio_name)) != 0) == pbt->gpio_on);
 		}

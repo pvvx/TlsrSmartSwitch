@@ -258,7 +258,7 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
 
     if (save & BIT(NBIT_ON_OFF_CONFIG)) {
     	save_config_on_off();
-//    	led_set_control();	// restore led?
+    	led_set_control();	// restore led?
     	// restore relay
 #if USE_THERMOSTAT // USE_SENSOR_MY18B20
     	set_therm_relay_status(cfg_on_off.onOff);

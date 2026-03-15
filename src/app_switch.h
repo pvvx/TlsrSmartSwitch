@@ -2,15 +2,13 @@
 #define SRC_INCLUDE_APP_SWITCH_H_
 
 typedef enum {
-    ACTION_HOLD = 0,
+    ACTION_RELEASE = 0, // Отпускание после длинного нажатия.
     ACTION_SINGLE,
     ACTION_DOUBLE,
     ACTION_TRIPLE,
     ACTION_QUADRUPLE,
     ACTION_QUINTUPLE,
-    ACTION_CLEAR = 250,
-    ACTION_RELEASE = 255,
-    ACTION_EMPTY = 300,
+    ACTION_HOLD = 255 // Начало длинного нажатия.
 } switch_zb_action_t;
 
 typedef enum {

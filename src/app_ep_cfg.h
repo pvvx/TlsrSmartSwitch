@@ -23,6 +23,7 @@
 #define ZCL_ATTRID_POWER_COEF         		0xF009
 #define ZCL_ATTRID_ENERGY_COEF         		0xF00A
 #define ZCL_ATTRID_FGREQ_COEF         		0xF00B
+#define ZCL_ATTRID_PWR_FIX_DIV         		0xF013
 
 /* Custom Attr (if USE_SENSOR_MY18B20) for TemperatureMeasurement */
 #define ZCL_TEMPERATURE_SENSOR_ID			0xF00C // R, uint32 id MY18B20
@@ -262,6 +263,7 @@ typedef struct {
     uint16_t time_reload; // in sec, minimum 8, step 8, = 0 - off
     uint16_t time_start; // in sec, minimum 8, step 8, = 0 - off
     uint8_t emergency_off; // emergency_off_t
+    uint8_t power_fix_div; // 0 - auto, 1 - 0..32767W, 2 - 0..3276.7W, 3 - 0..327.67W, 4 - 0..32.767W
 } zcl_config_min_max_t;
 
 extern zcl_config_min_max_t config_min_max;

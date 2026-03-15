@@ -75,6 +75,35 @@ static cnt_calibrate_t cnt_calibrate;
 
 zcl_sensor_calibrate_t sensor_calibrate_old, sensor_calibrate;
 
+/*********************************************************************
+ * @fn      app_set_report_power_div
+ *
+ * @brief	set clusterID:attrID is report.
+ *
+ * @param   NULL
+ *
+ * @return	NULL
+ */
+void app_set_report_power_div(void) {
+	if(reportingTab.reportNum) {
+		for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++){
+			reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
+			if(pEntry->used && pEntry->clusterID == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
+				if(pEntry->attrID == ZCL_ATTRID_AC_POWER_DIVISOR) {
+					pEntry->minIntCnt = 0;
+					wrk_rpt.extraSend = 1;
+				} else if(pEntry->attrID == ZCL_ATTRID_POWER_COEF) {
+					if(pEntry->minIntCnt == 0) {
+						pEntry->minIntCnt = 1;
+					}
+					if(pEntry->maxIntCnt == 0) {
+						pEntry->maxIntCnt = 1;
+					}
+				}
+			}
+		}
+	}
+}
 
 /* cnt4 max = 0x3fffffff
    return fp(14.18) = x/cnt4 */
@@ -230,6 +259,8 @@ void bl0937_new_dataCb(void *args) {
 
 	uint32_t  current, voltage, power, energy;
     uint64_t tmp;
+    uint16_t pwr_div;
+    u8 r;
 
 	current = bl0937_cnt.cnt_current;
     voltage = bl0937_cnt.cnt_voltage;
@@ -261,41 +292,69 @@ void bl0937_new_dataCb(void *args) {
 
     energy = power;
 
-    u8 r = irq_disable();
+    r = irq_disable();
    	tmp = mul32x32_64(power, sensor_pwr_coef.power);
    	irq_restore(r);
     tmp += old_fract.power;
     old_fract.power = tmp & 0xffff;
     power = tmp >> 16;
 
-   	if(power >= 3276700) { // (max 32767.00W)
-   		power = 32767;
-        energy = 7282;
-        g_zcl_msAttrs.power_divisor = 1;
-   	} else {
-   		if(power > 327670) {
+    pwr_div = 1;
+	if(!config_min_max.power_fix_div) {
+	   	if(power >= 3276700) { // (max 32767W)
+	   		power = 0x8000;
+// 		        pwr_div = 1;
+	   	} else if(power > 327670) {
    	        // x10: 3276.7..32767W (max 149A 220V)
    	        power += 50;
    	        power /= 100;
-   	        g_zcl_msAttrs.power_divisor = 1;
+// 		        pwr_div = 1;
    	    } else if(power > 32767) {
    	        // x10: 327.6..3276.7W (max 14.9A 220V)
    	        power += 5;
    	        power /= 10;
-   	        g_zcl_msAttrs.power_divisor = 10;
+   	        pwr_div = 10;
    	    } else {
    	        // x100 0..327.67W (max 1.49A 220V)
-   	        g_zcl_msAttrs.power_divisor = 100;
+   	        pwr_div = 100;
    	    }
-   		g_zcl_msAttrs.power = (int16_t)power;
+	} else if(config_min_max.power_fix_div == 1) {
+	    if(power > 3276700) { // (max 32767W)
+	    	power = 0x8000;
+	    } else {
+   	        // x10: 3276.7..32767W (max 149A 220V)
+   	        power += 50;
+   	        power /= 100;
+	    }
+//            pwr_div = 1;
+	} else if(config_min_max.power_fix_div == 3) {
+	    if(power > 32767) { // (max 327.67W)
+	    	power = 0x8000;
+	    }
+	    pwr_div = 100;
+	} else { // if(config_min_max.power_fix_div == 2)
+	    if(power > 327670) { // (max 3276.7W)
+	    	power = 0x8000;
+	    } else {
+	    	// x100 32.767..327.67W
+	    	power += 5;
+	    	power /= 10;
+	    }
+	    pwr_div = 10;
+	}
 
-   		u8 r = irq_disable();
-   		tmp = mul32x32_64(energy, sensor_pwr_coef.energy);
-   		irq_restore(r);
-   		tmp += old_fract.energy;
-   		old_fract.energy = tmp & 0xffff;
-   		energy = tmp >> 16;
-   	}
+	g_zcl_msAttrs.power = (int16_t)power;
+	if(g_zcl_msAttrs.power_divisor != pwr_div) {
+		g_zcl_msAttrs.power_divisor = pwr_div;
+		app_set_report_power_div();
+	}
+
+	r = irq_disable();
+	tmp = mul32x32_64(energy, sensor_pwr_coef.energy);
+	irq_restore(r);
+	tmp += old_fract.energy;
+	old_fract.energy = tmp & 0xffff;
+	energy = tmp >> 16;
 
   	if(energy) {
    		g_zcl_seAttrs.cur_sum_delivered += energy;

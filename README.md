@@ -1,8 +1,6 @@
 # TlsrSmartSwitch
 Alternative firmwares for Smart Switch on the TLSR825x/TLSR8656 chipset.
 
-Current FW Version: 0.1.0.0 (первый release)
-
 ## Supported device models:
 
 ![MiniZigbeeSwitchWitchPowerMonitor.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/MiniZigbeeSwitchWitchPowerMonitor.jpg) ![SMxSW1a.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/SMxSW1a.jpg) ![SMxSW1b.jpg](https://raw.githubusercontent.com/pvvx/TlsrSmartSwitch/refs/heads/master/img/SMxSW1b.jpg)

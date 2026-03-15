@@ -2,27 +2,7 @@
 
 extern bool reportableChangeValueChk(u8 dataType, u8 *curValue, u8 *prevValue, u8 *reportableChange);
 
-typedef struct {
-	u32 oldTimeSec;
-	u32 oldSysTick;
-	u32 cntRepeat;
-	int cntfor;
-} app_wrk_report_t;
-
 app_wrk_report_t wrk_rpt;
-
-#ifdef ZCL_MULTISTATE_INPUT
-
-uint32_t last_timeReportMsi;     // time of the last attribute report ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE
-uint8_t  last_seqNum;
-
-static int32_t resetMsiTimerCb(void *args) {
-
-    zcl_msInputAttr_t *msInputAttr = zcl_msInputAttrsGet();
-    msInputAttr->value = ACTION_EMPTY;
-    return -1;
-}
-#endif
 
 status_t app_forcedReport(uint8_t endpoint, uint16_t claster_id, uint16_t attr_id) {
 
@@ -43,7 +23,7 @@ status_t app_forcedReport(uint8_t endpoint, uint16_t claster_id, uint16_t attr_i
             ZB_EXCEPTION_POST(SYS_EXCEPTTION_ZB_ZCL_ENTRY);
             return ZCL_STA_FAILURE;
         }
-#ifdef ZCL_MULTISTATE_INPUT
+#if 0 // def ZCL_MULTISTATE_INPUT
         if (attr_id == ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE) {
             last_timeReportMsi = clock_time();
             last_seqNum = ZCL_SEQ_NUM;
@@ -173,7 +153,13 @@ status_t app_chk_report(u16 uptime_sec) {
 
 				            	pEntry->maxIntCnt = 0; // repeat after
 							}
-				            sws_printf("checkReport: %04x:%04x %02x\n", pEntry->clusterID, pAttrEntry->id, status);
+				            sws_printf("checkReport: %04x:%04x %d,%d,%d:%d %02x\n",
+				            		pEntry->clusterID, pAttrEntry->id,
+									pEntry->minInterval,
+									pEntry->maxInterval,
+									pEntry->reportableChange[0],
+									pEntry->prevData[0],
+									status);
 						}
 			        }
 				}
@@ -183,26 +169,6 @@ status_t app_chk_report(u16 uptime_sec) {
 		// no report
 	}
 	return status;
-}
-
-/*********************************************************************
- * @fn      app_set_report
- *
- * @brief	set clusterID is report.
- *
- * @param   NULL
- *
- * @return	NULL
- */
-void app_set_report(u16 clusterID) {
-	if(reportingTab.reportNum) {
-		for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++){
-			reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
-			if(pEntry->used && pEntry->clusterID == clusterID) {
-				pEntry->maxIntCnt = 0;
-			}
-		}
-	}
 }
 
 /*********************************************************************
@@ -218,7 +184,13 @@ _CODE_ZCL_ void app_report_handler(void)
 {
 	u32 tt, tmp;
 	if (zb_isDeviceJoinedNwk()) {
-		if (wrk_rpt.cntRepeat
+		if (wrk_rpt.extraSend) {
+			wrk_rpt.extraSend = 0;
+			if (app_chk_report(0) != ZCL_STA_SUCCESS) {
+				wrk_rpt.oldSysTick = clock_time();
+				wrk_rpt.cntRepeat = 3;
+			}
+		} else if (wrk_rpt.cntRepeat
 				&& clock_time() - wrk_rpt.oldSysTick
 						> 250 * CLOCK_16M_SYS_TIMER_CLK_1MS) {
 			if (app_chk_report(0) != ZCL_STA_SUCCESS) {

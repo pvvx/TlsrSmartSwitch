@@ -6,7 +6,7 @@ TEL_CHIP := $(POJECT_DEF) -DMCU_CORE_8258=1 -DROUTER=1 -DMCU_STARTUP_8258=1
 
 #All libs: -ldrivers_826x -ldrivers_8258 -ldrivers_8278 -lsoft-fp -lfirmware_encrypt -lzb_coordinator -lzb_ed -lzb_router
 
-PGM_PORT?=COM6
+PGM_PORT?=COM15
 PGM_PORT_BAUD?=1500000 
 
 PROJECT_PATH ?= .

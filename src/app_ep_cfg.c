@@ -339,11 +339,11 @@ const zclAttrInfo_t temperature_measurement_attrTbl[] =
 #ifdef ZCL_MULTISTATE_INPUT
 
 zcl_msInputAttr_t g_zcl_msInputAttrs = {
-        .value = ACTION_EMPTY,
+        .value = ACTION_RELEASE,
         .num = 8,
         .out_of_service = 0,
         .status_flag = 0,
-//		.reliablility = 0
+//		.reliablility = 0 // NO-FAULT-DETECTED (0)
 };
 
 const zclAttrInfo_t msInput1_attrTbl[] = {
@@ -434,7 +434,7 @@ const zclAttrInfo_t onOff1_attrTbl[] = {
 	{ ZCL_ATTRID_START_UP_ONOFF,            ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.startUpOnOff        },
 
 	// Custom Attr:
-#if USE_SWITCH
+#if USE_METERING || USE_SENSOR_MY18B20
 	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
 #else
 	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    R,     (uint8_t*)&relay_state },
@@ -479,7 +479,7 @@ const zclAttrInfo_t onOffCfg1_attrTbl[] =
     { ZCL_ATTRID_SWITCH_ACTION,             ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchActions      },
 	// Custom Attr:
     { CUSTOM_ATTRID_SWITCH_TYPE,            ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchType  },
-    { CUSTOM_ATTRID_DECOUPLED,              ZCL_ENUM8,    RWR,(u8*)&cfg_on_off.switchDecoupled   },
+    { CUSTOM_ATTRID_DECOUPLED,              ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchDecoupled   },
 
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,   R,  (u8*)&zcl_attr_global_clusterRevision           },
 };
@@ -538,10 +538,10 @@ zcl_msAttr_t g_zcl_msAttrs = {
 #endif
     .current = 0xffff, // in 0.001 A (mutipler/current_divisor)
     .voltage = 0xffff, // in 0.01 V (mutipler/divisor)
-    .power = 0xffff, // in 0.1, 0.01, 0.001 W (mutipler/power_divisor)
+    .power = 0x8000, // in 0.1, 0.01, 0.001 W (mutipler/power_divisor)
     .mutipler = 1, // mutipler for all
     .divisor = 100, // voltage and freq div 100
-    .power_divisor = 100,  // power div 10,100,1000: in 0.1, 0.01, 0.001 W
+    .power_divisor = 10,  // power div 10,100,1000: in 0.1, 0.01, 0.001 W
     .current_divisor = 1000 // current div 1000, in 0.001A
 };
 
@@ -563,6 +563,9 @@ zcl_msAttr_t g_zcl_msAttrs = {
 #ifndef PERIOD_START_DEF
 #define PERIOD_START_DEF	0	// sec
 #endif
+#ifndef POWER_FIX_DIV_DEF
+#define POWER_FIX_DIV_DEF	2	// 0 - auto, 1 - 0..32767W, 2 - 0..3276.7W, 3 - 0..327.67W, 4 - 0..32.767W
+#endif
 
 
 const zcl_config_min_max_t def_config_min_max = {
@@ -572,6 +575,8 @@ const zcl_config_min_max_t def_config_min_max = {
 	.time_max_current = PERIOD_MAX_CURRENT_DEF, // in sec, minimum 8, step 8, = 0 - off
 	.time_reload = PERIOD_RELOAD_DEF, // in sec, minimum 8, step 8, = 0 - off
 	.time_start = PERIOD_START_DEF, // in sec, minimum 8, step 8, = 0 - off
+	.emergency_off = 0,
+	.power_fix_div = POWER_FIX_DIV_DEF,
 };
 
 zcl_sensor_calibrate_t sensor_calibrate;
@@ -612,6 +617,7 @@ const zclAttrInfo_t ms_attrTbl[] = {
 	{ZCL_ATTRID_ENERGY_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.energy		},
 	{ZCL_ATTRID_FGREQ_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.freq		},
 #endif
+	{ZCL_ATTRID_PWR_FIX_DIV,  		ZCL_ENUM8,     RW,   (uint8_t*)&config_min_max.power_fix_div},
 #if USE_CALIBRATE_CVP
 	{ZCL_ATTRID_CURRENT_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.current	},
 	{ZCL_ATTRID_VOLTAGE_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.voltage	},
@@ -672,6 +678,23 @@ nv_sts_t load_config_min_max(void) {
 		memcpy(&config_min_max_saved, &def_config_min_max, sizeof(config_min_max));
 	}
 	memcpy(&config_min_max, &config_min_max_saved, sizeof(config_min_max));
+	// 0 - auto, 1 - 0..32.767W, 2 - 0..327.67W, 3 - 0..3276.7W, 4 - 0..32767W
+	switch(config_min_max.power_fix_div) {
+	case 1:
+		g_zcl_msAttrs.power_divisor = 1;
+		break;
+	case 2:
+		g_zcl_msAttrs.power_divisor = 10;
+		break;
+	case 3:
+		g_zcl_msAttrs.power_divisor = 100;
+		break;
+#if USE_BL0942
+	case 4:
+		g_zcl_msAttrs.power_divisor = 1000;
+		break;
+#endif
+	}
 	return ret;
 #else
     return NV_ENABLE_PROTECT_ERROR;
@@ -707,11 +730,6 @@ nv_sts_t load_config_on_off(void) {
 }
 
 nv_sts_t save_config_on_off(void) {
-#if USE_SWITCH
-	if (cfg_on_off.switchType == ZCL_SWITCH_TYPE_MULTIFUNCTION) {
-		cfg_on_off.switchDecoupled = CUSTOM_SWITCH_DECOUPLED_ON;
-	}
-#endif
 #if NV_ENABLE
 	nv_sts_t ret = NV_SUCC;
 	if(memcmp(&cfg_on_off_saved, &cfg_on_off, sizeof(cfg_on_off))) {

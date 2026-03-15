@@ -14,7 +14,7 @@ const ea = exposes_1.access;
 function localActionExtend(args = {}) {
     const { localAction = ["hold", "single", "double", "triple", "quadruple", "quintuple", "release"], 
             reporting = true, 
-            reportingConfig = {"min": 10, "max": 0, change: 1},
+            reportingConfig = {"min": 0, "max": 65000, change: 1},
             endpointNames = undefined } = args;
     let actions = localAction;
     if (endpointNames) {
@@ -22,16 +22,19 @@ function localActionExtend(args = {}) {
     }
     const exposes = [exposes_1.presets.enum("action", exposes_1.access.STATE, actions)];
     const attribute = "presentValue";
-
-    
+   
     const actionPayloadLookup = {
-      0: "hold",
+      0: "release",
       1: "single",
       2: "double",
       3: "triple",
       4: "quadruple",
       5: "quintuple",
-      255: "release",
+      6: "sextuple",
+      7: "septuple",
+      8: "octuple",
+      9: "nonuple",
+      255: "hold",
     };
 
     const fromZigbee = [
@@ -42,9 +45,6 @@ function localActionExtend(args = {}) {
                 if ((0, utils_1.hasAlreadyProcessedMessage)(msg, model))
                     return;
                 const data = msg.data;
-                //logger.logger.info('msg.data: ' + data[attribute]);
-                if (data[attribute] == 300)
-                    return "N/A";
                 const payload = { action: (0, utils_1.postfixWithEndpointName)(actionPayloadLookup[data[attribute]], msg, model, meta) };
                 return payload;
             },
@@ -104,6 +104,7 @@ export default {
             "attribute": {"ID": 0xf004, "type": 0x30},
             "reporting": {"min": 0, "max": 65000, "change": 0},
             "description": 'Relay decoupled'}),
+        m.identify()
     ],
     meta: {},
     ota: true,

@@ -507,7 +507,7 @@ _CODE_ZCL_ void reportAttrs(void) {
 
             dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
             dstEpInfo.profileId = profileID;
-#ifdef ZCL_MULTISTATE_INPUT
+#if 0 // def ZCL_MULTISTATE_INPUT
             if (report.attr[0].attrID == ZCL_MULTISTATE_INPUT_ATTRID_PRESENT_VALUE &&
                     !clock_time_exceed(last_timeReportMsi, TIMEOUT_TICK_250MS)) {
 

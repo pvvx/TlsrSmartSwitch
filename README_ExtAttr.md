@@ -71,6 +71,7 @@
 * Attribute ***0xF009***: Coefficient for calculating _power_ – значение коэффициента множителя для счетчика мощности. См. описание для конкретного варианта датчика: BL0937/BL0942
 * Attribute ***0xF00A***: Coefficient for calculating _energy_ – значение коэффициента множителя для счетчика энергии. См. описание для варианта с датчиком BL0942.
 * Attribute ***0xF00B***: Coefficient for calculating _freq_ – значение коэффициента для счетчика частоты. См. описание для варианта с датчиком BL0942.
+* Attribute ***0xF013***: Switch Resolution Power _pwr_fix_div_ – переключение разрешения power: 0 - auto, 1 - 0..32767W, 2 - 0..3276.7W, 3 - 0..327.67W, 4 - 0..32.767W. Default: 2
 
 ### Cluster 0x0402: _Temperature Measurement_
 

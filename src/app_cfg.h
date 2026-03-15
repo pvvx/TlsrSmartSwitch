@@ -433,7 +433,7 @@ typedef enum{
 
 /* Debug mode config (sws_printf()) */
 // DEBUG
-#define SWS_PRINTF_MODE	0
+//#define SWS_PRINTF_MODE	1
 #if UART_PRINTF_MODE
 	#define	DEBUG_INFO_TX_PIN	    GPIO_PD0//print
 #endif
