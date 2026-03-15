@@ -92,5 +92,5 @@
 
 Полный список имеющихся у устройства кластеров и атрибутов, и их начальных значений, возможно получить путем сканирования устройства. 
 
-К примеру, для HA с ZHA в zha_toolkit.scan_device - [Scan_EM8SW2TS.json](https://github.com/pvvx/TlsrSmartSwitch/blob/master/Scan_EM8SW2TS.yaml)...
+К примеру, для HA с ZHA в zha_toolkit.scan_device
 
