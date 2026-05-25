@@ -1,5 +1,5 @@
-#ifndef SRC_INCLUDE_APP_ONOFF_H_
-#define SRC_INCLUDE_APP_ONOFF_H_
+#ifndef _INCLUDE_APP_ONOFF_H_
+#define _INCLUDE_APP_ONOFF_H_
 
 void cmdOnOff_set(bool status);
 
@@ -13,4 +13,4 @@ void cmdOnOff_toggle(void);
 
 void remoteCmdOnOff(uint8_t cmd);
 
-#endif /* SRC_INCLUDE_APP_ONOFF_H_ */
+#endif /* _INCLUDE_APP_ONOFF_H_ */

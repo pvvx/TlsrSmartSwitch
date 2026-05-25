@@ -772,7 +772,11 @@ status_t app_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayloa
 
     sws_printf("app_onOffCb(%d#%04x)\n", pAddrInfo->dstEp, cmdId);
 
-    if(pAddrInfo->dstEp == APP_ENDPOINT1 || pAddrInfo->dstEp == APP_ENDPOINT2) {
+    if(pAddrInfo->dstEp == APP_ENDPOINT1
+#if USE_SWITCH
+    		|| pAddrInfo->dstEp == APP_ENDPOINT2
+#endif
+			) {
     	switch(cmdId){
     		case ZCL_CMD_ONOFF_ON:
     			cmdOnOff_on();

@@ -5,6 +5,8 @@
 #define APP_ENDPOINT2 0x02
 #define APP_ENDPOINT3 0x03
 
+#define ZCL_CUSTOM_CLUSTER		0xEA60
+
 /* Custom Attr for OnOff cluster */
 #define ZCL_ATTRID_RELAY_STATE				0xF000 // RR, On/Off
 #define ZCL_ATTRID_CUSTOM_KEY_LOCK          0xF001
@@ -34,6 +36,11 @@
 #define ZCL_TEMPERATURE_MIN					0xF011 // emergency
 #define ZCL_TEMPERATURE_MAX					0xF012 // emergency
 
+/* Custom Attr for Electrical Measurement cluster */
+#define ZCL_ATTRID_CURRENT_CAL       		0xF080
+#define ZCL_ATTRID_VOLTAGE_CAL        		0xF081
+#define ZCL_ATTRID_POWER_CAL         		0xF082
+
 #if USE_CFG_GPIO
 #define ZCL_ATTRID_GPIO_RELAY				0xF100
 #define ZCL_ATTRID_GPIO_LED1				0xF101
@@ -54,12 +61,6 @@
 #endif
 #define ZCL_ATTRID_GPIO_FLG					0xF10B
 #endif
-
-/* Custom Attr for Electrical Measurement cluster */
-#define ZCL_ATTRID_CURRENT_CAL       		0xF080
-#define ZCL_ATTRID_VOLTAGE_CAL        		0xF081
-#define ZCL_ATTRID_POWER_CAL         		0xF082
-
 
 /**
  *  @brief Defined for basic cluster attributes

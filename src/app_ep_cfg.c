@@ -90,6 +90,9 @@ const uint16_t app_ep1_inClusterList[] = {
 #ifdef ZCL_ZLL_COMMISSIONING
     ZCL_CLUSTER_TOUCHLINK_COMMISSIONING,
 #endif
+#if USE_CUSTOM_CLUSTER
+	ZCL_CUSTOM_CLUSTER
+#endif
 };
 
 /**
@@ -289,6 +292,7 @@ const zclAttrInfo_t thermostat_ui_cfg_attrTbl[] =
 	//{ZCL_ATTRID_HVAC_THERMOSTAT_AC_ERROR_CODE, ZCL_BITMAP8, RW, (uint8_t*)&my18b20.errors},
 	//{ZCL_ATTRID_HVAC_THERMOSTAT_SETPOINT_CHANGE_SOURCE, ZCL_ENUM8,  R, (uint8_t*)},
 	//{ZCL_ATTRID_HVAC_THERMOSTAT_SETPOINT_CHANGE_AMOUNT, ZCL_INT16,  R, (uint8_t*)},
+#if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
 #ifndef ZCL_TEMPERATURE_MEASUREMENT
 	{ ZCL_TEMPERATURE_SENSOR_ID,     		ZCL_UINT32, R, (uint8_t*)&my18b20.id },
@@ -299,6 +303,7 @@ const zclAttrInfo_t thermostat_ui_cfg_attrTbl[] =
 	{ ZCL_TEMPERATURE_MIN,          		ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.min_temp },
 	{ ZCL_TEMPERATURE_MAX,     				ZCL_UINT32, RW, (uint8_t*)&my18b20.coef.min_temp },
 #endif
+#endif // !USE_CUSTOM_CLUSTER
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, 	ZCL_UINT16,  	R, (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
@@ -321,6 +326,7 @@ const zclAttrInfo_t temperature_measurement_attrTbl[] =
 	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MINMEASUREDVALUE,      ZCL_INT16,    R,  (uint8_t*)&g_zcl_temperatureAttrs.minValue },
 	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MAXMEASUREDVALUE,      ZCL_INT16,    R,  (uint8_t*)&g_zcl_temperatureAttrs.maxValue },
 	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_TOLERANCE,       		ZCL_UINT16,   R,  (uint8_t*)&g_zcl_temperatureAttrs.tolerance },
+#if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
 	{ ZCL_TEMPERATURE_SENSOR_ID,     		ZCL_UINT32, R, (uint8_t*)&my18b20.id },
 	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_BITMAP8, R, (uint8_t*)&my18b20.errors },
@@ -329,7 +335,7 @@ const zclAttrInfo_t temperature_measurement_attrTbl[] =
 	{ ZCL_TEMPERATURE_SENSOR_HYSTERESIS,	ZCL_INT16,	RW, (uint8_t*)&my18b20.coef.temp_hysteresis },
 	{ ZCL_TEMPERATURE_MIN,          		ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.min_temp },
 	{ ZCL_TEMPERATURE_MAX,     				ZCL_UINT32, RW, (uint8_t*)&my18b20.coef.min_temp },
-
+#endif // !USE_CUSTOM_CLUSTER
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, 	ZCL_DATA_TYPE_UINT16,  	ACCESS_CONTROL_READ,  						(u8*)&zcl_attr_global_clusterRevision},
 };
 
@@ -433,6 +439,7 @@ const zclAttrInfo_t onOff1_attrTbl[] = {
 
 	{ ZCL_ATTRID_START_UP_ONOFF,            ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.startUpOnOff        },
 
+#if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
 #if USE_METERING || USE_SENSOR_MY18B20
 	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
@@ -462,6 +469,7 @@ const zclAttrInfo_t onOff1_attrTbl[] = {
 #endif
     { ZCL_ATTRID_GPIO_FLG,   				ZCL_DATA_TYPE_BITMAP16,   RW, (u8*)&dev_gpios_new.flg },
 #endif
+#endif // !USE_CUSTOM_CLUSTER
 
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,     R,      (uint8_t*)&zcl_attr_global_clusterRevision      },
 };
@@ -477,10 +485,11 @@ const zclAttrInfo_t onOffCfg1_attrTbl[] =
 {
     { ZCL_ATTRID_SWITCH_TYPE,               ZCL_ENUM8,    R,  (u8*)&cfg_on_off.switchType         },
     { ZCL_ATTRID_SWITCH_ACTION,             ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchActions      },
+#if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
     { CUSTOM_ATTRID_SWITCH_TYPE,            ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchType  },
     { CUSTOM_ATTRID_DECOUPLED,              ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchDecoupled   },
-
+#endif // !USE_CUSTOM_CLUSTER
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_UINT16,   R,  (u8*)&zcl_attr_global_clusterRevision           },
 };
 
@@ -567,7 +576,6 @@ zcl_msAttr_t g_zcl_msAttrs = {
 #define POWER_FIX_DIV_DEF	2	// 0 - auto, 1 - 0..32767W, 2 - 0..3276.7W, 3 - 0..327.67W, 4 - 0..32.767W
 #endif
 
-
 const zcl_config_min_max_t def_config_min_max = {
 	.max_voltage = MAX_VOLTAGE_DEF, // in 0.01V, = 0 - off
 	.min_voltage = MIN_VOLTAGE_DEF, // in 0.01V, = 0 - off
@@ -607,7 +615,8 @@ const zclAttrInfo_t ms_attrTbl[] = {
 	{ZCL_ATTRID_RMS_EXTREME_OVER_VOLTAGE,   ZCL_INT16,    RW,   (uint8_t*)&config_min_max.max_voltage		},
 	{ZCL_ATTRID_RMS_EXTREME_UNDER_VOLTAGE,  ZCL_INT16,    RW,   (uint8_t*)&config_min_max.min_voltage		},
 	{ZCL_ATTRID_RMS_VOLTAGE_SWELL,  		ZCL_INT16,    RW,   (uint8_t*)&config_min_max.max_current		},
-
+#if !USE_CUSTOM_CLUSTER
+	// Custom Attr:
 	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.emergency_off},
 	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&relay_off},
 	{ZCL_ATTRID_CURRENT_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.current		},
@@ -623,11 +632,87 @@ const zclAttrInfo_t ms_attrTbl[] = {
 	{ZCL_ATTRID_VOLTAGE_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.voltage	},
 	{ZCL_ATTRID_POWER_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.power		},
 #endif
+#endif // !USE_CUSTOM_CLUSTER
     {ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,    ZCL_UINT16,   R,    (uint8_t*)&zcl_attr_global_clusterRevision  }
 };
 
 #define ZCL_MS_ATTR_NUM    sizeof(ms_attrTbl) / sizeof(zclAttrInfo_t)
 #endif // ZCL_ELECTRICAL_MEASUREMENT
+
+//--------------- CUSTOM_CLUSTER -------------------------------
+#if USE_CUSTOM_CLUSTER
+const zclAttrInfo_t custom_attrTbl[] = {
+#ifdef ZCL_ON_OFF
+#if USE_METERING || USE_SENSOR_MY18B20
+	{ ZCL_ATTRID_RELAйY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
+#else
+	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    R,     (uint8_t*)&relay_state },
+#endif
+	{ ZCL_ATTRID_CUSTOM_KEY_LOCK,           ZCL_BOOLEAN,    RW,     (uint8_t*)&cfg_on_off.key_lock        },
+	{ ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.led_control     },
+#endif // ZCL_ON_OFF
+
+#ifdef ZCL_ON_OFF_SWITCH_CFG
+    { CUSTOM_ATTRID_SWITCH_TYPE,            ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchType  },
+    { CUSTOM_ATTRID_DECOUPLED,              ZCL_ENUM8,    RW, (u8*)&cfg_on_off.switchDecoupled   },
+#endif //ZCL_ON_OFF_SWITCH_CFG
+
+#ifdef ZCL_ELECTRICAL_MEASUREMENT
+	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.emergency_off},
+	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&relay_off},
+	{ZCL_ATTRID_CURRENT_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.current		},
+	{ZCL_ATTRID_VOLTAGE_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.voltage		},
+	{ZCL_ATTRID_POWER_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.power		},
+#if USE_BL0942
+	{ZCL_ATTRID_ENERGY_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.energy		},
+	{ZCL_ATTRID_FGREQ_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.freq		},
+#endif
+	{ZCL_ATTRID_PWR_FIX_DIV,  		ZCL_ENUM8,     RW,   (uint8_t*)&config_min_max.power_fix_div},
+#if USE_CALIBRATE_CVP
+	{ZCL_ATTRID_CURRENT_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.current	},
+	{ZCL_ATTRID_VOLTAGE_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.voltage	},
+	{ZCL_ATTRID_POWER_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.power		},
+#endif
+#endif // ZCL_ELECTRICAL_MEASUREMENT
+
+#if USE_CFG_GPIO
+    { ZCL_ATTRID_GPIO_RELAY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rl },
+    { ZCL_ATTRID_GPIO_LED1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.led1 },
+    { ZCL_ATTRID_GPIO_LED2,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.led2 },
+    { ZCL_ATTRID_GPIO_KEY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.key },
+    { ZCL_ATTRID_GPIO_SW1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.sw1 },
+#if USE_SENSOR_MY18B20
+    { ZCL_ATTRID_GPIO_SWIRE,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.swire },
+#endif
+#if USE_BL0937
+    { ZCL_ATTRID_GPIO_SEL,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.sel },
+    { ZCL_ATTRID_GPIO_CF,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.cf },
+    { ZCL_ATTRID_GPIO_CF1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.cf1 },
+#endif
+#if USE_BL0942
+    { ZCL_ATTRID_GPIO_RX,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rx },
+    { ZCL_ATTRID_GPIO_TX,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.tx },
+#endif
+    { ZCL_ATTRID_GPIO_FLG,   				ZCL_DATA_TYPE_BITMAP16,   RW, (u8*)&dev_gpios_new.flg },
+#endif // USE_CFG_GPIO
+
+#if defined(ZCL_THERMOSTAT)	|| defined(ZCL_TEMPERATURE_MEASUREMENT)
+	// Custom Attr:
+#ifndef ZCL_TEMPERATURE_MEASUREMENT
+	{ ZCL_TEMPERATURE_SENSOR_ID,     		ZCL_UINT32, R, (uint8_t*)&my18b20.id },
+	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_BITMAP8, R, (uint8_t*)&my18b20.errors },
+	{ ZCL_TEMPERATURE_SENSOR_MULTIPLER,     ZCL_UINT32, RW, (uint8_t*)&my18b20.coef.temp_k },
+	{ ZCL_TEMPERATURE_SENSOR_ZERO,          ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.temp_z },
+	{ ZCL_TEMPERATURE_SENSOR_HYSTERESIS,	ZCL_INT16,	RW, (uint8_t*)&my18b20.coef.temp_hysteresis },
+	{ ZCL_TEMPERATURE_MIN,          		ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.min_temp },
+	{ ZCL_TEMPERATURE_MAX,     				ZCL_UINT32, RW, (uint8_t*)&my18b20.coef.min_temp },
+#endif
+#endif // ZCL_THERMOSTAT || ZCL_TEMPERATURE_MEASUREMENT
+};
+
+#define ZCL_CUSTOM_ATTR_NUM    sizeof(custom_attrTbl) / sizeof(zclAttrInfo_t)
+
+#endif // USE_CUSTOM_CLUSTER
 
 /**
  *  @brief Definition for mini relay ZCL specific cluster
@@ -659,15 +744,24 @@ const zcl_specClusterInfo_t g_appClusterList1[] =
 	{ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT,	MANUFACTURER_CODE_NONE, ZCL_TEMPERATURE_MEASUREMENT_ATTR_NUM, temperature_measurement_attrTbl, 	zcl_temperature_measurement_register, 	NULL},
 #endif
 #ifdef ZCL_METERING
-    {ZCL_CLUSTER_SE_METERING,               MANUFACTURER_CODE_NONE, ZCL_SE_ATTR_NUM,            se_attrTbl,          app_zcl_metering_register,         app_meteringCb  },
+    {ZCL_CLUSTER_SE_METERING,               MANUFACTURER_CODE_NONE, ZCL_MS_ATTR_NUM,            se_attrTbl,          app_zcl_metering_register,         app_meteringCb  },
 #endif
 #ifdef ZCL_ELECTRICAL_MEASUREMENT
     {ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_MS_ATTR_NUM,            ms_attrTbl,          zcl_electricalMeasure_register,    NULL    },
+#endif
+#if USE_CUSTOM_CLUSTER
+    {ZCL_CUSTOM_CLUSTER, 					MANUFACTURER_CODE_NONE, ZCL_CUSTOM_ATTR_NUM,         custom_attrTbl,          zcl_custom_register,    NULL    },
 #endif
 };
 
 uint8_t APP_CB_CLUSTER_NUM1 = (sizeof(g_appClusterList1)/sizeof(g_appClusterList1[0]));
 
+#if USE_CUSTOM_CLUSTER
+_CODE_ZCL_ status_t zcl_custom_register(u8 endpoint, u16 manuCode, u8 attrNum, const zclAttrInfo_t attrTbl[], cluster_forAppCb_t cb)
+{
+    return zcl_registerCluster(endpoint, ZCL_CUSTOM_CLUSTER, manuCode, attrNum, attrTbl, NULL, cb);
+}
+#endif
 
 #ifdef ZCL_ELECTRICAL_MEASUREMENT
 

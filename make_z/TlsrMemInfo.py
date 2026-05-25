@@ -134,7 +134,7 @@ def main():
 	print("{0} : {1:d} {2} {3}".format("Total Used SRAM", ram_used, "from", chip_sram_size))
 	print("{0} : {1:d}{2}{3}{4}{5}".format("Total Free SRAM", sec_size[4], " + stack[", sec_size[11], '] = ',  sec_size[4] + sec_size[11]))
 	if sec_size[11] < 256:
-		print("Warning! Stack is low!")
+		print("Warning! Stack is low!", file=sys.stderr)
 	sys.exit(0);
 	
 
