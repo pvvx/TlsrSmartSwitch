@@ -104,9 +104,9 @@ Optimizations have been made:
 
 Эта дополнительная кнопка или переключатель имеет три опции работы:
 
-1.	Toogle
-2.	Momentary
-3.	Multifunction
+0.	Toogle
+1.	Momentary
+2.	Multifunction
 
 Первые две опции могут работать отдельно от реле. Отключение  выбирается  в атрибуте _switch_decoupled_. 
 
