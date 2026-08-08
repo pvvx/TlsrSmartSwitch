@@ -74,10 +74,9 @@
 * Attribute ***0xF013***: Switch Resolution Power _pwr_fix_div_ – переключение разрешения power:
 	0. auto,
   	1. 0..32767W,
-  	2. 0..3276.7W,
+  	2. 0..3276.7W, (default)
   	3. 0..327.67W,
   	4. 0..32.767W.
-  Default: 2
 
 ### Cluster 0x0402: _Temperature Measurement_
 
