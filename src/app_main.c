@@ -178,7 +178,7 @@ static void app_sysException(void) {
 #endif
 #define REPORT_TIME_MAX_DEF			600		// 10 min
 #define REPORT_TIME_STAT_DEF		3600	// 1 h
-#define REPORT_TIME_MAX				65000
+#define REPORT_TIME_MAX				5400	// 65000
 
 /*********************************************************************
  * @fn      user_init

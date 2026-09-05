@@ -178,9 +178,9 @@ void buttonInit(void) {
 		pbt = &app_button[i];
 		if(pbt->gpio_name) {
 			gpio_input_init(pbt->gpio_name, PM_PIN_PULLUP_10K);
-			sleep_us(32);
+		    sleep_ms(1); // waiting for the button output level to pull Up
 			pbt->event_time = clock_time();
-			pbt->pressed = (((gpio_read(pbt->gpio_name)) != 0) == pbt->gpio_on);
+			pbt->pressed = (((gpio_read(pbt->gpio_name)) != 0) == pbt->gpio_on); // = OnOff
 		}
 		pbt->wait_off = BUTTON_FLAG_WAIT_LONG_OFF;
 	}

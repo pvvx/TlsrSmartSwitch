@@ -1,6 +1,6 @@
 @set TLPATH=D:\MCU\TelinkIoTStudio
 @set PATH=%TLPATH%\bin;%TLPATH%\opt\tc32\bin;%TLPATH%\mingw\bin;%TLPATH%\opt\tc32\tc32-elf\bin;%PATH%
-@set SWVER=_v0102
+@set SWVER=_v0104
 @del /Q .\bin\*.bin
 @del /Q .\bin\*.zigbee
 @del /Q .\build
@@ -13,6 +13,7 @@ set PROJECT_NAME=EM1SW1
 make -s -j clean
 make -s -j VERSION_BIN=%SWVER% PROJECT_NAME=%PROJECT_NAME% POJECT_DEF="-DBOARD=BOARD_%PROJECT_NAME%"
 @if not exist "bin\%PROJECT_NAME%%SWVER%.bin" goto :error
+@rem python3 make_z\zb_bin_ota.py bin\%PROJECT_NAME%%SWVER%.bin bin\TS011F_TZ3210_w0qqde0g%SWVER% -m0x1141 -i0xD3A3 -v0x00993001 -s"TS011F:_TZ3210_w0qqde0g"
 set PROJECT_NAME=EM8SW1
 make -s -j clean
 make -s -j VERSION_BIN=%SWVER% PROJECT_NAME=%PROJECT_NAME% POJECT_DEF="-DBOARD=BOARD_%PROJECT_NAME%"
