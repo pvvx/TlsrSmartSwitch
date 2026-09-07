@@ -35,7 +35,8 @@ const ext_tab_gpios_t  tab_gpios = {
 };
 
 dev_gpios_t  dev_gpios;
-uint8_t relay_off, relay_state;
+uint8_t relay_bits_emergency;
+uint8_t relay_state;
 
 static void check_first_start(void) {
     switch(cfg_on_off.startUpOnOff) {
@@ -73,7 +74,7 @@ bool get_relay_status(void) {
 void set_relay_status(bool status) {
 	sws_printf("set_relay_status(%d)\n", status);
 #if USE_METERING
-	if(relay_off || tik_reload != 0xffff || tik_start != 0xffff)
+	if(relay_bits_emergency || tik_reload != 0xffff || tik_start != 0xffff)
 		status = false;
 #endif
 	if(status)
@@ -131,12 +132,13 @@ void gpio_output_init(GPIO_PinTypeDef pin, uint8_t value) {
 	gpio_set_input_en(pin, 1);  //enable input
 }
 
-extern u32 scan_pins[1]; // in drv_keyboard.c
+//extern u32 scan_pins[1]; // in drv_keyboard.c
 
 #if USE_CFG_GPIO
 
 dev_gpios_t  dev_gpios_new;
 
+/* saving tab_gpios to flash memory */
 static void save_fgpio(flash_tab_gpios_t * pftab) {
 	pftab->id[0] = tab_gpios.id[0];
 	pftab->id[1] = tab_gpios.id[1];
@@ -145,6 +147,7 @@ static void save_fgpio(flash_tab_gpios_t * pftab) {
 	flash_write_page(FLASH_ADDR_TAB_GPIOS, sizeof(flash_tab_gpios_t), (uint8_t *) pftab);
 }
 
+/* Check for updates and, if changed, save tab_gpios to flash memory */
 void save_config_gpio(void) {
 	flash_tab_gpios_t ftab;
 	flash_read_page(FLASH_ADDR_TAB_GPIOS, sizeof(ftab), (uint8_t *)&ftab);
@@ -154,6 +157,7 @@ void save_config_gpio(void) {
 	}
 }
 
+/* reading tab_gpios from flash memory */
 static void flash_gpios_init(void) {
 	flash_tab_gpios_t ftab;
 	flash_read_page(FLASH_ADDR_TAB_GPIOS, sizeof(ftab), (uint8_t *)&ftab);
@@ -162,6 +166,7 @@ static void flash_gpios_init(void) {
 		&& xcrc32((uint8_t *)&ftab.gpios, sizeof(ftab.gpios), 0xffffffff) == ftab.crc) {
 		memcpy(&dev_gpios, &ftab.gpios, sizeof(dev_gpios));
 	} else {
+		// set default tab_gpios
 		memcpy(&dev_gpios, &tab_gpios.gpios, sizeof(dev_gpios));
 		memcpy(&ftab.gpios, &tab_gpios.gpios, sizeof(dev_gpios));
 		save_fgpio(&ftab);
@@ -171,6 +176,7 @@ static void flash_gpios_init(void) {
 }
 #endif
 
+/* start initialize */
 void dev_gpios_init(void) {
 #if USE_CFG_GPIO
 	flash_gpios_init();
@@ -193,6 +199,7 @@ void dev_gpios_init(void) {
     buttonInit();
 }
 
+/* start initialize */
 void dev_relay_init(void) {
     check_first_start();
     light_blink_start(1, 100, 100);

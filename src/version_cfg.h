@@ -67,7 +67,7 @@
 
 /* Board define */
 #ifndef BOARD
-#define BOARD				BOARD_EM0SW2
+#define BOARD				BOARD_EM8SW1
 #endif
 
 // #define MY_DEVICE	1
@@ -133,9 +133,7 @@
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.
  * Refer to ZCL OTA specification for details.
  */
-//#define MANUFACTURER_CODE_TELINK           	0x1141	// Telink ID
-#define MANUFACTURER_CODE_TELINK           	0xEA60	// 60000 Telink-pvvx
-//#define	IMAGE_TYPE							((USE_BL0937 << 15) | (USE_BL0942 << 12) | (USE_THERMOSTAT << 8) | (USE_SENSOR_MY18B20 << 4)  | USE_SWITCH)
+#define MANUFACTURER_CODE_TELINK           	0xEA60	// 60000 Telink-pvvx // Telink ID: 0x1141
 #define	IMAGE_TYPE							(0x0100 | BOARD)
 #define	FILE_VERSION					  	((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
 
@@ -144,7 +142,7 @@
 #define RESV_FOR_APP_RAM_CODE_SIZE			0
 #define IMAGE_OFFSET						APP_IMAGE_ADDR
 
-#define	DEEPRETENTION_SECTION_USED          1  // (if BLE)
+//#define	DEEPRETENTION_SECTION_USED          1  // (if BLE)
 
 #endif // _VERSION_CFG_H_
 

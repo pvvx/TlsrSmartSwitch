@@ -216,8 +216,7 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
 				&& attrID <= ZCL_ATTRID_FGREQ_COEF) {
 				save |= BIT(NBIT_SENSOR_CONFIG);
 #if USE_CALIBRATE_CVP
-			} else if (attrID >= ZCL_ATTRID_CURRENT_CAL
-				&& attrID <= ZCL_ATTRID_POWER_CAL) {
+			} else if (attrID == ZCL_ATTRID_START_CAL) {
 				save |= BIT(NBIT_SENSOR_CALIBRATE);
 #endif
 			} else {

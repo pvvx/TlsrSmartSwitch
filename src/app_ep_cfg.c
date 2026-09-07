@@ -441,13 +441,9 @@ const zclAttrInfo_t onOff1_attrTbl[] = {
 
 #if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
-#if USE_METERING || USE_SENSOR_MY18B20
-	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
-#else
-	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    R,     (uint8_t*)&relay_state },
-#endif
-	{ ZCL_ATTRID_CUSTOM_KEY_LOCK,           ZCL_BOOLEAN,    RW,     (uint8_t*)&cfg_on_off.key_lock        },
-	{ ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.led_control     },
+	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,	R,     (uint8_t*)&relay_state },
+	{ ZCL_ATTRID_CUSTOM_KEY_LOCK,           ZCL_BOOLEAN,	RW,    (uint8_t*)&cfg_on_off.key_lock        },
+	{ ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,		RW,    (uint8_t*)&cfg_on_off.led_control     },
 
 #if USE_CFG_GPIO
     { ZCL_ATTRID_GPIO_RELAY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rl },
@@ -618,7 +614,7 @@ const zclAttrInfo_t ms_attrTbl[] = {
 #if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
 	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.emergency_off},
-	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&relay_off},
+	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&relay_bits_emergency},
 	{ZCL_ATTRID_CURRENT_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.current		},
 	{ZCL_ATTRID_VOLTAGE_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.voltage		},
 	{ZCL_ATTRID_POWER_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.power		},
@@ -627,10 +623,16 @@ const zclAttrInfo_t ms_attrTbl[] = {
 	{ZCL_ATTRID_FGREQ_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.freq		},
 #endif
 	{ZCL_ATTRID_PWR_FIX_DIV,  		ZCL_ENUM8,     RW,   (uint8_t*)&config_min_max.power_fix_div},
+
+#ifdef	ZCL_ATTRID_BITS_ALARM_MASK
+	// TODO...
+#endif
+
 #if USE_CALIBRATE_CVP
 	{ZCL_ATTRID_CURRENT_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.current	},
 	{ZCL_ATTRID_VOLTAGE_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.voltage	},
 	{ZCL_ATTRID_POWER_CAL,  		ZCL_UINT16,    RW,   (uint8_t*)&sensor_calibrate.power		},
+	{ZCL_ATTRID_START_CAL,  		ZCL_ENUM8,     RWR,  (uint8_t*)&sensor_calibrate.start		},
 #endif
 #endif // !USE_CUSTOM_CLUSTER
     {ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,    ZCL_UINT16,   R,    (uint8_t*)&zcl_attr_global_clusterRevision  }
@@ -644,7 +646,7 @@ const zclAttrInfo_t ms_attrTbl[] = {
 const zclAttrInfo_t custom_attrTbl[] = {
 #ifdef ZCL_ON_OFF
 #if USE_METERING || USE_SENSOR_MY18B20
-	{ ZCL_ATTRID_RELAйY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
+	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
 #else
 	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    R,     (uint8_t*)&relay_state },
 #endif
@@ -659,7 +661,7 @@ const zclAttrInfo_t custom_attrTbl[] = {
 
 #ifdef ZCL_ELECTRICAL_MEASUREMENT
 	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.emergency_off},
-	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&relay_off},
+	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&relay_bits_emergency},
 	{ZCL_ATTRID_CURRENT_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.current		},
 	{ZCL_ATTRID_VOLTAGE_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.voltage		},
 	{ZCL_ATTRID_POWER_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.power		},
@@ -801,6 +803,23 @@ nv_sts_t save_config_min_max(void) {
 	if(memcmp(&config_min_max_saved, &config_min_max, sizeof(config_min_max))) {
 		memcpy(&config_min_max_saved, &config_min_max, sizeof(config_min_max));
 		ret = nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_CFG_MIN_MAX, sizeof(config_min_max_saved), (uint8_t*)&config_min_max_saved);
+		// 0 - auto, 1 - 0..32.767W, 2 - 0..327.67W, 3 - 0..3276.7W, 4 - 0..32767W
+		switch(config_min_max.power_fix_div) {
+		case 1:
+			g_zcl_msAttrs.power_divisor = 1;
+			break;
+		case 2:
+			g_zcl_msAttrs.power_divisor = 10;
+			break;
+		case 3:
+			g_zcl_msAttrs.power_divisor = 100;
+			break;
+#if USE_BL0942
+		case 4:
+			g_zcl_msAttrs.power_divisor = 1000;
+			break;
+#endif
+		}
 	}
     return ret;
 #else

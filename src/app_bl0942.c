@@ -180,52 +180,62 @@ static uint32_t _calk_coef(uint32_t cnt, uint16_t x) {
 static void sensor_calibrate_coef(void) {
 	bool save_flg = false;
 	reg_calibrate.cnt = 0;
-	if(sensor_calibrate.current) { // in 0.001 A, max 25.000A
-		if(reg_calibrate.current) { // x4
+	if(sensor_calibrate.start & SENSOR_CAL_I) {
+		if(sensor_calibrate.current // in 0.001 A, max 25.000A
+		&& reg_calibrate.current) { // x4
 			// coef.current - fp(0.32)
 			sensor_pwr_coef.current =
 				_calk_coef(reg_calibrate.current, sensor_calibrate.current) << (32+2-23); // << 11
 			save_flg = true;
-		}
-		sensor_calibrate.current = 0;
+		} else
+			sensor_calibrate.start |= SENSOR_CAL_ERROR;
 	}
-	if(sensor_calibrate.voltage) { // in 0.01V, max 300.00V
-		if(reg_calibrate.voltage) { // x4
+	if(sensor_calibrate.start & SENSOR_CAL_U) {
+		if(sensor_calibrate.voltage // in 0.01V, max 300.00V
+		&& reg_calibrate.voltage) { // x4
 			// coef.voltage - fp(0.32)
 			sensor_pwr_coef.voltage =
 				_calk_coef(reg_calibrate.voltage, sensor_calibrate.voltage) << (32+2-23); // << 11
 			save_flg = true;
-		}
-		sensor_calibrate.voltage = 0;
+		} else
+			sensor_calibrate.start |= SENSOR_CAL_ERROR;
 	}
-	if(sensor_calibrate.power) { // in 0.1 W, max 6250.0W (250V*25A)
-		if(sensor_calibrate.power == 1) {
-			u8 r = irq_disable();
-			sensor_pwr_coef.power = mul32x32_64(sensor_pwr_coef.current, sensor_pwr_coef.voltage) >> 24;
-			irq_restore(r);
-		} else if(reg_calibrate.power) { // x4
-			// coef.power - fp(8.24)
-			sensor_pwr_coef.power =
-				_calk_coef(reg_calibrate.power, sensor_calibrate.power) << (24+2-23); // << 3
-		}
+	if(sensor_calibrate.start & SENSOR_RECAL_P) {
+		u8 r = irq_disable();
+		sensor_pwr_coef.power = mul32x32_64(sensor_pwr_coef.current, sensor_pwr_coef.voltage) >> 24;
 		// energy = power * 3600000 / 419430.4
 		// 2pow24*419430.4/36000 = 195468733.8
-		u8 r = irq_disable();
 		sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power, BL0942_COEF_P2E) >> 24;
 		irq_restore(r);
 		save_flg = true;
-		sensor_calibrate.power = 0;
+	} else if(sensor_calibrate.start & SENSOR_CAL_P) {
+		if(sensor_calibrate.power // in 0.1 W, max 6250.0W (250V*25A)
+		&& reg_calibrate.power) { // x4
+			// coef.power - fp(8.24)
+			sensor_pwr_coef.power =
+			_calk_coef(reg_calibrate.power, sensor_calibrate.power) << (24+2-23); // << 3
+			// energy = power * 3600000 / 419430.4
+			// 2pow24*419430.4/36000 = 195468733.8
+			u8 r = irq_disable();
+			sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power, BL0942_COEF_P2E) >> 24;
+			irq_restore(r);
+			save_flg = true;
+		} else
+			sensor_calibrate.start |= SENSOR_CAL_ERROR;
 	}
-	if(save_flg) {
+	if(sensor_calibrate.start < SENSOR_CAL_ERROR && save_flg) {
 		save_config_sensor();
+		sensor_calibrate.start = SENSOR_CAL_OK;
 	}
 }
 
 void check_start_calibrate(void) {
-	reg_calibrate.current = 0;
-	reg_calibrate.voltage = 0;
-	reg_calibrate.power = 0;
-	reg_calibrate.cnt = 1;
+	if(sensor_calibrate.start < SENSOR_CAL_ERROR && sensor_calibrate.start != SENSOR_CAL_OK) {
+		reg_calibrate.current = 0;
+		reg_calibrate.voltage = 0;
+		reg_calibrate.power = 0;
+		reg_calibrate.cnt = 1;
+	}
 }
 
 #endif
@@ -460,7 +470,7 @@ void monitoring_handler(void) {
             			tik_start = 0; // continue from the beginning startup timeout
             		}
                		if (config_min_max.emergency_off & BIT(BIT_MIN_VOLTAGE_OFF)) {
-            			relay_off |= BIT(BIT_MIN_VOLTAGE_OFF);
+            			relay_bits_emergency |= BIT(BIT_MIN_VOLTAGE_OFF);
                		}
                 } else if(config_min_max.max_voltage && voltage > config_min_max.max_voltage) {
                 	tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
@@ -468,7 +478,7 @@ void monitoring_handler(void) {
             			tik_start = 0; // continue from the beginning startup timeout, relay Off
             		}
                		if (config_min_max.emergency_off & BIT(BIT_MAX_VOLTAGE_OFF)) {
-            			relay_off |= BIT(BIT_MAX_VOLTAGE_OFF);
+            			relay_bits_emergency |= BIT(BIT_MAX_VOLTAGE_OFF);
                		}
                 } else if(config_min_max.max_current
                   && config_min_max.time_max_current
@@ -479,7 +489,7 @@ void monitoring_handler(void) {
             				tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
             				tik_max_current = 0xffff; // Over Current timeout expired
             				if (config_min_max.emergency_off & BIT(BIT_MAX_CURRENT_OFF))
-            					relay_off |= BIT(BIT_MAX_CURRENT_OFF);
+            					relay_bits_emergency |= BIT(BIT_MAX_CURRENT_OFF);
             			}
             		} else { // Over Current timeout expired
             			tik_reload = 0; // continue the reload timeout count from the beginning, relay Off

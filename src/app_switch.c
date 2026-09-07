@@ -16,7 +16,7 @@ static int32_t msInputTimerCb(void *args) {
  * @brief	switch Action
  */
 void switchAction(switch_action_t action, u8 count) {
-//    bool report = false;
+
     zcl_msInputAttr_t *msInputAttr = zcl_msInputAttrsGet();
 
     sws_printf("switchAction(%d,%d)\n", action, count);

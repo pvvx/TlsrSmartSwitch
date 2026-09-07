@@ -3,11 +3,19 @@
 
 #define MAX_BUTTON_MULTI_PRESSED    5
 
+/*** Configure button ***/
+
+enum {
+    VK_SW1 = 0,
+    VK_SW2,
+    VK_SW3
+};
+
 #ifndef MAX_BUTTON_NUM
 #if USE_SWITCH
-#define MAX_BUTTON_NUM 2
+#define MAX_BUTTON_NUM  2
 #else
-#define MAX_BUTTON_NUM 1
+#define MAX_BUTTON_NUM  1
 #endif
 #endif
 

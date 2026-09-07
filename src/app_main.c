@@ -313,6 +313,12 @@ void user_init(bool isRetention)
     bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID,
     		ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_ALARM_EVENTS,
 			0, REPORT_TIME_STAT_DEF, (uint8_t *)&reportableChange_tmp);
+#if USE_CALIBRATE_CVP
+    //reportableChange_tmp = 1;
+	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID,
+			ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_START_CAL,
+			0, REPORT_TIME_STAT_DEF, (u8 *)&reportableChange_tmp);
+#endif
 #endif // ZCL_ELECTRICAL_MEASUREMENT
 
 #ifdef ZCL_TEMPERATURE_MEASUREMENT

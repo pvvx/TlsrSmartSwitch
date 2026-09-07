@@ -8,7 +8,7 @@
 #define ZCL_CUSTOM_CLUSTER		0xEA60
 
 /* Custom Attr for OnOff cluster */
-#define ZCL_ATTRID_RELAY_STATE				0xF000 // RR, On/Off
+#define ZCL_ATTRID_RELAY_STATE				0xF000 // On/Off
 #define ZCL_ATTRID_CUSTOM_KEY_LOCK          0xF001
 #define ZCL_ATTRID_CUSTOM_LED               0xF002
 
@@ -19,6 +19,8 @@
 /* Custom Attr for Electrical Measurement cluster */
 #define ZCL_ATTRID_ALARM_MASK				0xF005 // RW
 #define ZCL_ATTRID_ALARM_EVENTS				0xF006 // RWR, 8 bits_emergency_off_t
+
+//#define ZCL_ATTRID_BITS_ALARM_MASK			0xF020 // 0xF020..0xF024
 
 #define ZCL_ATTRID_CURRENT_COEF       		0xF007
 #define ZCL_ATTRID_VOLTAGE_COEF        		0xF008
@@ -40,6 +42,7 @@
 #define ZCL_ATTRID_CURRENT_CAL       		0xF080
 #define ZCL_ATTRID_VOLTAGE_CAL        		0xF081
 #define ZCL_ATTRID_POWER_CAL         		0xF082
+#define ZCL_ATTRID_START_CAL				0xF090
 
 #if USE_CFG_GPIO
 #define ZCL_ATTRID_GPIO_RELAY				0xF100
@@ -61,6 +64,15 @@
 #endif
 #define ZCL_ATTRID_GPIO_FLG					0xF10B
 #endif
+
+typedef enum {
+	SENSOR_CAL_OK = 0, // = SENSOR_CAL_END
+	SENSOR_CAL_U = 1,
+	SENSOR_CAL_I = 2,
+	SENSOR_CAL_P = 4,
+	SENSOR_RECAL_P = 8,
+	SENSOR_CAL_ERROR = 0x80 // = SENSOR_CAL_END
+}sensor_bits_calibrate_t;
 
 /**
  *  @brief Defined for basic cluster attributes
@@ -254,7 +266,7 @@ typedef enum {
 	BIT_MAX_TEMP_OFF,		// 0x08
 	BIT_MIN_TEMP_OFF,		// 0x10
 	BIT_ERR_TS_OFF,			// 0x20
-} bits_emergency_off_t;
+} relay_bits_emergency_e;
 
 typedef struct {
     int16_t max_voltage; // in 0.01V, = 0 - off
@@ -275,6 +287,7 @@ typedef struct {
     uint16_t current; // in 0.001 A, max 25.000A
     uint16_t voltage; // in 0.01V, max 300.00V
     uint16_t power; // in 0.1 W, max 6250.0W (250V*25A)
+    uint8_t start;  // start & status
 } zcl_sensor_calibrate_t;
 
 extern zcl_sensor_calibrate_t sensor_calibrate;

@@ -312,16 +312,6 @@ extern "C" {
 
 #endif /* UART_PRINTF_MODE */
 
-/*** Configure button ***/
-
-enum {
-    VK_SW1 = 0,
-    VK_SW2,
-    VK_SW3
-};
-
-#define MAX_BUTTON_NUM  2
-
 /**********************************************************************
  * Battery & RF Power
  */

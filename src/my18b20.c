@@ -315,7 +315,7 @@ static void error_my18b20(void) {
 #endif
 #if USE_METERING
 		if (config_min_max.emergency_off & BIT(BIT_ERR_TS_OFF)) {
-			relay_off |= BIT(BIT_ERR_TS_OFF);
+			relay_bits_emergency |= BIT(BIT_ERR_TS_OFF);
 		}
 #endif
 	}
@@ -366,10 +366,10 @@ void task_my18b20(void) {
 #if USE_METERING
 				if ((config_min_max.emergency_off & BIT(BIT_MAX_TEMP_OFF))
 					&& temp > my18b20.coef.max_temp)
-					relay_off |= BIT(BIT_MAX_TEMP_OFF);
+					relay_bits_emergency |= BIT(BIT_MAX_TEMP_OFF);
 				if ((config_min_max.emergency_off & BIT(BIT_MIN_TEMP_OFF))
 					&& temp > my18b20.coef.min_temp)
-					relay_off |= BIT(BIT_MIN_TEMP_OFF);
+					relay_bits_emergency |= BIT(BIT_MIN_TEMP_OFF);
 #endif
 #ifdef ZCL_THERMOSTAT
 				set_thermostat(temp);

@@ -27,7 +27,8 @@ typedef struct {
 } dev_gpios_t;
 
 extern dev_gpios_t dev_gpios;
-extern uint8_t relay_off, relay_state;
+extern uint8_t relay_bits_emergency;
+extern uint8_t relay_state;
 
 void gpio_input_init(GPIO_PinTypeDef pin, GPIO_PullTypeDef pulup);
 void gpio_output_init(GPIO_PinTypeDef pin, uint8_t value);

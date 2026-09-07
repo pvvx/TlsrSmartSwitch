@@ -123,8 +123,8 @@ void buttonTask(void) {
 			if (pbt->wait_off) {
 				// включено ожидание длительного (заключительного) интервала отжатой кнопки
 				if (pbt->wait_off >= BUTTON_FLAG_WAIT_TST_OFF) {
-				// тест дребезга контакта пройден,
-				// ждем длительного интервала отжатой кнопки для завершения серии нажатий
+					// тест дребезга контакта пройден,
+					// ждем длительного интервала отжатой кнопки для завершения серии нажатий
 					if(tt - pbt->event_time	> BUTTON_OFF_TIME_TICK) {
 						// кнопка отжата уже более BUTTON_OFF_TIME_TICK мс
 						// отключить последующие ожидания интервалов отжатой кнопки
@@ -172,7 +172,7 @@ void buttonInit(void) {
 		app_button[1].gpio_on = (dev_gpios.flg & GPIOS_FLG_BTN_ON) != 0;
 #endif
 	}
-#endif
+#endif // USE_SWITCH
 // типовой buttonInit()
     for(int i = 0; i < MAX_BUTTON_NUM; i++) {
 		pbt = &app_button[i];

@@ -12,7 +12,7 @@ void cmdOnOff_set(bool status) {
    			&& cfg_on_off.startUpOnOff != ZCL_START_UP_ONOFF_SET_ONOFF_TO_ON) {
         	save_config_on_off();
     	} else {
-    		cfg_on_off_saved.onOff = cfg_on_off.onOff;
+    		cfg_on_off_saved.onOff = status;
     	}
     }
 #if USE_THERMOSTAT // USE_SENSOR_MY18B20
