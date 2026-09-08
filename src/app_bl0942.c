@@ -227,6 +227,7 @@ static void sensor_calibrate_coef(void) {
 		save_config_sensor();
 		sensor_calibrate.start = SENSOR_CAL_OK;
 	}
+	wrk_rpt.extraSend = 1;
 }
 
 void check_start_calibrate(void) {
