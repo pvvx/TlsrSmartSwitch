@@ -446,24 +446,24 @@ const zclAttrInfo_t onOff1_attrTbl[] = {
 	{ ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,		RW,    (uint8_t*)&cfg_on_off.led_control     },
 
 #if USE_CFG_GPIO
-    { ZCL_ATTRID_GPIO_RELAY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rl },
-    { ZCL_ATTRID_GPIO_LED1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.led1 },
-    { ZCL_ATTRID_GPIO_LED2,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.led2 },
-    { ZCL_ATTRID_GPIO_KEY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.key },
-    { ZCL_ATTRID_GPIO_SW1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.sw1 },
+    { ZCL_ATTRID_GPIO_RELAY,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.rl },
+    { ZCL_ATTRID_GPIO_LED1,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.led1 },
+    { ZCL_ATTRID_GPIO_LED2,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.led2 },
+    { ZCL_ATTRID_GPIO_KEY,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.key },
+    { ZCL_ATTRID_GPIO_SW1,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.sw1 },
 #if USE_SENSOR_MY18B20
-    { ZCL_ATTRID_GPIO_SWIRE,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.swire },
+    { ZCL_ATTRID_GPIO_SWIRE,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.swire },
 #endif
 #if USE_BL0937
-    { ZCL_ATTRID_GPIO_SEL,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.sel },
-    { ZCL_ATTRID_GPIO_CF,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.cf },
-    { ZCL_ATTRID_GPIO_CF1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.cf1 },
+    { ZCL_ATTRID_GPIO_SEL,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.sel },
+    { ZCL_ATTRID_GPIO_CF,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.cf },
+    { ZCL_ATTRID_GPIO_CF1,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.cf1 },
 #endif
 #if USE_BL0942
-    { ZCL_ATTRID_GPIO_RX,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rx },
-    { ZCL_ATTRID_GPIO_TX,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.tx },
+    { ZCL_ATTRID_GPIO_RX,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.rx },
+    { ZCL_ATTRID_GPIO_TX,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.tx },
 #endif
-    { ZCL_ATTRID_GPIO_FLG,   				ZCL_DATA_TYPE_BITMAP16,   RW, (u8*)&dev_gpios_new.flg },
+    { ZCL_ATTRID_GPIO_FLG,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.flg },
 #endif
 #endif // !USE_CUSTOM_CLUSTER
 
@@ -678,24 +678,24 @@ const zclAttrInfo_t custom_attrTbl[] = {
 #endif // ZCL_ELECTRICAL_MEASUREMENT
 
 #if USE_CFG_GPIO
-    { ZCL_ATTRID_GPIO_RELAY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rl },
-    { ZCL_ATTRID_GPIO_LED1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.led1 },
-    { ZCL_ATTRID_GPIO_LED2,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.led2 },
-    { ZCL_ATTRID_GPIO_KEY,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.key },
-    { ZCL_ATTRID_GPIO_SW1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.sw1 },
+    { ZCL_ATTRID_GPIO_RELAY,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.rl },
+    { ZCL_ATTRID_GPIO_LED1,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.led1 },
+    { ZCL_ATTRID_GPIO_LED2,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.led2 },
+    { ZCL_ATTRID_GPIO_KEY,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.key },
+    { ZCL_ATTRID_GPIO_SW1,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.sw1 },
 #if USE_SENSOR_MY18B20
-    { ZCL_ATTRID_GPIO_SWIRE,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.swire },
+    { ZCL_ATTRID_GPIO_SWIRE,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.swire },
 #endif
 #if USE_BL0937
-    { ZCL_ATTRID_GPIO_SEL,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.sel },
-    { ZCL_ATTRID_GPIO_CF,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.cf },
-    { ZCL_ATTRID_GPIO_CF1,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.cf1 },
+    { ZCL_ATTRID_GPIO_SEL,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.sel },
+    { ZCL_ATTRID_GPIO_CF,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.cf },
+    { ZCL_ATTRID_GPIO_CF1,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.cf1 },
 #endif
 #if USE_BL0942
-    { ZCL_ATTRID_GPIO_RX,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.rx },
-    { ZCL_ATTRID_GPIO_TX,   				ZCL_UINT16,   RW, (u8*)&dev_gpios_new.tx },
+    { ZCL_ATTRID_GPIO_RX,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.rx },
+    { ZCL_ATTRID_GPIO_TX,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.tx },
 #endif
-    { ZCL_ATTRID_GPIO_FLG,   				ZCL_DATA_TYPE_BITMAP16,   RW, (u8*)&dev_gpios_new.flg },
+    { ZCL_ATTRID_GPIO_FLG,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.flg },
 #endif // USE_CFG_GPIO
 
 #if defined(ZCL_THERMOSTAT)	|| defined(ZCL_TEMPERATURE_MEASUREMENT)

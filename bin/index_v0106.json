@@ -1,0 +1,245 @@
+[
+    {
+        "fileVersion": 278476295,
+        "fileSize": 190306,
+        "manufacturerCode": 4107,
+        "imageType": 522,
+        "sha512": "4f1a4e62380908f26057f6b742125528d9af6c445b8bae9985f2ab7715f9c12a2d09699c907f8e4c41dbaa7cb8439d169d210a4922ea48d8055cefceed1b448d",
+        "otaHeaderString": "Hue to Telink-pvvx",
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/100b-020a-10993607-Zbeacon_TS0001_v0106.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 190306,
+        "manufacturerCode": 60000,
+        "imageType": 256,
+        "sha512": "861ad1230df275b815d122a1dc2eab71954e8c681f989e07cfc891eac7ce70dfd13f9c6bb68939613806b287dd88bb98a1472db2b468bb2ccdbe0d07f1219969",
+        "otaHeaderString": "Telink-pvvx:EM0SW1_z",
+        "modelId": "EM0SW1_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0100-01063001-EM0SW1.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 191234,
+        "manufacturerCode": 60000,
+        "imageType": 257,
+        "sha512": "8d9731a92fbc29203d6c6e1aefc06b750944845929e8d9b66c19daad0d71c4eedea541d2e9e9d025a201e537af4f0fecac242a04c7e8aca3d088491fcaa62c75",
+        "otaHeaderString": "Telink-pvvx:EM0SW2_z",
+        "modelId": "EM0SW2_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0101-01063001-EM0SW2.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 192018,
+        "manufacturerCode": 60000,
+        "imageType": 258,
+        "sha512": "a3b25b410cd4852f7b30ea1872fabfe0e5f99cbfa1c3582709575774e7799aaa3735fdc62be72b13363aaccb45cefecf6b7f094972ce9f8f38ef2d04f5726c89",
+        "otaHeaderString": "Telink-pvvx:EM0SW1T_z",
+        "modelId": "EM0SW1T_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0102-01063001-EM0SW1T.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 192930,
+        "manufacturerCode": 60000,
+        "imageType": 259,
+        "sha512": "b1d62ace38fe1e971162af5ff3d261383dd350b8a7393ba8a445273e8c634d6917bc9d4629dc78b675b569e04d9620e5df9ded74e3e646d1080809f72f378bd1",
+        "otaHeaderString": "Telink-pvvx:EM0SW2T_z",
+        "modelId": "EM0SW2T_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0103-01063001-EM0SW2T.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 193506,
+        "manufacturerCode": 60000,
+        "imageType": 262,
+        "sha512": "5109da64e7b30a49da69bdd215cad7d76bdc4c0eb80e77115311912b651cf13e1df6d7575b04d404bc1ac42be236fa53228b68045151c90143594566e7a6cafd",
+        "otaHeaderString": "Telink-pvvx:EM0SW1TS_z",
+        "modelId": "EM0SW1TS_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0106-01063001-EM0SW1TS.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 194466,
+        "manufacturerCode": 60000,
+        "imageType": 263,
+        "sha512": "dbe024701578dc026990004791a70ba8547f24ec95f58b25e96bd1943ae6104e3d19b558b294a3637ee2a005cee5affa68f0ce5f1b4ea541461a93ec3d26abb6",
+        "otaHeaderString": "Telink-pvvx:EM0SW2TS_z",
+        "modelId": "EM0SW2TS_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0107-01063001-EM0SW2TS.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 196082,
+        "manufacturerCode": 60000,
+        "imageType": 264,
+        "sha512": "73cb24b189b4cd63b298f92e46315ff7d7982c9da53cec89e90d9f50ea7c2aee27378aeaa9691d1b7e461e3916677876af5ea1f54fb05347c0f580387b545e9d",
+        "otaHeaderString": "Telink-pvvx:EM1SW1_z",
+        "modelId": "EM1SW1_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0108-01063001-EM1SW1.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 197010,
+        "manufacturerCode": 60000,
+        "imageType": 265,
+        "sha512": "89c147a21a33c506577ea0df33f13e5220bc8a89bdbc48b1f78f4033a4e9fca5941e4d31668cd289597d007357b3595ca39f6a2634c8c38252d9f3cdc57c7142",
+        "otaHeaderString": "Telink-pvvx:EM1SW2_z",
+        "modelId": "EM1SW2_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0109-01063001-EM1SW2.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 197858,
+        "manufacturerCode": 60000,
+        "imageType": 266,
+        "sha512": "63f2e65abd963d73f87464cbb1c06b872a169b0c81c2d01ef7834bde9c259839b012d005130914a360ea3f2e0078cbc9291ee23b3ec4ad3c7fe5732ed4322f02",
+        "otaHeaderString": "Telink-pvvx:EM1SW1T_z",
+        "modelId": "EM1SW1T_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-010a-01063001-EM1SW1T.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 198802,
+        "manufacturerCode": 60000,
+        "imageType": 267,
+        "sha512": "1ad5efc902294d413e66cb2b0676f8bc9bb392caa20fd541d6777637e33dbb055d37a1f77c952195038288c76c60d2ea90ad0764a1db82679dee1dc8b2ed3475",
+        "otaHeaderString": "Telink-pvvx:EM1SW2T_z",
+        "modelId": "EM1SW2T_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-010b-01063001-EM1SW2T.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 199362,
+        "manufacturerCode": 60000,
+        "imageType": 270,
+        "sha512": "e82aeafa2c7224eae7d5db69015e84e7292e86b945443e8b4ac821b827e9c6517cda79997281fa96276cf816532287b550601ebc9adc1fb8a4354db8ab9b8914",
+        "otaHeaderString": "Telink-pvvx:EM1SW1TS_z",
+        "modelId": "EM1SW1TS_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-010e-01063001-EM1SW1TS.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 200290,
+        "manufacturerCode": 60000,
+        "imageType": 271,
+        "sha512": "e1ceda9a2679f865c865ecc62a765318c4138a430083f9d209caf4a7f36372a73fcba32b30c95a5dfd344c5ca3d86e6a6657552967907c737b5eecfc811b7331",
+        "otaHeaderString": "Telink-pvvx:EM1SW2TS_z",
+        "modelId": "EM1SW2TS_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-010f-01063001-EM1SW2TS.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 195970,
+        "manufacturerCode": 60000,
+        "imageType": 272,
+        "sha512": "fc9c5bf0849c3454a7f0a283762c052c1c4b4e82cbf326d0344778ec5a970ae40e699cc3aebb7f218ca1433e1a19405fbd57914561a5e0368a8ea792bc5035f9",
+        "otaHeaderString": "Telink-pvvx:EM8SW1_z",
+        "modelId": "EM8SW1_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0110-01063001-EM8SW1.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 196882,
+        "manufacturerCode": 60000,
+        "imageType": 273,
+        "sha512": "5751f0668f1f0f15dc365a9a521718592e612f479ad07af6ff39b50367ba6e2e0135731898bfe1685da2ae4abd6c68fdb745ff791582f45f6c7edddbaed99e62",
+        "otaHeaderString": "Telink-pvvx:EM8SW2_z",
+        "modelId": "EM8SW2_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0111-01063001-EM8SW2.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 197762,
+        "manufacturerCode": 60000,
+        "imageType": 274,
+        "sha512": "a72a2b1356599c891795a29e27426b17db3f10ef978d681cd550696af1de208ec5d175be9c0ca03c8773c0ff70bdeab7b28f4f31211a49c463d8b58a01f87b7b",
+        "otaHeaderString": "Telink-pvvx:EM8SW1T_z",
+        "modelId": "EM8SW1T_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0112-01063001-EM8SW1T.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 198690,
+        "manufacturerCode": 60000,
+        "imageType": 275,
+        "sha512": "87ca2c97f4348722d35fc7606dcb1ff5c9c8f06834ed1b9714e1dd5bed831b3df3b2c5e8d02a2aa880a9c266db0b93b5329a83dfcf5c2d41203973e688fd9f91",
+        "otaHeaderString": "Telink-pvvx:EM8SW2T_z",
+        "modelId": "EM8SW2T_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0113-01063001-EM8SW2T.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 199250,
+        "manufacturerCode": 60000,
+        "imageType": 278,
+        "sha512": "3abe4b92b00bc0c1bd80273897ab9badd95a4023fddbf3bb56affbd1510f13f16854c4d2d3a4c4c963dbf449dae496d695a3f688253bdb81106add7dc86cfb69",
+        "otaHeaderString": "Telink-pvvx:EM8SW1TS_z",
+        "modelId": "EM8SW1TS_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0116-01063001-EM8SW1TS.zigbee"
+    },
+    {
+        "fileVersion": 17182721,
+        "fileSize": 200178,
+        "manufacturerCode": 60000,
+        "imageType": 279,
+        "sha512": "03352e49155e92087cff3a13254a59958e7ea176d31f2014e61e67f91c70aa879e7e98ecdb0c01921e902e72c091c09a78bb49d970ee8864269ac8e31583cfd5",
+        "otaHeaderString": "Telink-pvvx:EM8SW2TS_z",
+        "modelId": "EM8SW2TS_z",
+        "manufacturerName": [
+            "Telink-pvvx"
+        ],
+        "url": "https://github.com/pvvx/TlsrSmartSwitch/raw/refs/heads/master/bin/ea60-0117-01063001-EM8SW2TS.zigbee"
+    }
+]
