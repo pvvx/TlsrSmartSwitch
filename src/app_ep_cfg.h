@@ -71,7 +71,9 @@ typedef enum {
 	SENSOR_CAL_I = 2,
 	SENSOR_CAL_P = 4,
 	SENSOR_RECAL_P = 8,
-	SENSOR_CAL_ERROR = 0x80 // = SENSOR_CAL_END
+	SENSOR_CAL_MAX = 15,
+	SENSOR_CAL_ERVAL = 0x40, // Error value or value not specified
+	SENSOR_CAL_ERROR = 0x80 // calibration error
 }sensor_bits_calibrate_t;
 
 /**
@@ -284,7 +286,7 @@ extern zcl_config_min_max_t config_min_max;
 #if USE_CALIBRATE_CVP
 // Data for calibrate
 typedef struct {
-    uint16_t current; // in 0.001 A, max 25.000A
+    uint16_t current; // in mA, max 25.000A
     uint16_t voltage; // in 0.01V, max 300.00V
     uint16_t power; // in 0.1 W, max 6250.0W (250V*25A)
     uint8_t start;  // start & status

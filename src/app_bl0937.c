@@ -69,9 +69,9 @@ typedef struct {
     uint32_t voltage;
     uint32_t power;
     uint8_t cnt;
-} cnt_calibrate_t;
+} wrk_calibrate_t;
 
-static cnt_calibrate_t cnt_calibrate;
+static wrk_calibrate_t wrk_calibrate;
 
 zcl_sensor_calibrate_t sensor_calibrate_old, sensor_calibrate;
 
@@ -122,23 +122,23 @@ static uint32_t _calk_coef(uint32_t cnt4, uint32_t x) {
 /* Sensor Calibrate Coefficients */
 static void sensor_calibrate_coef(void) {
 	bool save_flg = false;
-	cnt_calibrate.cnt = 0;
+	wrk_calibrate.cnt = 0;
 	if(sensor_calibrate.start & SENSOR_CAL_I) {
 		if(sensor_calibrate.current // in 0.001 A, max 25.000A
-		&& cnt_calibrate.current) { // x4
+		&& wrk_calibrate.current) { // x4
 				// coef.current - fp(16.16)
 				sensor_pwr_coef.current =
-					_calk_coef(cnt_calibrate.current, sensor_calibrate.current);
+					_calk_coef(wrk_calibrate.current, sensor_calibrate.current);
 				save_flg = true;
 		} else
 			sensor_calibrate.start |= SENSOR_CAL_ERROR;
 	}
 	if(sensor_calibrate.start & SENSOR_CAL_U) {
 		if(sensor_calibrate.voltage) { // in 0.01V, max 300.00V
-			if(cnt_calibrate.voltage) { // x4
+			if(wrk_calibrate.voltage) { // x4
 				// coef.voltage - fp(16.16)
 				sensor_pwr_coef.voltage =
-					_calk_coef(cnt_calibrate.voltage, sensor_calibrate.voltage);
+					_calk_coef(wrk_calibrate.voltage, sensor_calibrate.voltage);
 				save_flg = true;
 			}
 			sensor_calibrate.voltage = 0;
@@ -153,10 +153,10 @@ static void sensor_calibrate_coef(void) {
 		save_flg = true;
 	} else if(sensor_calibrate.start & SENSOR_CAL_P) {
 		if(sensor_calibrate.power // in 0.1 W, max 6250.0W (250V*25A)
-		&& cnt_calibrate.power) { // x4
+		&& wrk_calibrate.power) { // x4
 			// coef.power - fp(16.16)
 			sensor_pwr_coef.power =
-				_calk_coef(cnt_calibrate.power, sensor_calibrate.power);
+				_calk_coef(wrk_calibrate.power, sensor_calibrate.power);
 				// 0x100000000/(60*60/8)=9544371.76888
 			u8 r = irq_disable();
 			sensor_pwr_coef.energy = mul32x32_64(sensor_pwr_coef.power+225, 9544372) >> 32;
@@ -173,11 +173,29 @@ static void sensor_calibrate_coef(void) {
 }
 
 void check_start_calibrate(void) {
-	if(sensor_calibrate.start < SENSOR_CAL_ERROR && sensor_calibrate.start != SENSOR_CAL_OK) {
-		cnt_calibrate.current = 0;
-		cnt_calibrate.voltage = 0;
-		cnt_calibrate.power = 0;
-		cnt_calibrate.cnt = 1;
+	u8 err = 0;
+	if(sensor_calibrate.start <= SENSOR_CAL_MAX && sensor_calibrate.start != SENSOR_CAL_OK) {
+		if(sensor_calibrate.start == SENSOR_RECAL_P) {
+			sensor_calibrate_coef();
+		} else {
+			if((sensor_calibrate.start & SENSOR_CAL_U)
+			&& (sensor_calibrate.voltage < 1200 || sensor_calibrate.voltage > 30000))
+				err = SENSOR_CAL_U | SENSOR_CAL_ERVAL;
+			if((sensor_calibrate.start & SENSOR_CAL_I)
+			&& (sensor_calibrate.current < 50 || sensor_calibrate.current > 25000))
+				err |= SENSOR_CAL_I | SENSOR_CAL_ERVAL;
+			if((sensor_calibrate.start & SENSOR_CAL_P)
+				&& (sensor_calibrate.power < 100 || sensor_calibrate.power > 62500))
+				err |= SENSOR_CAL_P | SENSOR_CAL_ERVAL;
+			if(err) {
+				sensor_calibrate.start = err;
+			} else {
+				wrk_calibrate.current = 0;
+				wrk_calibrate.voltage = 0;
+				wrk_calibrate.power = 0;
+				wrk_calibrate.cnt = 1;
+			}
+		}
 	}
 }
 
@@ -278,12 +296,12 @@ void bl0937_new_dataCb(void *args) {
     power = bl0937_cnt.cnt_power;
 
 #if USE_CALIBRATE_CVP
-    if(cnt_calibrate.cnt) {
-        cnt_calibrate.cnt++;
-    	cnt_calibrate.current += current;
-    	cnt_calibrate.voltage += voltage;
-    	cnt_calibrate.power += power;
-    	if(cnt_calibrate.cnt > 4) {
+    if(wrk_calibrate.cnt) {
+        wrk_calibrate.cnt++;
+    	wrk_calibrate.current += current;
+    	wrk_calibrate.voltage += voltage;
+    	wrk_calibrate.power += power;
+    	if(wrk_calibrate.cnt > 4) {
     		sensor_calibrate_coef();
     	}
     }

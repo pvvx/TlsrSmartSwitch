@@ -39,20 +39,64 @@ class TssAlarmMask(t.bitmap8):
 	Under_Temp = 0b00010000
 	Error_TS = 0b00100000
 
+def Alarm_converter(value: int) -> str:
+    if value == 0:
+        return "None"
+    if value > 63:
+        return "Unknown"
+    names = ["OV", "UV", "UI", "OT", "UT", "TS"]
+    parts = []
+    for i in range(6):
+        if value & (1 << i):
+            parts.append(names[i])
+    return ", ".join(parts)
+
 class TssCalibration(t.enum8):
 	Cal_ok = 0
 	Cal_U = 1
 	Cal_I = 2
 	Cal_UI = 3
 	Cal_P = 4
+	Cal_UP = 5
+	Cal_IP = 6
 	Cal_UIP = 7
 	ReCal_P = 8
-	ErrCal_U = 129
-	ErrCal_I = 130
-	ErrCal_UI = 131
-	ErrCal_P = 132
-	ErrCal_UP = 133
-	ErrCal_UIP = 135
+	#ErrCal_U = 129
+	#ErrCal_I = 130
+	#ErrCal_UI = 131
+	#ErrCal_P = 132
+	#ErrCal_UP = 133
+	#ErrCal_IP = 134
+	#ErrCal_UIP = 135
+
+def StatusCalibration_converter(value: int) -> str:
+	actions = {
+		0: "Ok",
+		1: "Calibrate V",
+		2: "Calibrate I",
+		3: "Calibrate V and I",
+		4: "Calibrate P",
+		5: "Calibrate V and P",
+		6: "Calibrate I and P",
+		7: "Calibrate V, I, P",
+		8: "Recalculate Power",
+		65: "Error value V",
+		66: "Error value I" ,
+		67: "Error value V and I",
+		68: "Error value P",
+		69: "Error value V and P"
+		70: "Error value I and P",
+		71: "Error value V, I, P"
+		128: "Calibration error",
+		129: "V calibration error",
+		130: "I calibration error" ,
+		131: "V and I calibration error",
+		132: "P calibration error",
+		133: "V and P calibration error",
+		134: "I and P calibration error",
+		135: "V, I, P calibration error"
+	}
+	return actions.get(value)
 
 
 class TssOnOff(CustomCluster, OnOff):
@@ -304,7 +348,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		multiplier=0.01,
 		unit=UnitOfElectricPotential.VOLT,
 		translation_key="rms_extreme_over_voltage",
-		fallback_name="Over voltage",
+		fallback_name="Over Voltage",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -317,7 +361,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		multiplier=0.01,
 		unit=UnitOfElectricPotential.VOLT,
 		translation_key="rms_extreme_under_voltage",
-		fallback_name="Under voltage",
+		fallback_name="Under Voltage",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -330,7 +374,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		# if Amper: multiplier=0.001,
 		unit=UnitOfElectricCurrent.MILLIAMPERE,
 		translation_key="rms_extreme_over_current",
-		fallback_name="Over current",
+		fallback_name="Over Current",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -341,7 +385,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		max_value=4294967295,
 		step=1,
 		translation_key="calculating_current",
-		fallback_name="Calc.Coef. current",
+		fallback_name="Calc.Coef. Current",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -352,7 +396,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		max_value=4294967295,
 		step=1,
 		translation_key="calculating_voltage",
-		fallback_name="Calc.Coef. voltage",
+		fallback_name="Calc.Coef. Voltage",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -363,7 +407,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		max_value=4294967295,
 		step=1,
 		translation_key="calculating_power",
-		fallback_name="Calc.Coef. power",
+		fallback_name="Calc.Coef. Power",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -375,7 +419,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		max_value=4294967295,
 		step=1,
 		translation_key="calculating_freq",
-		fallback_name="Calc.Coef. freq",
+		fallback_name="Calc.Coef. Freq",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -388,7 +432,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		max_value=32000,
 		step=1,
 		translation_key="calibration_current",
-		fallback_name="Value for current calibration",
+		fallback_name="Value for Current calibration",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -402,7 +446,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		step=1,
 		multiplier=0.01,
 		translation_key="calibration_voltage",
-		fallback_name="Value for voltage calibration",
+		fallback_name="Value for Voltage calibration",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -416,7 +460,7 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		multiplier=0.1,
 		unit=UnitOfPower.WATT,
 		translation_key="calibration_power",
-		fallback_name="Value for power calibration",
+		fallback_name="Value for Power calibration",
 		mode="box",
 		endpoint_id=1,
 	)
@@ -424,11 +468,19 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		TssElectricalMeasurement.AttributeDefs.start_calibration.name,
 		TssCalibration,
 		TssElectricalMeasurement.cluster_id,
-        initially_disabled=True,
 		translation_key="start_calibration",
-		fallback_name="Start and Status calibration",
+		fallback_name="Start calibration",
+		endpoint_id=1,
+	)
+	.sensor(
+		TssElectricalMeasurement.AttributeDefs.start_calibration.name,
+		TssElectricalMeasurement.cluster_id,
+		attribute_converter = StatusCalibration_converter,
+		translation_key="start_calibration",
+		fallback_name="Calibration status",
+		entity_type=EntityType.DIAGNOSTIC,
 		reporting_config=ReportingConfig(
-			min_interval=0, max_interval=900, reportable_change=1
+			min_interval=1, max_interval=900, reportable_change=1
 		),
 		endpoint_id=1,
 	)
@@ -444,8 +496,9 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		TssElectricalMeasurement.AttributeDefs.alarm_events.name,
 		TssElectricalMeasurement.cluster_id,
 		entity_type=EntityType.DIAGNOSTIC,
+		attribute_converter = Alarm_converter,
 		reporting_config=ReportingConfig(
-			min_interval=0, max_interval=900, reportable_change=1
+			min_interval=1, max_interval=900, reportable_change=1
 		),
 		translation_key="alarm_events",
 		fallback_name="Alarm Events",
@@ -457,8 +510,8 @@ class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 		min_value=0,
 		max_value=63,
 		step=1,
-		fallback_name="alarm_mask",
-		translation_key="Alarm mask",
+		translation_key="alarm_mask",
+		fallback_name="Alarm mask",
 		mode="box",
 		endpoint_id=1,
 	)
