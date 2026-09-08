@@ -84,9 +84,9 @@ def StatusCalibration_converter(value: int) -> str:
 		66: "Error value I" ,
 		67: "Error value V and I",
 		68: "Error value P",
-		69: "Error value V and P"
+		69: "Error value V and P",
 		70: "Error value I and P",
-		71: "Error value V, I, P"
+		71: "Error value V, I, P",
 		128: "Calibration error",
 		129: "V calibration error",
 		130: "I calibration error" ,
