@@ -52,22 +52,15 @@ def Alarm_converter(value: int) -> str:
     return ", ".join(parts)
 
 class TssCalibration(t.enum8):
-	Cal_ok = 0
-	Cal_U = 1
-	Cal_I = 2
-	Cal_UI = 3
-	Cal_P = 4
-	Cal_UP = 5
-	Cal_IP = 6
-	Cal_UIP = 7
-	ReCal_P = 8
-	#ErrCal_U = 129
-	#ErrCal_I = 130
-	#ErrCal_UI = 131
-	#ErrCal_P = 132
-	#ErrCal_UP = 133
-	#ErrCal_IP = 134
-	#ErrCal_UIP = 135
+	Calibrate_ok = 0
+	Calibrate_V = 1
+	Calibrate_I = 2
+	Calibrate_VI = 3
+	Calibrate_P = 4
+	Calibrate_VP = 5
+	Calibrate_IP = 6
+	Calibrate_VIP = 7
+	Recalculate_Power = 8
 
 def StatusCalibration_converter(value: int) -> str:
 	actions = {
