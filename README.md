@@ -162,6 +162,18 @@ Optimizations have been made:
 
 ## ...
 
+<img width="419" height="630" alt="image" src="https://github.com/user-attachments/assets/4a3fc86a-1a09-4a8e-b1bb-57fa8d54461a" />
+
+
+<img width="422" height="331" alt="image" src="https://github.com/user-attachments/assets/9721160e-c6b9-42aa-aa1d-f8f08a564355" />
+
+
+<img width="429" height="1976" alt="image" src="https://github.com/user-attachments/assets/91c15710-8709-42f1-aafb-0c5d96272a9a" />
+
+
+
+
+
 * Требуется помощь в проверке всех вариантов прошивок и комбинаций установок, а так-же в создании скриптов "причуд" для ZHA и Z2M.
 
 [Telegram](https://t.me/pvvx_developments/39)
