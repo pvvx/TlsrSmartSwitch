@@ -296,12 +296,12 @@ const zclAttrInfo_t thermostat_ui_cfg_attrTbl[] =
 	// Custom Attr:
 #ifndef ZCL_TEMPERATURE_MEASUREMENT
 	{ ZCL_TEMPERATURE_SENSOR_ID,     		ZCL_UINT32, R, (uint8_t*)&my18b20.id },
-	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_ENUM8, R, (uint8_t*)&my18b20.errors },
+	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_BITMAP8,RR, (uint8_t*)&my18b20.errors },
 	{ ZCL_TEMPERATURE_SENSOR_MULTIPLER,     ZCL_UINT32, RW, (uint8_t*)&my18b20.coef.temp_k },
 	{ ZCL_TEMPERATURE_SENSOR_ZERO,          ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.temp_z },
 	{ ZCL_TEMPERATURE_SENSOR_HYSTERESIS,	ZCL_INT16,	RW, (uint8_t*)&my18b20.coef.temp_hysteresis },
 	{ ZCL_TEMPERATURE_MIN,          		ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.min_temp },
-	{ ZCL_TEMPERATURE_MAX,     				ZCL_INT16, RW, (uint8_t*)&my18b20.coef.min_temp },
+	{ ZCL_TEMPERATURE_MAX,     				ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.max_temp },
 #endif
 #endif // !USE_CUSTOM_CLUSTER
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, 	ZCL_UINT16,  	R, (uint8_t*)&zcl_attr_global_clusterRevision},
@@ -329,12 +329,12 @@ const zclAttrInfo_t temperature_measurement_attrTbl[] =
 #if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
 	{ ZCL_TEMPERATURE_SENSOR_ID,     		ZCL_UINT32, R, (uint8_t*)&my18b20.id },
-	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_ENUM8,  R, (uint8_t*)&my18b20.errors },
+	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_BITMAP8,RR, (uint8_t*)&my18b20.errors },
 	{ ZCL_TEMPERATURE_SENSOR_MULTIPLER,     ZCL_UINT32, RW, (uint8_t*)&my18b20.coef.temp_k },
 	{ ZCL_TEMPERATURE_SENSOR_ZERO,          ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.temp_z },
 	{ ZCL_TEMPERATURE_SENSOR_HYSTERESIS,	ZCL_INT16,	RW, (uint8_t*)&my18b20.coef.temp_hysteresis },
 	{ ZCL_TEMPERATURE_MIN,          		ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.min_temp },
-	{ ZCL_TEMPERATURE_MAX,     				ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.min_temp },
+	{ ZCL_TEMPERATURE_MAX,     				ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.max_temp },
 #endif // !USE_CUSTOM_CLUSTER
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, 	ZCL_DATA_TYPE_UINT16,  	ACCESS_CONTROL_READ,  						(u8*)&zcl_attr_global_clusterRevision},
 };
@@ -702,12 +702,12 @@ const zclAttrInfo_t custom_attrTbl[] = {
 	// Custom Attr:
 #ifndef ZCL_TEMPERATURE_MEASUREMENT
 	{ ZCL_TEMPERATURE_SENSOR_ID,     		ZCL_UINT32, R, (uint8_t*)&my18b20.id },
-	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_ENUM8, R, (uint8_t*)&my18b20.errors },
+	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_BITMAP8,RR, (uint8_t*)&my18b20.errors },
 	{ ZCL_TEMPERATURE_SENSOR_MULTIPLER,     ZCL_UINT32, RW, (uint8_t*)&my18b20.coef.temp_k },
 	{ ZCL_TEMPERATURE_SENSOR_ZERO,          ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.temp_z },
 	{ ZCL_TEMPERATURE_SENSOR_HYSTERESIS,	ZCL_INT16,	RW, (uint8_t*)&my18b20.coef.temp_hysteresis },
 	{ ZCL_TEMPERATURE_MIN,          		ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.min_temp },
-	{ ZCL_TEMPERATURE_MAX,     				ZCL_INT16, RW, (uint8_t*)&my18b20.coef.min_temp },
+	{ ZCL_TEMPERATURE_MAX,     				ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.max_temp },
 #endif
 #endif // ZCL_THERMOSTAT || ZCL_TEMPERATURE_MEASUREMENT
 };

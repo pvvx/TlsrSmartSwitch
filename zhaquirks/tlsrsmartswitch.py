@@ -19,11 +19,6 @@ import zigpy.types as t
 
 ENDPOINT = 1
 
-
-# --------------------------------------------------------------------------
-# Типы и enum'ы
-# --------------------------------------------------------------------------
-
 class TssGPIO_rx(t.enum16):
 	PA0 = 0x0001
 	PB0 = 0x0101
@@ -127,6 +122,20 @@ def Alarm_converter(value: int) -> str:
 		return "Unknown"
 	names = ["OV", "UV", "UI", "OT", "UT", "TS"]
 	parts = [names[i] for i in range(6) if value & (1 << i)]
+	return ", ".join(parts)
+
+class Tss18b20_error(t.bitmap8):
+	Init = 0b00000001
+	Read = 0b00000010
+	Malfunction = 0b00000100
+
+def Tss18b20_err_converter(value: int) -> str:
+	if value == 0:
+		return "None"
+	if value > 7:
+		return "Unknown"
+	names = ["Init", "Read", "Malfunction"]
+	parts = [names[i] for i in range(3) if value & (1 << i)]
 	return ", ".join(parts)
 
 class TssCalibration(t.enum8):
@@ -246,13 +255,13 @@ class TssOnOffConfiguration(CustomCluster, OnOffConfiguration):
 		)
 
 class Tss18b20(CustomCluster, TemperatureMeasurement):
-	class AttributeDefs(ElectricalMeasurement.AttributeDefs):
+	class AttributeDefs(TemperatureMeasurement.AttributeDefs):
 		temp_sensor_id = ZCLAttributeDef(
 			id=0xF00C, type=t.uint32_t, access="r",
 			is_manufacturer_specific=True,
 		)
 		temp_sensor_errors = ZCLAttributeDef(
-			id=0xF00D, type=t.enum8, access="r",
+			id=0xF00D, type=Tss18b20_error, access="rp",
 			is_manufacturer_specific=True,
 		)
 		temp_sensor_coef_mul = ZCLAttributeDef(
@@ -498,6 +507,7 @@ def add_ts18B20(b):
 			min_value=-55.0,
 			max_value=125.0,
 			step=0.01,
+			multiplier=0.01,
 			translation_key="temp_sensor_t_min",
 			fallback_name="Minimum Temperature",
 			mode="box",
@@ -509,6 +519,7 @@ def add_ts18B20(b):
 			min_value=-55.0,
 			max_value=125.0,
 			step=0.01,
+			multiplier=0.01,
 			unit=UnitOfTemperature.CELSIUS,
 			translation_key="temp_sensor_t_max",
 			fallback_name="Maximum Temperature",
@@ -532,6 +543,7 @@ def add_ts18B20(b):
 			min_value=-20.0,
 			max_value=20.0,
 			step=0.01,
+			multiplier=0.01,
 			unit=UnitOfTemperature.CELSIUS,
 			translation_key="temp_sensor_coef_z",
 			fallback_name="Temperature Offset",
@@ -543,15 +555,19 @@ def add_ts18B20(b):
 			Tss18b20.cluster_id,
 			translation_key="temp_sensor_id",
 			fallback_name="18B20 ID",
-			#mode="box",
+			mode="box",
 			endpoint_id=ENDPOINT,
 		)
-		.number(
+		.sensor(
 			Tss18b20.AttributeDefs.temp_sensor_errors.name,
 			Tss18b20.cluster_id,
+			entity_type=EntityType.DIAGNOSTIC,
+			attribute_converter=Tss18b20_err_converter,
+			reporting_config=ReportingConfig(
+				min_interval=1, max_interval=5400, reportable_change=1
+			),
 			translation_key="temp_sensor_errors",
 			fallback_name="18B20 Errors",
-			#mode="box",
 			endpoint_id=ENDPOINT,
 		)
 	)
@@ -564,6 +580,7 @@ def add_thermostat(b):
 			min_value=0.0,
 			max_value=10.0,
 			step=0.01,
+			multiplier=0.01,
 			unit=UnitOfTemperature.CELSIUS,
 			translation_key="thermostat_hysteresis",
 			fallback_name="Thermostat Hysteresis",
@@ -607,7 +624,7 @@ def add_electrical(b):
 		.number(
 			ElectricalMeasurement.AttributeDefs.rms_extreme_over_voltage.name,
 			ElectricalMeasurement.cluster_id,
-			min_value=0, max_value=380, step=1, multiplier=0.01,
+			min_value=0, max_value=380.0, step=0.01, multiplier=0.01,
 			unit=UnitOfElectricPotential.VOLT,
 			translation_key="rms_extreme_over_voltage",
 			fallback_name="Over Voltage",
@@ -617,7 +634,7 @@ def add_electrical(b):
 		.number(
 			ElectricalMeasurement.AttributeDefs.rms_extreme_under_voltage.name,
 			ElectricalMeasurement.cluster_id,
-			min_value=0, max_value=380, step=1, multiplier=0.01,
+			min_value=0, max_value=380.0, step=0.01, multiplier=0.01,
 			unit=UnitOfElectricPotential.VOLT,
 			translation_key="rms_extreme_under_voltage",
 			fallback_name="Under Voltage",
@@ -668,7 +685,7 @@ def add_electrical(b):
 			TssElectricalMeasurement.AttributeDefs.calibration_current.name,
 			TssElectricalMeasurement.cluster_id,
 			unit=UnitOfElectricCurrent.MILLIAMPERE,
-			min_value=100, max_value=32000, step=1,
+			min_value=0, max_value=32000, step=1,
 			translation_key="calibration_current",
 			fallback_name="Value for Current calibration",
 			mode="box",
@@ -678,7 +695,7 @@ def add_electrical(b):
 			TssElectricalMeasurement.AttributeDefs.calibration_voltage.name,
 			TssElectricalMeasurement.cluster_id,
 			unit=UnitOfElectricPotential.VOLT,
-			min_value=12, max_value=380, step=1, multiplier=0.01,
+			min_value=0, max_value=380.0, step=0.01, multiplier=0.01,
 			translation_key="calibration_voltage",
 			fallback_name="Value for Voltage calibration",
 			mode="box",
@@ -687,7 +704,7 @@ def add_electrical(b):
 		.number(
 			TssElectricalMeasurement.AttributeDefs.calibration_power.name,
 			TssElectricalMeasurement.cluster_id,
-			min_value=1, max_value=12160, step=1, multiplier=0.1,
+			min_value=0, max_value=6500.0, step=0.1, multiplier=0.1,
 			unit=UnitOfPower.WATT,
 			translation_key="calibration_power",
 			fallback_name="Value for Power calibration",
@@ -787,7 +804,6 @@ MODELS = {
 		"bl0937": False,
 		"bl0942": False,
 	},
-
 	"EM1SW1_z": {
 		"gpio_switch": False,
 		"temp_sensor": False,
@@ -828,7 +844,6 @@ MODELS = {
 		"bl0937": False,
 		"bl0942": True,
 	},
-
 	"EM8SW1_z": {
 		"gpio_switch": False,
 		"temp_sensor": False,
@@ -891,7 +906,9 @@ def build_quirk(model: str, cfg: dict) -> None:
 		b = (
 			b.removes(Tss18b20.cluster_id, endpoint_id=ENDPOINT)
 			.adds(Tss18b20)
+
 		)
+		b = add_ts18B20(b)
 		if cfg["thermostat"]:
 			b = add_thermostat(b)
 

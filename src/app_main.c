@@ -325,7 +325,11 @@ void user_init(bool isRetention)
     reportableChange_tmp = 10; // 0.1C
 	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID,
 			ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, ZCL_TEMPERATURE_MEASUREMENT_ATTRID_MEASUREDVALUE,
-			10, 6000, (u8 *)&reportableChange_tmp);
+			REPORT_TIME_MIN_DEF, REPORT_TIME_MAX_DEF, (u8 *)&reportableChange_tmp);
+    reportableChange_tmp = 1;
+	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID,
+			ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, ZCL_TEMPERATURE_SENSOR_ERRORS,
+			REPORT_TIME_MIN_DEF, REPORT_TIME_MAX, (u8 *)&reportableChange_tmp);
 #endif
 
     /* Initialize BDB */

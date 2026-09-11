@@ -67,7 +67,7 @@
 
 /* Board define */
 #ifndef BOARD
-#define BOARD				BOARD_EM8SW1TS
+#define BOARD				BOARD_EM1SW1TS
 #endif
 
 // #define MY_DEVICE	1
