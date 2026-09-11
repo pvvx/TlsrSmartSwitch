@@ -11,7 +11,7 @@
 typedef struct _my18b20_coef_t {
 	uint32_t temp_k;
 	int16_t temp_z; // in 0.01 C
-	int16_t temp_hysteresis; // in 0.1 С
+	int16_t temp_hysteresis; // in 0.01 С
 	int16_t min_temp; // in 0.01 C
 	int16_t max_temp; // in 0.01 C
 } my18b20_coef_t;
