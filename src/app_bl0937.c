@@ -390,6 +390,7 @@ void bl0937_new_dataCb(void *args) {
 	//TODO: Calculate Power factor = ?
 
     if(config_min_max.min_voltage && voltage < config_min_max.min_voltage) {
+    	// Relay Off
    		if (config_min_max.event_blocking_mask & BIT(BIT_MIN_VOLTAGE_OFF)) {
    			ev_wrk.relay_bits_blocking_events |= BIT(BIT_MIN_VOLTAGE_OFF);
    		}
@@ -399,6 +400,7 @@ void bl0937_new_dataCb(void *args) {
 	    	ev_wrk.tik_reload = 0;
 		}
     } else if(config_min_max.max_voltage && voltage > config_min_max.max_voltage) {
+    	// Relay Off
    		if (config_min_max.event_blocking_mask & BIT(BIT_MAX_VOLTAGE_OFF)) {
    			ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_VOLTAGE_OFF);
    		}
@@ -407,20 +409,37 @@ void bl0937_new_dataCb(void *args) {
 		} else {
 	    	ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
 		}
-    } else if(config_min_max.max_current && config_min_max.time_max_current
-      && (current > config_min_max.max_current)) {
-		if(ev_wrk.tik_max_current == 0xffff) { // Over Current timeout expired?
-			ev_wrk.tik_max_current = 0;
-			if(ev_wrk.tik_max_current >= config_min_max.time_max_current) {
-				ev_wrk.tik_max_current = 0xffff; // Over Current timeout expired
+    } else if(config_min_max.max_current && (current > config_min_max.max_current)) {
+    	if(ev_wrk.tik_max_current == 0xffff) {
+    		if(config_min_max.time_max_current) {
+    			// wait config_min_max.time_max_current for Off
+    			ev_wrk.tik_max_current = 0;
+#if USE_THERMOSTAT
+    			set_therm_relay_status(cfg_on_off.onOff);
+#else
+    			set_relay_status(cfg_on_off.onOff);
+#endif
+    			return;
+    		} else {
+   				// Relay Off
 				ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
-				if (config_min_max.event_blocking_mask & BIT(BIT_MAX_CURRENT_OFF)) {
-					ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_CURRENT_OFF);
-				}
-			}
-		} else { // Over Current timeout expired
+    		}
+    	} else if(ev_wrk.tik_max_current >= config_min_max.time_max_current) {
+			// Relay Off
+			ev_wrk.tik_max_current = 0xffff; // Over Current timeout expired
 			ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
-		}
+			if (config_min_max.event_blocking_mask & BIT(BIT_MAX_CURRENT_OFF)) {
+				ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_CURRENT_OFF);
+			}
+    	} else {
+    		// wait config_min_max.time_max_current for Off
+#if USE_THERMOSTAT
+    		set_therm_relay_status(cfg_on_off.onOff);
+#else
+    		set_relay_status(cfg_on_off.onOff);
+#endif
+    		return;
+    	}
     } else { // all ok
     	ev_wrk.tik_max_current = 0xffff;
     	if(ev_wrk.tik_start >= config_min_max.time_start) {

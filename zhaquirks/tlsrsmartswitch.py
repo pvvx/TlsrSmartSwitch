@@ -105,7 +105,7 @@ class TssPowerPrecision(t.enum8):
 	max_32767W = 1
 	max_3276W7 = 2
 	max_327W67 = 3
-	max_32W767 = 4
+	max_32W767_BL0942 = 4
 
 class TssElAlarmMask(t.bitmap8):
 	Over_Voltage = 0b00000001
