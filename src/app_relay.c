@@ -36,11 +36,18 @@ const ext_tab_gpios_t  tab_gpios = {
 
 dev_gpios_t  dev_gpios;
 
-#if USE_BL0942
-event_processing_t ev_wrk = { .first_start = true};
-#else
-event_processing_t ev_wrk;
+event_processing_t ev_wrk = {
+#if USE_METERING || USE_SENSOR_MY18B20
+		.tik_start = 0xffff,
+		.tik_reload = 0xffff,
 #endif
+#if USE_METERING
+		.tik_max_current = 0xffff,
+#endif
+#if USE_BL0942
+		.first_start = true
+#endif
+};
 
 static void check_first_start(void) {
     switch(cfg_on_off.startUpOnOff) {

@@ -280,12 +280,21 @@ static void set_thermostat(int16_t temp) {
 	}
 	if(zcl_thermostat_attrs.cfg.sys_mode != TH_SMODE_OFF)
 		set_relay_status(zcl_thermostat_attrs.run_mode != TH_RMODE_OFF);
+#if !USE_METERING
+	else
+      	set_relay_status(cfg_on_off.onOff);
+#endif
 }
 #endif // ZCL_THERMOSTAT
 
 void init_my18b20(void) {
 #if !USE_METERING
 	load_config_min_max();
+	ev_wrk.tik_reload = 0xffff;
+	if(!config_min_max.time_start)
+		ev_wrk.tik_start = 0xffff;
+	else
+		ev_wrk.tik_start = 0;
 #endif
 	load_config_my18b20();
 #ifdef ZCL_THERMOSTAT
@@ -332,6 +341,7 @@ static void error_my18b20(void) {
 #endif
 		if (config_min_max.event_blocking_mask & BIT(BIT_ERR_TS_OFF)) {
 			ev_wrk.relay_bits_blocking_events |= BIT(BIT_ERR_TS_OFF);
+			set_relay_status(0); // Relay Off
 		}
 	}
 }
@@ -402,8 +412,9 @@ void task_my18b20(void) {
 	            		} else {
 	                    	ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
 	            		}
+	            		// set_relay_status(0); // Relay Off
 			   		}
-					if(temp < my18b20.coef.min_temp) {
+					else if(temp < my18b20.coef.min_temp) {
 						if(config_min_max.event_blocking_mask & BIT(BIT_MIN_TEMP_OFF)) {
 							ev_wrk.relay_bits_blocking_events |= BIT(BIT_MIN_TEMP_OFF);
 						}
@@ -412,10 +423,23 @@ void task_my18b20(void) {
 	            		} else {
 	                    	ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
 	            		}
-					}
-#ifdef ZCL_THERMOSTAT
-					set_thermostat(temp);
+	            		// set_relay_status(0); // Relay Off
+					} else {
+#if !USE_METERING
+						// ok
+	                	if(ev_wrk.tik_start >= config_min_max.time_start) {
+	                		ev_wrk.tik_start = 0xffff;
+	                	}
+	                	if(ev_wrk.tik_reload >= config_min_max.time_reload) {
+	                		ev_wrk.tik_reload = 0xffff;
+	                	}
 #endif
+					}
+#if USE_THERMOSTAT
+					set_thermostat(temp);
+#else
+               		set_relay_status(cfg_on_off.onOff);
+#endif // USE_THERMOSTAT
 					my18b20.cnt_errors = 0;
 				}
 #ifdef ZCL_TEMPERATURE_MEASUREMENT

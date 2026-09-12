@@ -242,7 +242,7 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
 #endif
 #if USE_SENSOR_MY18B20
  #ifdef ZCL_THERMOSTAT
-    if (save &  BIT(NBIT_THERM_CONFIG)) {
+    if (save & BIT(NBIT_THERM_CONFIG)) {
     	save_config_termostat();
     	// restore relay
 #if USE_SENSOR_MY18B20
@@ -252,7 +252,7 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
 #endif
     }
  #endif
-    if (save &  BIT(NBIT_MY18B20_CONFIG)) {
+    if (save & BIT(NBIT_MY18B20_CONFIG)) {
     	save_config_my18b20();
     }
 #endif // USE_SENSOR_MY18B20

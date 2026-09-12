@@ -298,11 +298,11 @@ class Tss18b20(CustomCluster, TemperatureMeasurement):
 			id=0xF010, type=t.int16s, access="rw",
 			is_manufacturer_specific=True,
 		)
-		temp_sensor_t_max = ZCLAttributeDef(
+		temp_sensor_t_min = ZCLAttributeDef(
 			id=0xF011, type=t.int16s, access="rw",
 			is_manufacturer_specific=True,
 		)
-		temp_sensor_t_min = ZCLAttributeDef(
+		temp_sensor_t_max = ZCLAttributeDef(
 			id=0xF012, type=t.int16s, access="rw",
 			is_manufacturer_specific=True,
 		)

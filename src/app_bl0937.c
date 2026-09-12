@@ -256,8 +256,11 @@ void app_sensor_init(void) {
 	load_config_min_max();
 	energy_restore();
 	ev_wrk.tik_reload = 0xffff;
+	ev_wrk.tik_max_current = 0xffff;
 	if(!config_min_max.time_start)
 		ev_wrk.tik_start = 0xffff;
+	else
+		ev_wrk.tik_start = 0;
 	if(!dev_gpios.sel) {
 		dev_gpios.sel = GPIO_SEL;
 	}
@@ -387,39 +390,39 @@ void bl0937_new_dataCb(void *args) {
 	//TODO: Calculate Power factor = ?
 
     if(config_min_max.min_voltage && voltage < config_min_max.min_voltage) {
+   		if (config_min_max.event_blocking_mask & BIT(BIT_MIN_VOLTAGE_OFF)) {
+   			ev_wrk.relay_bits_blocking_events |= BIT(BIT_MIN_VOLTAGE_OFF);
+   		}
 		if(ev_wrk.tik_start != 0xffff) { // startup timeout expired?
 			ev_wrk.tik_start = 0; // continue from the beginning startup timeout
 		} else {
 	    	ev_wrk.tik_reload = 0;
 		}
-   		if (config_min_max.event_blocking_mask & BIT(BIT_MIN_VOLTAGE_OFF)) {
-   			ev_wrk.relay_bits_blocking_events |= BIT(BIT_MIN_VOLTAGE_OFF);
-   		}
     } else if(config_min_max.max_voltage && voltage > config_min_max.max_voltage) {
+   		if (config_min_max.event_blocking_mask & BIT(BIT_MAX_VOLTAGE_OFF)) {
+   			ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_VOLTAGE_OFF);
+   		}
 		if(ev_wrk.tik_start != 0xffff) { // startup timeout expired?
 			ev_wrk.tik_start = 0; // continue from the beginning startup timeout, relay Off
 		} else {
 	    	ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
 		}
-   		if (config_min_max.event_blocking_mask & BIT(BIT_MAX_VOLTAGE_OFF)) {
-   			ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_VOLTAGE_OFF);
-   		}
-    } else if(config_min_max.max_current
-      && config_min_max.time_max_current
+    } else if(config_min_max.max_current && config_min_max.time_max_current
       && (current > config_min_max.max_current)) {
-		if(ev_wrk.tik_max_current != 0xffff) { // Over Current timeout expired?
-			ev_wrk.tik_max_current += 8;
+		if(ev_wrk.tik_max_current == 0xffff) { // Over Current timeout expired?
+			ev_wrk.tik_max_current = 0;
 			if(ev_wrk.tik_max_current >= config_min_max.time_max_current) {
-				ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
 				ev_wrk.tik_max_current = 0xffff; // Over Current timeout expired
-				if (config_min_max.event_blocking_mask & BIT(BIT_MAX_CURRENT_OFF))
+				ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
+				if (config_min_max.event_blocking_mask & BIT(BIT_MAX_CURRENT_OFF)) {
 					ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_CURRENT_OFF);
+				}
 			}
 		} else { // Over Current timeout expired
 			ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
 		}
     } else { // all ok
-    	ev_wrk.tik_max_current = 0;
+    	ev_wrk.tik_max_current = 0xffff;
     	if(ev_wrk.tik_start >= config_min_max.time_start) {
     		ev_wrk.tik_start = 0xffff;
     	}
@@ -482,6 +485,8 @@ int32_t app_monitoringCb(void *arg) {
 		ev_wrk.tik_reload++;
 	if(ev_wrk.tik_start != 0xffff)
 		ev_wrk.tik_start++;
+	if(ev_wrk.tik_max_current != 0xffff) // Over Current timeout expired?
+		ev_wrk.tik_max_current++;
 #if USE_SENSOR_MY18B20
 	my18b20.start_measure = 1;
 #endif
