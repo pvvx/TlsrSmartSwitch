@@ -107,7 +107,7 @@ class TssPowerPrecision(t.enum8):
 	max_327W67 = 3
 	max_32W767 = 4
 
-class TssAlarmMask(t.bitmap8):
+class TssElAlarmMask(t.bitmap8):
 	Over_Voltage = 0b00000001
 	Under_Voltage = 0b00000010
 	Over_Current = 0b00000100
@@ -115,13 +115,27 @@ class TssAlarmMask(t.bitmap8):
 	Under_Temp = 0b00010000
 	Error_TS = 0b00100000
 
-def Alarm_converter(value: int) -> str:
+class TssTsAlarmMask(t.bitmap8):
+	Over_Temp = 0b00000001
+	Under_Temp = 0b00000010
+	Error_TS = 0b00000100
+
+def ElAlarm_converter(value: int) -> str:
 	if value == 0:
 		return "None"
 	if value > 63:
 		return "Unknown"
 	names = ["OV", "UV", "UI", "OT", "UT", "TS"]
 	parts = [names[i] for i in range(6) if value & (1 << i)]
+	return ", ".join(parts)
+
+def TsAlarm_converter(value: int) -> str:
+	if value == 0:
+		return "None"
+	if value > 7:
+		return "Unknown"
+	names = ["OT", "UT", "TS"]
+	parts = [names[i] for i in range(3) if value & (1 << i)]
 	return ", ".join(parts)
 
 class Tss18b20_error(t.bitmap8):
@@ -256,6 +270,14 @@ class TssOnOffConfiguration(CustomCluster, OnOffConfiguration):
 
 class Tss18b20(CustomCluster, TemperatureMeasurement):
 	class AttributeDefs(TemperatureMeasurement.AttributeDefs):
+		event_blocking_mask  = ZCLAttributeDef(
+			id=0xF005, type=TssTsAlarmMask, access="rw",
+			is_manufacturer_specific=True,
+		)
+		blocking_events = ZCLAttributeDef(
+			id=0xF006, type=TssTsAlarmMask, access="rwp",
+			is_manufacturer_specific=True,
+		)
 		temp_sensor_id = ZCLAttributeDef(
 			id=0xF00C, type=t.uint32_t, access="r",
 			is_manufacturer_specific=True,
@@ -284,16 +306,24 @@ class Tss18b20(CustomCluster, TemperatureMeasurement):
 			id=0xF012, type=t.int16s, access="rw",
 			is_manufacturer_specific=True,
 		)
+		poweron_test_period = ZCLAttributeDef(
+			id=0xF013, type=t.uint16_t, access="rw",
+			is_manufacturer_specific=True,
+		)
+		post_emergency_period = ZCLAttributeDef(
+			id=0xF014, type=t.uint16_t, access="rw",
+			is_manufacturer_specific=True,
+		)
 
 class TssElectricalMeasurement(CustomCluster, ElectricalMeasurement):
 
 	class AttributeDefs(ElectricalMeasurement.AttributeDefs):
-		alarm_mask = ZCLAttributeDef(
-			id=0xF005, type=TssAlarmMask, access="rw",
+		event_blocking_mask = ZCLAttributeDef(
+			id=0xF005, type=TssElAlarmMask, access="rw",
 			is_manufacturer_specific=True,
 		)
-		alarm_events = ZCLAttributeDef(
-			id=0xF006, type=TssAlarmMask, access="rwp",
+		blocking_events = ZCLAttributeDef(
+			id=0xF006, type=TssElAlarmMask, access="rwp",
 			is_manufacturer_specific=True,
 		)
 		calculating_current = ZCLAttributeDef(
@@ -502,31 +532,6 @@ def add_ts18B20(b):
 			endpoint_id=ENDPOINT,
 		)
 		.number(
-			Tss18b20.AttributeDefs.temp_sensor_t_min.name,
-			Tss18b20.cluster_id,
-			min_value=-55.0,
-			max_value=125.0,
-			step=0.01,
-			multiplier=0.01,
-			translation_key="temp_sensor_t_min",
-			fallback_name="Minimum Temperature",
-			mode="box",
-			endpoint_id=ENDPOINT,
-		)
-		.number(
-			Tss18b20.AttributeDefs.temp_sensor_t_max.name,
-			Tss18b20.cluster_id,
-			min_value=-55.0,
-			max_value=125.0,
-			step=0.01,
-			multiplier=0.01,
-			unit=UnitOfTemperature.CELSIUS,
-			translation_key="temp_sensor_t_max",
-			fallback_name="Maximum Temperature",
-			mode="box",
-			endpoint_id=ENDPOINT,
-		)
-		.number(
 			Tss18b20.AttributeDefs.temp_sensor_coef_mul.name,
 			Tss18b20.cluster_id,
 			min_value=204800,
@@ -570,6 +575,32 @@ def add_ts18B20(b):
 			fallback_name="18B20 Errors",
 			endpoint_id=ENDPOINT,
 		)
+		.number(
+			Tss18b20.AttributeDefs.temp_sensor_t_min.name,
+			Tss18b20.cluster_id,
+			min_value=-55.0,
+			max_value=125.0,
+			step=0.01,
+			multiplier=0.01,
+			unit=UnitOfTemperature.CELSIUS,
+			translation_key="temp_sensor_t_min",
+			fallback_name="Minimum Temperature",
+			mode="box",
+			endpoint_id=ENDPOINT,
+		)
+		.number(
+			Tss18b20.AttributeDefs.temp_sensor_t_max.name,
+			Tss18b20.cluster_id,
+			min_value=-55.0,
+			max_value=125.0,
+			step=0.01,
+			multiplier=0.01,
+			unit=UnitOfTemperature.CELSIUS,
+			translation_key="temp_sensor_t_max",
+			fallback_name="Maximum Temperature",
+			mode="box",
+			endpoint_id=ENDPOINT,
+		)
 	)
 
 def add_thermostat(b):
@@ -589,15 +620,60 @@ def add_thermostat(b):
 		)
 	)
 
+def add_temp_alarm(b):
+	return (
+		b.number(
+			Tss18b20.AttributeDefs.poweron_test_period.name,
+			Tss18b20.cluster_id,
+			min_value=0, max_value=65535, step=1,
+			unit=UnitOfTime.SECONDS,
+			translation_key="poweron_test_period",
+			fallback_name="Power-on test period",
+			mode="box",
+			endpoint_id=ENDPOINT,
+		)
+		.number(
+			Tss18b20.AttributeDefs.post_emergency_period.name,
+			Tss18b20.cluster_id,
+			min_value=0, max_value=65535, step=1,
+			unit=UnitOfTime.SECONDS,
+			translation_key="post_emergency_period",
+			fallback_name="Post-emergency period",
+			mode="box",
+			endpoint_id=ENDPOINT,
+		)
+		.sensor(
+			Tss18b20.AttributeDefs.blocking_events.name,
+			Tss18b20.cluster_id,
+			entity_type=EntityType.DIAGNOSTIC,
+			attribute_converter=TsAlarm_converter,
+			reporting_config=ReportingConfig(
+				min_interval=1, max_interval=900, reportable_change=1
+			),
+			translation_key="alarm_events",
+			fallback_name="Blocking Events",
+			endpoint_id=ENDPOINT,
+		)
+		.number(
+			Tss18b20.AttributeDefs.event_blocking_mask.name,
+			Tss18b20.cluster_id,
+			min_value=0, max_value=63, step=1,
+			translation_key="event_blocking_mask",
+			fallback_name="Event-based Blocking Mask",
+			mode="box",
+			endpoint_id=ENDPOINT,
+		)
+	)
+
 def add_electrical(b):
-	b = (
+	return (
 		b.number(
 			ElectricalMeasurement.AttributeDefs.rms_extreme_over_voltage_period.name,
 			ElectricalMeasurement.cluster_id,
 			min_value=0, max_value=65535, step=1,
 			unit=UnitOfTime.SECONDS,
-			translation_key="restart_period_after_protection",
-			fallback_name="Restart period after protection",
+			translation_key="post_emergency_period",
+			fallback_name="Post-emergency period",
 			mode="box",
 			endpoint_id=ENDPOINT,
 		)
@@ -617,7 +693,7 @@ def add_electrical(b):
 			min_value=0, max_value=65535, step=1,
 			unit=UnitOfTime.SECONDS,
 			translation_key="overcurrent_period",
-			fallback_name="Overcurrent period before Off",
+			fallback_name="Overcurrent period",
 			mode="box",
 			endpoint_id=ENDPOINT,
 		)
@@ -678,10 +754,7 @@ def add_electrical(b):
 			mode="box",
 			endpoint_id=ENDPOINT,
 		)
-	)
-
-	return (
-		b.number(
+		.number(
 			TssElectricalMeasurement.AttributeDefs.calibration_current.name,
 			TssElectricalMeasurement.cluster_id,
 			unit=UnitOfElectricCurrent.MILLIAMPERE,
@@ -740,23 +813,23 @@ def add_electrical(b):
 			endpoint_id=ENDPOINT,
 		)
 		.sensor(
-			TssElectricalMeasurement.AttributeDefs.alarm_events.name,
+			TssElectricalMeasurement.AttributeDefs.blocking_events.name,
 			TssElectricalMeasurement.cluster_id,
 			entity_type=EntityType.DIAGNOSTIC,
-			attribute_converter=Alarm_converter,
+			attribute_converter=ElAlarm_converter,
 			reporting_config=ReportingConfig(
 				min_interval=1, max_interval=900, reportable_change=1
 			),
-			translation_key="alarm_events",
-			fallback_name="Alarm Events",
+			translation_key="blocking_events",
+			fallback_name="Blocking Events",
 			endpoint_id=ENDPOINT,
 		)
 		.number(
-			TssElectricalMeasurement.AttributeDefs.alarm_mask.name,
+			TssElectricalMeasurement.AttributeDefs.event_blocking_mask.name,
 			TssElectricalMeasurement.cluster_id,
 			min_value=0, max_value=63, step=1,
-			translation_key="alarm_mask",
-			fallback_name="Alarm mask",
+			translation_key="event_blocking_mask",
+			fallback_name="Event-based Blocking Mask",
 			mode="box",
 			endpoint_id=ENDPOINT,
 		)
@@ -906,11 +979,12 @@ def build_quirk(model: str, cfg: dict) -> None:
 		b = (
 			b.removes(Tss18b20.cluster_id, endpoint_id=ENDPOINT)
 			.adds(Tss18b20)
-
 		)
 		b = add_ts18B20(b)
 		if cfg["thermostat"]:
 			b = add_thermostat(b)
+		if not (cfg["bl0937"] or cfg["bl0942"]):
+			b = add_temp_alarm(b)
 
 	if cfg["bl0937"] or cfg["bl0942"]:
 		b = (
@@ -922,7 +996,7 @@ def build_quirk(model: str, cfg: dict) -> None:
 			b = add_bl0937(b)
 		else:
 			b = add_bl0942(b)
-
+		
 	b.add_to_registry()
 
 for _model, _cfg in MODELS.items():

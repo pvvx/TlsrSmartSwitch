@@ -67,7 +67,7 @@
 
 /* Board define */
 #ifndef BOARD
-#define BOARD				BOARD_EM1SW1TS
+#define BOARD				BOARD_EM1SW1
 #endif
 
 // #define MY_DEVICE	1
@@ -75,15 +75,12 @@
 #if (BOARD & 16)
 #define USE_BL0937			1
 #define USE_BL0942			0
-#define USE_METERING		1
 #elif (BOARD & 8)
 #define USE_BL0937			0
 #define USE_BL0942			1
-#define USE_METERING		1
 #else
 #define USE_BL0937			0
 #define USE_BL0942			0
-#define USE_METERING		0
 #endif
 #if (BOARD & 1)
 #define USE_SWITCH			1
@@ -100,6 +97,8 @@
 #else
 #define USE_THERMOSTAT		0
 #endif
+
+#define USE_METERING		(USE_BL0942 || USE_BL0937)
 
 /* Chip IDs */
 #define TLSR_8267				0x00
@@ -124,7 +123,7 @@
 #endif
 
 #define APP_RELEASE				0x01	//0x12 -> BCD app release "1.2"
-#define APP_BUILD				0x07	//0x34 -> BCD app build "3.4"
+#define APP_BUILD				0x08	//0x34 -> BCD app build "3.4"
 
 #define STACK_RELEASE			0x30	//BCD stack release 3.0
 #define STACK_BUILD				0x01	//BCD stack build 01

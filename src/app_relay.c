@@ -35,8 +35,12 @@ const ext_tab_gpios_t  tab_gpios = {
 };
 
 dev_gpios_t  dev_gpios;
-uint8_t relay_bits_emergency;
-uint8_t relay_state;
+
+#if USE_BL0942
+event_processing_t ev_wrk = { .first_start = true};
+#else
+event_processing_t ev_wrk;
+#endif
 
 static void check_first_start(void) {
     switch(cfg_on_off.startUpOnOff) {
@@ -73,8 +77,10 @@ bool get_relay_status(void) {
 /* Set relay and led, if not emergency */
 void set_relay_status(bool status) {
 	sws_printf("set_relay_status(%d)\n", status);
-#if USE_METERING
-	if(relay_bits_emergency || tik_reload != 0xffff || tik_start != 0xffff)
+#if USE_METERING || USE_SENSOR_MY18B20
+	if(ev_wrk.relay_bits_blocking_events
+	|| ev_wrk.tik_reload != 0xffff
+	|| ev_wrk.tik_start != 0xffff)
 		status = false;
 #endif
 	if(status)
@@ -87,9 +93,8 @@ void set_relay_status(bool status) {
 	gpio_write(dev_gpios.rl, !status);
 #endif
 #if !USE_SWITCH
-	if(relay_state != status) {
-		if(status)
-		{
+	if(ev_wrk.relay_state != status) {
+		if(status) {
 #if RELAY_ON
 			remoteCmdOnOff(ZCL_CMD_ONOFF_ON);
 #else
@@ -104,7 +109,7 @@ void set_relay_status(bool status) {
 		}
 	}
 #endif // !USE_SWITCH
-	relay_state = status;
+	ev_wrk.relay_state = status;
 }
 
 #if USE_THERMOSTAT // USE_SENSOR_MY18B20

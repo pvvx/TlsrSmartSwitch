@@ -250,7 +250,7 @@ zcl_thermostatAttr_t zcl_thermostat_attrs = {
 		.local_temp = 0x8000, // in 0.01 C
 		.min_temp = -5000, // in 0.01 C
 		.max_temp = 12500, // in 0.01 C
-		.relay_state = 0,
+		.running_state = 0,
 		.cool_on = 0,
 		.healt_on = 0,
 		.operation = 5,
@@ -288,7 +288,7 @@ const zclAttrInfo_t thermostat_ui_cfg_attrTbl[] =
 	{ZCL_ATTRID_HVAC_THERMOSTAT_SYS_MODE, ZCL_ENUM8, RW, (uint8_t*)&zcl_thermostat_attrs.cfg.sys_mode},
 
 	{ZCL_ATTRID_HVAC_THERMOSTAT_RUNNING_MODE, ZCL_ENUM8, R, (uint8_t*)&zcl_thermostat_attrs.run_mode},
-	{ZCL_ATTRID_HVAC_THERMOSTAT_RUNNING_STATE, ZCL_DATA_TYPE_BITMAP16, R, (uint8_t*)&zcl_thermostat_attrs.relay_state},
+	{ZCL_ATTRID_HVAC_THERMOSTAT_RUNNING_STATE, ZCL_DATA_TYPE_BITMAP16, R, (uint8_t*)&zcl_thermostat_attrs.running_state},
 	//{ZCL_ATTRID_HVAC_THERMOSTAT_AC_ERROR_CODE, ZCL_BITMAP8, RW, (uint8_t*)&my18b20.errors},
 	//{ZCL_ATTRID_HVAC_THERMOSTAT_SETPOINT_CHANGE_SOURCE, ZCL_ENUM8,  R, (uint8_t*)},
 	//{ZCL_ATTRID_HVAC_THERMOSTAT_SETPOINT_CHANGE_AMOUNT, ZCL_INT16,  R, (uint8_t*)},
@@ -310,6 +310,48 @@ const zclAttrInfo_t thermostat_ui_cfg_attrTbl[] =
 #define	ZCL_THERMOSTAT_UI_CFG_ATTR_NUM		 sizeof(thermostat_ui_cfg_attrTbl) / sizeof(zclAttrInfo_t)
 #endif // ZCL_THERMOSTAT_UI_CFG
 
+#if USE_METERING || USE_SENSOR_MY18B20
+
+#ifndef PERIOD_RELOAD_DEF
+#define PERIOD_RELOAD_DEF	0	// in sec, minimum 1, step 1 or 8, = 0 - off
+#endif
+#ifndef PERIOD_START_DEF
+#define PERIOD_START_DEF	0	// in sec, minimum 1, step 1 or 8, = 0 - off
+#endif
+#ifndef MAX_VOLTAGE_DEF
+#define MAX_VOLTAGE_DEF		0 // 26000 -> 260.00V
+#endif
+#ifndef MIN_VOLTAGE_DEF
+#define MIN_VOLTAGE_DEF		0 // 18000 -> 180.00V
+#endif
+#ifndef MAX_CURRENT_DEF
+#define MAX_CURRENT_DEF		16000 // 16.000A
+#endif
+#ifndef PERIOD_MAX_CURRENT_DEF
+#define PERIOD_MAX_CURRENT_DEF	1	// sec
+#endif
+#ifndef POWER_FIX_DIV_DEF
+#define POWER_FIX_DIV_DEF	2	// 0 - auto, 1 - 0..32767W, 2 - 0..3276.7W, 3 - 0..327.67W, 4 - 0..32.767W
+#endif
+
+const zcl_config_min_max_t def_config_min_max = {
+	.time_reload = PERIOD_RELOAD_DEF, // in sec, minimum 1, step 1 or 8, = 0 - off
+	.time_start = PERIOD_START_DEF, // in sec, minimum 1, step 1 or 8, = 0 - off
+#if USE_METERING
+	.time_max_current = PERIOD_MAX_CURRENT_DEF, // in sec, minimum 1 or 8, step 8, = 0 - off
+	.max_voltage = MAX_VOLTAGE_DEF, // in 0.01V, = 0 - off
+	.min_voltage = MIN_VOLTAGE_DEF, // in 0.01V, = 0 - off
+	.max_current = MAX_CURRENT_DEF, // in 0.001A, = 0 - off
+	.power_fix_div = POWER_FIX_DIV_DEF,
+#endif
+	.event_blocking_mask = 0,
+};
+
+zcl_config_min_max_t config_min_max;
+zcl_config_min_max_t config_min_max_saved;
+
+#endif // USE_METERING || USE_SENSOR_MY18B20
+
 #ifdef ZCL_TEMPERATURE_MEASUREMENT
 
 zcl_temperatureAttr_t g_zcl_temperatureAttrs =
@@ -328,6 +370,10 @@ const zclAttrInfo_t temperature_measurement_attrTbl[] =
 	{ ZCL_TEMPERATURE_MEASUREMENT_ATTRID_TOLERANCE,       		ZCL_UINT16,   R,  (uint8_t*)&g_zcl_temperatureAttrs.tolerance },
 #if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
+#if !USE_METERING
+	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.event_blocking_mask},
+	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&ev_wrk.relay_bits_blocking_events},
+#endif
 	{ ZCL_TEMPERATURE_SENSOR_ID,     		ZCL_UINT32, R, (uint8_t*)&my18b20.id },
 	{ ZCL_TEMPERATURE_SENSOR_ERRORS,     	ZCL_BITMAP8,RR, (uint8_t*)&my18b20.errors },
 	{ ZCL_TEMPERATURE_SENSOR_MULTIPLER,     ZCL_UINT32, RW, (uint8_t*)&my18b20.coef.temp_k },
@@ -335,6 +381,10 @@ const zclAttrInfo_t temperature_measurement_attrTbl[] =
 	{ ZCL_TEMPERATURE_SENSOR_HYSTERESIS,	ZCL_INT16,	RW, (uint8_t*)&my18b20.coef.temp_hysteresis },
 	{ ZCL_TEMPERATURE_MIN,          		ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.min_temp },
 	{ ZCL_TEMPERATURE_MAX,     				ZCL_INT16,  RW, (uint8_t*)&my18b20.coef.max_temp },
+#if !USE_METERING
+	{ZCL_STARTUP_TEST_PERIOD, 				ZCL_UINT16, RW, (uint8_t*)&config_min_max.time_start },
+	{ZCL_RELOAD_TEST_PERIOD, 				ZCL_UINT16, RW, (uint8_t*)&config_min_max.time_reload },
+#endif
 #endif // !USE_CUSTOM_CLUSTER
 	{ ZCL_ATTRID_GLOBAL_CLUSTER_REVISION, 	ZCL_DATA_TYPE_UINT16,  	ACCESS_CONTROL_READ,  						(u8*)&zcl_attr_global_clusterRevision},
 };
@@ -432,18 +482,18 @@ zcl_onOffAttr_t g_zcl_onOffAttrs = {
 };
 
 const zclAttrInfo_t onOff1_attrTbl[] = {
-    { ZCL_ATTRID_ONOFF,                     ZCL_BOOLEAN,    RR,     (uint8_t*)&cfg_on_off.onOff               },
+    { ZCL_ATTRID_ONOFF,                     ZCL_BOOLEAN,    RR,     (uint8_t*)&cfg_on_off.onOff },
     { ZCL_ATTRID_GLOBAL_SCENE_CONTROL,      ZCL_BOOLEAN,    R,      (uint8_t*)&g_zcl_onOffAttrs.globalSceneControl  },
 //    { ZCL_ATTRID_ON_TIME,                   ZCL_UINT16,     RW,     (uint8_t*)&g_zcl_onOffAttrs.onTime              },
 //    { ZCL_ATTRID_OFF_WAIT_TIME,             ZCL_UINT16,     RW,     (uint8_t*)&g_zcl_onOffAttrs.offWaitTime         },
 
-	{ ZCL_ATTRID_START_UP_ONOFF,            ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.startUpOnOff        },
+	{ ZCL_ATTRID_START_UP_ONOFF,            ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.startUpOnOff },
 
 #if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
-	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,	R,     (uint8_t*)&relay_state },
-	{ ZCL_ATTRID_CUSTOM_KEY_LOCK,           ZCL_BOOLEAN,	RW,    (uint8_t*)&cfg_on_off.key_lock        },
-	{ ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,		RW,    (uint8_t*)&cfg_on_off.led_control     },
+	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,	R,     (uint8_t*)&ev_wrk.relay_state },
+	{ ZCL_ATTRID_CUSTOM_KEY_LOCK,           ZCL_BOOLEAN,	RW,    (uint8_t*)&cfg_on_off.key_lock },
+	{ ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,		RW,    (uint8_t*)&cfg_on_off.led_control },
 
 #if USE_CFG_GPIO
     { ZCL_ATTRID_GPIO_RELAY,   				ZCL_ENUM16,   RW, (u8*)&dev_gpios_new.rl },
@@ -550,43 +600,7 @@ zcl_msAttr_t g_zcl_msAttrs = {
     .current_divisor = 1000 // current div 1000, in 0.001A
 };
 
-#ifndef MAX_VOLTAGE_DEF
-#define MAX_VOLTAGE_DEF			0 // 26000 // 260.00V
-#endif
-#ifndef MIN_VOLTAGE_DEF
-#define MIN_VOLTAGE_DEF			0 // 18000 // 180.00V
-#endif
-#ifndef MAX_CURRENT_DEF
-#define MAX_CURRENT_DEF			16000 // 25.000A
-#endif
-#ifndef PERIOD_MAX_CURRENT_DEF
-#define PERIOD_MAX_CURRENT_DEF	8	// sec
-#endif
-#ifndef PERIOD_RELOAD_DEF
-#define PERIOD_RELOAD_DEF	0	// sec
-#endif
-#ifndef PERIOD_START_DEF
-#define PERIOD_START_DEF	0	// sec
-#endif
-#ifndef POWER_FIX_DIV_DEF
-#define POWER_FIX_DIV_DEF	2	// 0 - auto, 1 - 0..32767W, 2 - 0..3276.7W, 3 - 0..327.67W, 4 - 0..32.767W
-#endif
-
-const zcl_config_min_max_t def_config_min_max = {
-	.max_voltage = MAX_VOLTAGE_DEF, // in 0.01V, = 0 - off
-	.min_voltage = MIN_VOLTAGE_DEF, // in 0.01V, = 0 - off
-	.max_current = MAX_CURRENT_DEF, // in 0.001A, = 0 - off
-	.time_max_current = PERIOD_MAX_CURRENT_DEF, // in sec, minimum 8, step 8, = 0 - off
-	.time_reload = PERIOD_RELOAD_DEF, // in sec, minimum 8, step 8, = 0 - off
-	.time_start = PERIOD_START_DEF, // in sec, minimum 8, step 8, = 0 - off
-	.emergency_off = 0,
-	.power_fix_div = POWER_FIX_DIV_DEF,
-};
-
 zcl_sensor_calibrate_t sensor_calibrate;
-
-zcl_config_min_max_t config_min_max;
-zcl_config_min_max_t config_min_max_saved;
 
 const zclAttrInfo_t ms_attrTbl[] = {
     {ZCL_ATTRID_MEASUREMENT_TYPE,           ZCL_BITMAP32, R,    (uint8_t*)&g_zcl_msAttrs.type               },
@@ -613,8 +627,8 @@ const zclAttrInfo_t ms_attrTbl[] = {
 	{ZCL_ATTRID_RMS_VOLTAGE_SWELL,  		ZCL_INT16,    RW,   (uint8_t*)&config_min_max.max_current		},
 #if !USE_CUSTOM_CLUSTER
 	// Custom Attr:
-	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.emergency_off},
-	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&relay_bits_emergency},
+	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.event_blocking_mask},
+	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&ev_wrk.relay_bits_blocking_events},
 	{ZCL_ATTRID_CURRENT_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.current		},
 	{ZCL_ATTRID_VOLTAGE_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.voltage		},
 	{ZCL_ATTRID_POWER_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.power		},
@@ -646,9 +660,9 @@ const zclAttrInfo_t ms_attrTbl[] = {
 const zclAttrInfo_t custom_attrTbl[] = {
 #ifdef ZCL_ON_OFF
 #if USE_METERING || USE_SENSOR_MY18B20
-	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&relay_state },
+	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    RR,     (uint8_t*)&ev_wrk.relay_state },
 #else
-	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    R,     (uint8_t*)&relay_state },
+	{ ZCL_ATTRID_RELAY_STATE, 				ZCL_BOOLEAN,    R,     (uint8_t*)&ev_wrk.relay_state },
 #endif
 	{ ZCL_ATTRID_CUSTOM_KEY_LOCK,           ZCL_BOOLEAN,    RW,     (uint8_t*)&cfg_on_off.key_lock        },
 	{ ZCL_ATTRID_CUSTOM_LED,                ZCL_ENUM8,      RW,     (uint8_t*)&cfg_on_off.led_control     },
@@ -660,8 +674,8 @@ const zclAttrInfo_t custom_attrTbl[] = {
 #endif //ZCL_ON_OFF_SWITCH_CFG
 
 #ifdef ZCL_ELECTRICAL_MEASUREMENT
-	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.emergency_off},
-	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&relay_bits_emergency},
+	{ZCL_ATTRID_ALARM_MASK,  		ZCL_BITMAP8,   RW,   (uint8_t*)&config_min_max.event_blocking_mask},
+	{ZCL_ATTRID_ALARM_EVENTS,  		ZCL_BITMAP8,   RWR,  (uint8_t*)&ev_wrk.relay_bits_blocking_events},
 	{ZCL_ATTRID_CURRENT_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.current		},
 	{ZCL_ATTRID_VOLTAGE_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.voltage		},
 	{ZCL_ATTRID_POWER_COEF,  		ZCL_UINT32,    RW,   (uint8_t*)&sensor_pwr_coef.power		},
@@ -765,7 +779,7 @@ _CODE_ZCL_ status_t zcl_custom_register(u8 endpoint, u16 manuCode, u8 attrNum, c
 }
 #endif
 
-#ifdef ZCL_ELECTRICAL_MEASUREMENT
+#if USE_METERING || USE_SENSOR_MY18B20
 
 nv_sts_t load_config_min_max(void) {
 #if NV_ENABLE
@@ -774,6 +788,7 @@ nv_sts_t load_config_min_max(void) {
 		memcpy(&config_min_max_saved, &def_config_min_max, sizeof(config_min_max));
 	}
 	memcpy(&config_min_max, &config_min_max_saved, sizeof(config_min_max));
+#if USE_METERING
 	// 0 - auto, 1 - 0..32.767W, 2 - 0..327.67W, 3 - 0..3276.7W, 4 - 0..32767W
 	switch(config_min_max.power_fix_div) {
 	case 1:
@@ -791,6 +806,7 @@ nv_sts_t load_config_min_max(void) {
 		break;
 #endif
 	}
+#endif // USE_METERING
 	return ret;
 #else
     return NV_ENABLE_PROTECT_ERROR;
@@ -803,6 +819,7 @@ nv_sts_t save_config_min_max(void) {
 	if(memcmp(&config_min_max_saved, &config_min_max, sizeof(config_min_max))) {
 		memcpy(&config_min_max_saved, &config_min_max, sizeof(config_min_max));
 		ret = nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_CFG_MIN_MAX, sizeof(config_min_max_saved), (uint8_t*)&config_min_max_saved);
+#if USE_METERING
 		// 0 - auto, 1 - 0..32.767W, 2 - 0..327.67W, 3 - 0..3276.7W, 4 - 0..32767W
 		switch(config_min_max.power_fix_div) {
 		case 1:
@@ -820,6 +837,7 @@ nv_sts_t save_config_min_max(void) {
 			break;
 #endif
 		}
+#endif // USE_METERING
 	}
     return ret;
 #else
@@ -827,7 +845,7 @@ nv_sts_t save_config_min_max(void) {
 #endif
 }
 
-#endif // ZCL_ELECTRICAL_MEASUREMENT
+#endif // USE_METERING || USE_SENSOR_MY18B20
 
 nv_sts_t load_config_on_off(void) {
 #if NV_ENABLE

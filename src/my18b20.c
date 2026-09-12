@@ -9,8 +9,6 @@
 #include "sensors.h"
 #include "my18b20.h"
 
-// #define GPIO_ONEWIRE	GPIO_PB1
-
 #define ERROR_TIMEOUT_TICK		(200 * CLOCK_16M_SYS_TIMER_CLK_1MS)
 #define MEASURE_TIMEOUT_TICK	(500 * CLOCK_16M_SYS_TIMER_CLK_1MS)
 #define MIN_STEP_TICK_US		495
@@ -172,6 +170,19 @@ static int onewire_read(unsigned int bitcnt) {
 	return ret;
 }
 
+#if !USE_METERING
+
+// Step 1 sec
+static int32_t app_monitoringCb(void *arg) {
+	if(ev_wrk.tik_reload != 0xffff)
+		ev_wrk.tik_reload++;
+	if(ev_wrk.tik_start != 0xffff)
+		ev_wrk.tik_start++;
+	my18b20.start_measure = 1;
+    return 0;
+}
+#endif
+
 #ifdef ZCL_THERMOSTAT
 
 #define SHL_SUMM_TEMP  2 // Bit
@@ -211,7 +222,7 @@ static void set_thermostat(int16_t temp) {
 
 		zcl_thermostat_attrs.cool_on = 0;
 		zcl_thermostat_attrs.healt_on = 0;
-		zcl_thermostat_attrs.relay_state = 0;
+		zcl_thermostat_attrs.running_state = 0;
 
 		zcl_thermostat_attrs.cfg.sys_mode = TH_SMODE_OFF;
 		zcl_thermostat_attrs.run_mode = TH_RMODE_OFF;
@@ -222,14 +233,14 @@ static void set_thermostat(int16_t temp) {
 			if(zcl_thermostat_attrs.healt_on) {
 				if(temp > zcl_thermostat_attrs.cfg.temp_heating + my18b20.coef.temp_hysteresis) {
 					zcl_thermostat_attrs.healt_on = 0;
-					zcl_thermostat_attrs.relay_state = BIT(2);
+					zcl_thermostat_attrs.running_state = BIT(2);
 				} else {
 					// zcl_thermostat_attrs.healt_on = 100;
 				}
 			} else {
 				if(temp < zcl_thermostat_attrs.cfg.temp_heating - my18b20.coef.temp_hysteresis) {
 					zcl_thermostat_attrs.healt_on = 100;
-					zcl_thermostat_attrs.relay_state = BIT(0) | BIT(2);
+					zcl_thermostat_attrs.running_state = BIT(0) | BIT(2);
 					// TODO: Alarm
 				} else {
 					// zcl_thermostat_attrs.healt_on = 0;
@@ -243,14 +254,14 @@ static void set_thermostat(int16_t temp) {
 			if(zcl_thermostat_attrs.cool_on) {
 				if(temp < zcl_thermostat_attrs.cfg.temp_cooling - my18b20.coef.temp_hysteresis) {
 					zcl_thermostat_attrs.cool_on = 0;
-					zcl_thermostat_attrs.relay_state = BIT(2);
+					zcl_thermostat_attrs.running_state = BIT(2);
 				} else {
 					// zcl_thermostat_attrs.healt_on = 100;
 				}
 			} else {
 				if(temp > zcl_thermostat_attrs.cfg.temp_cooling + my18b20.coef.temp_hysteresis) {
 					zcl_thermostat_attrs.cool_on = 100;
-					zcl_thermostat_attrs.relay_state = BIT(1) | BIT(2);
+					zcl_thermostat_attrs.running_state = BIT(1) | BIT(2);
 					// TODO: Alarm
 				} else {
 					// zcl_thermostat_attrs.healt_on = 0;
@@ -273,6 +284,9 @@ static void set_thermostat(int16_t temp) {
 #endif // ZCL_THERMOSTAT
 
 void init_my18b20(void) {
+#if !USE_METERING
+	load_config_min_max();
+#endif
 	load_config_my18b20();
 #ifdef ZCL_THERMOSTAT
 	load_config_termostat();
@@ -292,20 +306,23 @@ void init_my18b20(void) {
 		if(onewire_write(0x033, 8) >= 0) {
 			my18b20.id = onewire_read(32);
 		} else {
-			my18b20.errors |= BIT(0); // Room Temperature Sensor Failure?
+			my18b20.errors |= BIT(MY18B20_BIT_ERR_INIT); // Room Temperature Sensor Failure?
 		}
 	} else {
-		my18b20.errors |= BIT(0); // Room Temperature Sensor Failure?
+		my18b20.errors |= BIT(MY18B20_BIT_ERR_INIT); // Room Temperature Sensor Failure?
 	}
 	onewire_bus_low();
 	my18b20.tick = clock_time();
+#if !USE_METERING
+    TL_ZB_TIMER_SCHEDULE(app_monitoringCb, NULL, TIMEOUT_1SEC);
+#endif
 }
 
 static void error_my18b20(void) {
-	my18b20.errors |= BIT(1);
+	my18b20.errors |= BIT(MY18B20_BIT_ERR_READ);
 	my18b20.stage = 0;
 	if(++my18b20.cnt_errors > 7) {
-		my18b20.errors |= BIT(2);
+		my18b20.errors |= BIT(MY18B20_BIT_ERR_BAD);
 		my18b20.cnt_errors = 0;
 #ifdef ZCL_TEMPERATURE_MEASUREMENT
 		g_zcl_temperatureAttrs.measuredValue = 0x8000;
@@ -313,11 +330,9 @@ static void error_my18b20(void) {
 #ifdef ZCL_THERMOSTAT
 		zcl_thermostat_attrs.local_temp = 0x8000;
 #endif
-#if USE_METERING
-		if (config_min_max.emergency_off & BIT(BIT_ERR_TS_OFF)) {
-			relay_bits_emergency |= BIT(BIT_ERR_TS_OFF);
+		if (config_min_max.event_blocking_mask & BIT(BIT_ERR_TS_OFF)) {
+			ev_wrk.relay_bits_blocking_events |= BIT(BIT_ERR_TS_OFF);
 		}
-#endif
 	}
 }
 
@@ -363,22 +378,50 @@ void task_my18b20(void) {
 			if(onewire_write(0x0becc, 16) >= 0 // cmd read
 				&& onewire_16bit_read(&my18b20.rtemp) >= 0) { // read measure
 				temp = ((int)(my18b20.rtemp * my18b20.coef.temp_k) >> 16) + my18b20.coef.temp_z; // x 0.01 C
-#if USE_METERING
-				if ((config_min_max.emergency_off & BIT(BIT_MAX_TEMP_OFF))
-					&& temp > my18b20.coef.max_temp)
-					relay_bits_emergency |= BIT(BIT_MAX_TEMP_OFF);
-				if ((config_min_max.emergency_off & BIT(BIT_MIN_TEMP_OFF))
-					&& temp > my18b20.coef.min_temp)
-					relay_bits_emergency |= BIT(BIT_MIN_TEMP_OFF);
+#ifdef ZCL_TEMPERATURE_MEASUREMENT
+				if(temp < g_zcl_temperatureAttrs.minValue || temp > g_zcl_temperatureAttrs.maxValue) {
+					temp = 0x8000;
+					if(++my18b20.cnt_errors > 7) {
+						error_my18b20();
+					}
+				} else {
+#else
+				if(temp < -5000 || temp > 17500) {
+					temp = 0x8000;
+					if(++my18b20.cnt_errors > 7) {
+						error_my18b20();
+					}
+				} else {
 #endif
+					if(temp > my18b20.coef.max_temp) {
+						if(config_min_max.event_blocking_mask & BIT(BIT_MAX_TEMP_OFF)) {
+							ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_TEMP_OFF);
+						}
+	            		if(ev_wrk.tik_start != 0xffff) { // startup timeout expired?
+	            			ev_wrk.tik_start = 0; // continue from the beginning startup timeout, relay Off
+	            		} else {
+	                    	ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
+	            		}
+			   		}
+					if(temp < my18b20.coef.min_temp) {
+						if(config_min_max.event_blocking_mask & BIT(BIT_MIN_TEMP_OFF)) {
+							ev_wrk.relay_bits_blocking_events |= BIT(BIT_MIN_TEMP_OFF);
+						}
+	            		if(ev_wrk.tik_start != 0xffff) { // startup timeout expired?
+	            			ev_wrk.tik_start = 0; // continue from the beginning startup timeout, relay Off
+	            		} else {
+	                    	ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
+	            		}
+					}
 #ifdef ZCL_THERMOSTAT
-				set_thermostat(temp);
+					set_thermostat(temp);
 #endif
+					my18b20.cnt_errors = 0;
+				}
 #ifdef ZCL_TEMPERATURE_MEASUREMENT
 				g_zcl_temperatureAttrs.measuredValue = temp;
 #endif
 				my18b20.stage = 2;
-				my18b20.cnt_errors = 0;
 			} else {
 				error_my18b20();
 			}

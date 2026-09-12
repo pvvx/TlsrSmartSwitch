@@ -7,11 +7,6 @@
 
 extern u64 mul32x32_64(u32 a, u32 b); // hard function (in div_mod.S)
 
-//--------- Work Data --------
-
-static uint16_t tik_max_current; // count max current, step 8 sec, =0xFFFF - flag end
-uint16_t tik_reload, tik_start; // step 1 sec, =0xFFFF - flag end
-
 //--------- Data for calculating BL09377 --------
 
 // Pulse counters BL0937
@@ -260,10 +255,9 @@ void app_sensor_init(void) {
 	load_config_sensor();
 	load_config_min_max();
 	energy_restore();
+	ev_wrk.tik_reload = 0xffff;
 	if(!config_min_max.time_start)
-	    tik_start = 0xffff;
-	if(!config_min_max.time_reload)
-		tik_reload = 0xffff;
+		ev_wrk.tik_start = 0xffff;
 	if(!dev_gpios.sel) {
 		dev_gpios.sel = GPIO_SEL;
 	}
@@ -393,42 +387,44 @@ void bl0937_new_dataCb(void *args) {
 	//TODO: Calculate Power factor = ?
 
     if(config_min_max.min_voltage && voltage < config_min_max.min_voltage) {
-    	tik_reload = 0;
-		if(tik_start != 0xffff) { // startup timeout expired?
-			tik_start = 0; // continue from the beginning startup timeout
+		if(ev_wrk.tik_start != 0xffff) { // startup timeout expired?
+			ev_wrk.tik_start = 0; // continue from the beginning startup timeout
+		} else {
+	    	ev_wrk.tik_reload = 0;
 		}
-   		if (config_min_max.emergency_off & BIT(BIT_MIN_VOLTAGE_OFF)) {
-			relay_bits_emergency |= BIT(BIT_MIN_VOLTAGE_OFF);
+   		if (config_min_max.event_blocking_mask & BIT(BIT_MIN_VOLTAGE_OFF)) {
+   			ev_wrk.relay_bits_blocking_events |= BIT(BIT_MIN_VOLTAGE_OFF);
    		}
     } else if(config_min_max.max_voltage && voltage > config_min_max.max_voltage) {
-    	tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
-		if(tik_start != 0xffff) { // startup timeout expired?
-			tik_start = 0; // continue from the beginning startup timeout, relay Off
+		if(ev_wrk.tik_start != 0xffff) { // startup timeout expired?
+			ev_wrk.tik_start = 0; // continue from the beginning startup timeout, relay Off
+		} else {
+	    	ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
 		}
-   		if (config_min_max.emergency_off & BIT(BIT_MAX_VOLTAGE_OFF)) {
-			relay_bits_emergency |= BIT(BIT_MAX_VOLTAGE_OFF);
+   		if (config_min_max.event_blocking_mask & BIT(BIT_MAX_VOLTAGE_OFF)) {
+   			ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_VOLTAGE_OFF);
    		}
     } else if(config_min_max.max_current
       && config_min_max.time_max_current
       && (current > config_min_max.max_current)) {
-		if(tik_max_current != 0xffff) { // Over Current timeout expired?
-			tik_max_current += 8;
-			if(tik_max_current >= config_min_max.time_max_current) {
-				tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
-				tik_max_current = 0xffff; // Over Current timeout expired
-				if (config_min_max.emergency_off & BIT(BIT_MAX_CURRENT_OFF))
-					relay_bits_emergency |= BIT(BIT_MAX_CURRENT_OFF);
+		if(ev_wrk.tik_max_current != 0xffff) { // Over Current timeout expired?
+			ev_wrk.tik_max_current += 8;
+			if(ev_wrk.tik_max_current >= config_min_max.time_max_current) {
+				ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
+				ev_wrk.tik_max_current = 0xffff; // Over Current timeout expired
+				if (config_min_max.event_blocking_mask & BIT(BIT_MAX_CURRENT_OFF))
+					ev_wrk.relay_bits_blocking_events |= BIT(BIT_MAX_CURRENT_OFF);
 			}
 		} else { // Over Current timeout expired
-			tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
+			ev_wrk.tik_reload = 0; // continue the reload timeout count from the beginning, relay Off
 		}
     } else { // all ok
-    	tik_max_current = 0;
-    	if(tik_start >= config_min_max.time_start) {
-    		tik_start = 0xffff;
+    	ev_wrk.tik_max_current = 0;
+    	if(ev_wrk.tik_start >= config_min_max.time_start) {
+    		ev_wrk.tik_start = 0xffff;
     	}
-    	if(tik_reload >= config_min_max.time_reload) {
-    		tik_reload = 0xffff;
+    	if(ev_wrk.tik_reload >= config_min_max.time_reload) {
+    		ev_wrk.tik_reload = 0xffff;
     	}
 #if USE_THERMOSTAT // USE_SENSOR_MY18B20
 		set_therm_relay_status(cfg_on_off.onOff);
@@ -482,10 +478,10 @@ int32_t app_monitoringCb(void *arg) {
 		TL_SCHEDULE_TASK(bl0937_new_dataCb, NULL);
 	}
 
-	if(tik_reload != 0xffff)
-		tik_reload++;
-	if(tik_start != 0xffff)
-		tik_start++;
+	if(ev_wrk.tik_reload != 0xffff)
+		ev_wrk.tik_reload++;
+	if(ev_wrk.tik_start != 0xffff)
+		ev_wrk.tik_start++;
 #if USE_SENSOR_MY18B20
 	my18b20.start_measure = 1;
 #endif

@@ -145,7 +145,7 @@ void app_task(void) {
 	buttonTask();
 	if(dev_gpios.led2) {
 		gpio_write(dev_gpios.led2,
-				(dev_gpios.flg & GPIOS_FLG_LED2_POL)? cfg_on_off.onOff : !cfg_on_off.onOff);
+			(dev_gpios.flg & GPIOS_FLG_LED2_POL)? cfg_on_off.onOff : !cfg_on_off.onOff);
 	}
 #if USE_BL0942
     monitoring_handler();
@@ -330,6 +330,13 @@ void user_init(bool isRetention)
 	bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID,
 			ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, ZCL_TEMPERATURE_SENSOR_ERRORS,
 			REPORT_TIME_MIN_DEF, REPORT_TIME_MAX, (u8 *)&reportableChange_tmp);
+#if !USE_METERING
+    /* Alarm */
+    //reportableChange_tmp = 1;
+    bdb_defaultReportingCfg(APP_ENDPOINT1, HA_PROFILE_ID,
+    		ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT, ZCL_ATTRID_ALARM_EVENTS,
+			1, REPORT_TIME_STAT_DEF, (uint8_t *)&reportableChange_tmp);
+#endif
 #endif
 
     /* Initialize BDB */

@@ -20,6 +20,12 @@ extern zcl_thermostatAttr_save_t thr_cfg_saved;
 
 // extern my18b20_coef_t def_coef_my18b20;
 
+typedef enum {
+	MY18B20_BIT_ERR_INIT = 0,
+	MY18B20_BIT_ERR_READ,
+	MY18B20_BIT_ERR_BAD
+} my18b20_errors_e;
+
 typedef struct {
 	my18b20_coef_t coef;
 	int16_t rtemp;

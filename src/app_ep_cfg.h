@@ -5,7 +5,7 @@
 #define APP_ENDPOINT2 0x02
 #define APP_ENDPOINT3 0x03
 
-#define ZCL_CUSTOM_CLUSTER		0xEA60
+#define ZCL_CUSTOM_CLUSTER					0xEA60 // if set USE_CUSTOM_CLUSTER
 
 /* Custom Attr for OnOff cluster */
 #define ZCL_ATTRID_RELAY_STATE				0xF000 // On/Off
@@ -13,37 +13,49 @@
 #define ZCL_ATTRID_CUSTOM_LED               0xF002
 
 /* Custom Attr for OnOff config cluster */
+#if USE_SWITCH
 #define CUSTOM_ATTRID_SWITCH_TYPE           0xF003
 #define CUSTOM_ATTRID_DECOUPLED             0xF004
+#endif
 
 /* Custom Attr for Electrical Measurement cluster */
-#define ZCL_ATTRID_ALARM_MASK				0xF005 // RW
-#define ZCL_ATTRID_ALARM_EVENTS				0xF006 // RWR, 8 bits_emergency_off_t
-
-//#define ZCL_ATTRID_BITS_ALARM_MASK			0xF020 // 0xF020..0xF024
-
+#if USE_METERING || USE_SENSOR_MY18B20
+#define ZCL_ATTRID_ALARM_MASK				0xF005 // RW relay_bits_blocking_events, relay_bits_emergency_e
+#define ZCL_ATTRID_ALARM_EVENTS				0xF006 // RWR, 8 relay_bits_blocking_events, relay_bits_emergency_e
+#endif
+#if USE_METERING
 #define ZCL_ATTRID_CURRENT_COEF       		0xF007
 #define ZCL_ATTRID_VOLTAGE_COEF        		0xF008
 #define ZCL_ATTRID_POWER_COEF         		0xF009
 #define ZCL_ATTRID_ENERGY_COEF         		0xF00A
 #define ZCL_ATTRID_FGREQ_COEF         		0xF00B
 #define ZCL_ATTRID_PWR_FIX_DIV         		0xF013
+#endif
 
 /* Custom Attr (if USE_SENSOR_MY18B20) for TemperatureMeasurement */
+#if USE_SENSOR_MY18B20
 #define ZCL_TEMPERATURE_SENSOR_ID			0xF00C // R, uint32 id MY18B20
-#define ZCL_TEMPERATURE_SENSOR_ERRORS		0xF00D // R, 8 bits_emergency_off_t
+#define ZCL_TEMPERATURE_SENSOR_ERRORS		0xF00D // RR, 8 relay_bits_emergency_e
 #define ZCL_TEMPERATURE_SENSOR_MULTIPLER	0xF00E
 #define ZCL_TEMPERATURE_SENSOR_ZERO			0xF00F
 #define ZCL_TEMPERATURE_SENSOR_HYSTERESIS	0xF010 // uses thermostat
 #define ZCL_TEMPERATURE_MIN					0xF011 // emergency
 #define ZCL_TEMPERATURE_MAX					0xF012 // emergency
+#if !USE_METERING
+#define ZCL_STARTUP_TEST_PERIOD				0xF013 // startup test, emergency
+#define ZCL_RELOAD_TEST_PERIOD				0xF014 // timeout reload, emergency
+#endif
+#endif // USE_SENSOR_MY18B20
 
 /* Custom Attr for Electrical Measurement cluster */
+#if USE_METERING
 #define ZCL_ATTRID_CURRENT_CAL       		0xF080
 #define ZCL_ATTRID_VOLTAGE_CAL        		0xF081
 #define ZCL_ATTRID_POWER_CAL         		0xF082
 #define ZCL_ATTRID_START_CAL				0xF090
+#endif
 
+/* Custom Attr for OnOff cluster */
 #if USE_CFG_GPIO
 #define ZCL_ATTRID_GPIO_RELAY				0xF100
 #define ZCL_ATTRID_GPIO_LED1				0xF101
@@ -131,11 +143,11 @@ typedef struct {
 	int16_t local_temp; // in 0.01 C
 	int16_t min_temp; // in 0.01 C
 	int16_t max_temp; // in 0.01 C
-	/* relay_state:
+	/* running_state:
 	 * bit0: Heat State On,
 	 * bit1: Cool State On,
 	 * bit2: Fan State On */
-	uint16_t relay_state;
+	uint16_t running_state;
 	uint8_t cool_on; // 0..100%
 	uint8_t healt_on; // 0..100%
 	/* operation:
@@ -151,8 +163,6 @@ typedef struct {
 	3 - Cool
 	4 - Heat */
 	uint8_t run_mode;
-//	int32_t summ_temp;
-//	uint8_t summ_cnt;
 	//
 	uint8_t occupancy; // = 0  unoccupied, = 1 occupied
 //	uint8_t remote_sensing; // = 0
@@ -260,25 +270,18 @@ typedef struct {
     uint16_t current_divisor; // current div 1000, in 0.001A
 } zcl_msAttr_t;
 
-// bits emergency_off
-typedef enum {
-	BIT_MAX_VOLTAGE_OFF = 0,// 0x01
-	BIT_MIN_VOLTAGE_OFF,	// 0x02
-	BIT_MAX_CURRENT_OFF,	// 0x04
-	BIT_MAX_TEMP_OFF,		// 0x08
-	BIT_MIN_TEMP_OFF,		// 0x10
-	BIT_ERR_TS_OFF,			// 0x20
-} relay_bits_emergency_e;
 
 typedef struct {
+    uint16_t time_reload; // in sec, minimum 1, step 1 or 8, = 0 - off
+    uint16_t time_start; // in sec, minimum 1, step 1 or 8, = 0 - off
+#if USE_METERING
+    uint16_t time_max_current; // in sec, minimum 1, step 1 or 8, = 0 - off
     int16_t max_voltage; // in 0.01V, = 0 - off
     int16_t min_voltage; // in 0.01V, = 0 - off
     int16_t max_current; // in 0.001A, = 0 - off
-    uint16_t time_max_current; // in sec, minimum 8, step 8, = 0 - off
-    uint16_t time_reload; // in sec, minimum 8, step 8, = 0 - off
-    uint16_t time_start; // in sec, minimum 8, step 8, = 0 - off
-    uint8_t emergency_off; // emergency_off_t
     uint8_t power_fix_div; // 0 - auto, 1 - 0..32767W, 2 - 0..3276.7W, 3 - 0..327.67W, 4 - 0..32.767W
+#endif
+    uint8_t event_blocking_mask; // Event-based Blocking Mask, relay_bits_emergency_e
 } zcl_config_min_max_t;
 
 extern zcl_config_min_max_t config_min_max;

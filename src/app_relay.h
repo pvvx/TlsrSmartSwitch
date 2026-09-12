@@ -27,8 +27,40 @@ typedef struct {
 } dev_gpios_t;
 
 extern dev_gpios_t dev_gpios;
-extern uint8_t relay_bits_emergency;
-extern uint8_t relay_state;
+
+//--------- Work Data --------
+// bits event_blocking_mask, relay_bits_blocking_events
+typedef enum {
+#if USE_METERING
+	BIT_MAX_VOLTAGE_OFF = 0,// 0x01
+	BIT_MIN_VOLTAGE_OFF,	// 0x02
+	BIT_MAX_CURRENT_OFF,	// 0x04
+	BIT_MAX_TEMP_OFF,		// 0x08
+	BIT_MIN_TEMP_OFF,		// 0x10
+	BIT_ERR_TS_OFF,			// 0x20
+#else
+	BIT_MAX_TEMP_OFF,		// 0x01
+	BIT_MIN_TEMP_OFF,		// 0x02
+	BIT_ERR_TS_OFF,			// 0x04
+#endif
+} relay_bits_emergency_e;
+
+typedef struct {
+#if USE_METERING || USE_SENSOR_MY18B20
+#if USE_METERING
+	uint16_t tik_max_current; // timer count max current, step 1 sec, =0xFFFF - flag end
+#endif
+	uint16_t tik_start; // step 1 sec, =0xFFFF - flag end
+	uint16_t tik_reload; // step 1 sec, =0xFFFF - flag end
+	uint8_t  relay_bits_blocking_events; // Blocking Events, relay_bits_emergency_e, reported
+#endif // USE_METERING || USE_SENSOR_MY18B20
+	uint8_t  relay_state; // cостояние реле
+#if USE_BL0942
+	uint8_t first_start; // flag, startup = true
+#endif
+} event_processing_t;
+
+extern event_processing_t ev_wrk;
 
 void gpio_input_init(GPIO_PinTypeDef pin, GPIO_PullTypeDef pulup);
 void gpio_output_init(GPIO_PinTypeDef pin, uint8_t value);

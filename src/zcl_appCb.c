@@ -207,7 +207,7 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
  #endif // ZCL_THERMOSTAT
  #ifdef ZCL_TEMPERATURE_MEASUREMENT
         } else if (clusterId == ZCL_CLUSTER_MS_TEMPERATURE_MEASUREMENT) {
-       		save |= BIT(NBIT_MY18B20_CONFIG);
+       		save |= BIT(NBIT_MY18B20_CONFIG) | BIT(NBIT_MIN_MAX_CONFIG);
  #endif // ZCL_TEMPERATURE_MEASUREMENT
 #endif // USE_SENSOR_MY18B20
 #ifdef ZCL_ELECTRICAL_MEASUREMENT
@@ -234,6 +234,8 @@ static void app_zclWriteReqCmd(uint8_t epId, uint16_t clusterId, zclWriteCmd_t *
     if (save & BIT(NBIT_SENSOR_CONFIG)) {
     	save_config_sensor();
     }
+#endif
+#if USE_METERING || USE_SENSOR_MY18B20
     if (save & BIT(NBIT_MIN_MAX_CONFIG)) {
     	save_config_min_max();
     }
