@@ -182,7 +182,7 @@ static void flash_gpios_init(void) {
 		memcpy(&dev_gpios, &tab_gpios.gpios, sizeof(dev_gpios));
 		memcpy(&ftab.gpios, &tab_gpios.gpios, sizeof(dev_gpios));
 		save_fgpio(&ftab);
-		factory_reset_start(NULL);
+		// app_factory_reset();
 	}
 	memcpy(&dev_gpios_new, &dev_gpios, sizeof(dev_gpios));
 }
@@ -214,7 +214,7 @@ void dev_gpios_init(void) {
 /* start initialize */
 void dev_relay_init(void) {
     check_first_start();
-    light_blink_start(1, 100, 100);
+    light_blink_start(5, 100, 100);
 }
 
 

@@ -78,24 +78,6 @@ void test_nv_version(void) {
 	}
 }
 #endif
-/*********************************************************************
- * @fn      stack_init
- *
- * @brief   This function initialize the ZigBee stack and related profile. If HA/ZLL profile is
- *          enabled in this application, related cluster should be registered here.
- *
- * @param   None
- *
- * @return  None
- */
-void stack_init(void)
-{
-	/* Initialize ZB stack */
-	zb_init();
-
-	/* Register stack CB */
-    zb_zdoCbRegister((zdo_appIndCb_t *)&appCbLst);
-}
 
 /*********************************************************************
  * @fn      user_app_init
@@ -119,7 +101,19 @@ void user_app_init(void)
 //    af_endpointRegister(APP_ENDPOINT2, (af_simple_descriptor_t *)&app_ep2_simpleDesc, zcl_rx_handler, NULL);
 
     /* Initialize or restore attributes, this must before 'zcl_register()' */
-    zcl_appAttrsInit();
+    populate_date_code();
+
+    /* Loading settings and configuring equipment */
+	load_config_on_off();
+#if USE_SENSOR_MY18B20
+    init_my18b20();
+#endif
+#if USE_METERING
+    app_sensor_init();
+#endif
+    dev_relay_init();
+
+    /*  zcl_reportCfgInfoEntryClear */
     zcl_reportingTabInit();
 
 	/* Register ZCL specific cluster information */
@@ -140,7 +134,15 @@ void user_app_init(void)
     wwah_init(WWAH_TYPE_SERVER, (af_simple_descriptor_t *)&app_simpleDesc);
 #endif
 }
-
+/*********************************************************************
+ * @fn      app_task
+ *
+ * @brief   This function application task
+ *
+ * @param   None
+ *
+ * @return  None
+ */
 void app_task(void) {
 	buttonTask();
 	if(dev_gpios.led2) {
@@ -158,11 +160,6 @@ void app_task(void) {
 }
 
 static void app_sysException(void) {
-
-#if UART_PRINTF_MODE
-    printf("app_sysException, line: %d, event: %d, reset\r\n", T_evtExcept[0], T_evtExcept[1]);
-#endif
-
 #if 1
     SYSTEM_RESET();
 #else
@@ -178,7 +175,7 @@ static void app_sysException(void) {
 #endif
 #define REPORT_TIME_MAX_DEF			600		// 10 min
 #define REPORT_TIME_STAT_DEF		3600	// 1 h
-#define REPORT_TIME_MAX				5400	// 65000
+#define REPORT_TIME_MAX				7200	// 2 h
 
 /*********************************************************************
  * @fn      user_init
@@ -189,9 +186,7 @@ static void app_sysException(void) {
  *
  * @return  None
  */
-//__attribute__((optimize("-Os")))
-void user_init(bool isRetention)
-{
+void user_init(bool isRetention) {
 #ifdef ZCL_METERING
 	uint64_t reportableChange_u64;
 #endif
@@ -205,12 +200,14 @@ void user_init(bool isRetention)
     /* Initialize GPIO led, key, relay, switch, ... */
     dev_gpios_init();
 
-
 #if PA_ENABLE
     rf_paInit(PA_TX, PA_RX);
 #endif
-    /* Initialize Stack */
-    stack_init();
+    /* * Initialize Stack * */
+	/* Initialize ZB stack */
+	zb_init();
+	/* Register stack CB */
+    zb_zdoCbRegister((zdo_appIndCb_t *)&appCbLst);
 
     /* Initialize user application */
     user_app_init();
@@ -348,23 +345,11 @@ void user_init(bool isRetention)
 #endif
 }
 
-static int32_t net_steer_start_offCb(void *args) {
-
-	g_appCtx.net_steer_start = false;
-
-    light_blink_stop();
-
-    return -1;
-}
-
 /*******************************************************************
- * @brief	factory reset start
+ * @brief	app factory reset
  */
-void factory_reset_start(void *args) {
-
-    zb_factoryReset();
-
-    g_appCtx.net_steer_start = true;
-    g_appCtx.timerFactoryReset = TL_ZB_TIMER_SCHEDULE(net_steer_start_offCb, NULL, TIMEOUT_1MIN30SEC);
-    light_blink_start(90, 250, 750);
+void app_factory_reset(void) {
+    tl_bdbReset2FN(); // zb_factoryReset();
+    nv_resetModule(NV_MODULE_APP);
+	drv_pm_longSleep(PM_SLEEP_MODE_DEEPSLEEP, PM_WAKEUP_SRC_TIMER, 3*1000); // 3 seconds
 }

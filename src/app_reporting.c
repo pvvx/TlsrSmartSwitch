@@ -208,5 +208,7 @@ _CODE_ZCL_ void app_report_handler(void)
 				}
 			}
 		}
+	} else {
+		light_blink_start(11, 500, 500);
 	}
 }

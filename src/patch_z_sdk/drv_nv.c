@@ -1041,7 +1041,7 @@ nv_sts_t nv_resetAll(void){
 }
 
 nv_sts_t nv_init(u8 rst){
-	if(rst){
+	if(rst) {
 		/* if reset is true, erase all flash for NV */
 		nv_resetAll();
 	}
@@ -1062,7 +1062,6 @@ nv_sts_t nv_resetToFactoryNew(void){
 			nv_resetModule(i);
 		}
 	}
-
 	nv_facrotyNewRstFlagClear();
 #endif
 	return SUCCESS;
@@ -1077,7 +1076,7 @@ bool nv_facrotyNewRstFlagCheck(void){
 
 void nv_facrotyNewRstFlagSet(void){
 	u8 flag = ITEM_FIELD_VALID;
-	flash_writeWithCheck(CFG_FACTORY_RST_CNT, 1, &flag);
+	flash_write(CFG_FACTORY_RST_CNT, 1, &flag);
 }
 
 void nv_facrotyNewRstFlagClear(void){

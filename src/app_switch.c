@@ -22,7 +22,7 @@ void switchAction(switch_action_t action, u8 count) {
     sws_printf("switchAction(%d,%d)\n", action, count);
 
 	if(count == BUTTON_CNT_FACTORY_RESET) {
-		factory_reset_start(NULL);
+		app_factory_reset();
 		return;
 	}
 	if (cfg_on_off.switchType == ZCL_SWITCH_TYPE_MULTIFUNCTION) {

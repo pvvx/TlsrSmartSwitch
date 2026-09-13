@@ -337,6 +337,5 @@ nv_sts_t load_config_min_max(void);
 nv_sts_t save_config_min_max(void);
 nv_sts_t load_config_on_off(void);
 nv_sts_t save_config_on_off(void);
-void zcl_appAttrsInit(void);
 
 #endif /* SRC_INCLUDE_APP_ENDPOINT_CFG_H_ */

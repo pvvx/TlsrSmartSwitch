@@ -9,7 +9,7 @@ app_button_t app_button[MAX_BUTTON_NUM];
 static void buttonKeepPressed(u8 btNum) {
 	sws_printf("buttonKeepPressed(%d)\n", btNum);
     if(btNum == VK_SW1) {
-    	factory_reset_start(NULL);
+    	app_factory_reset();
     }
 }
 

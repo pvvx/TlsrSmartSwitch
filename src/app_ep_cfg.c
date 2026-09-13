@@ -900,25 +900,3 @@ void populate_date_code(void) {
 	g_zcl_basicAttrs.dateCode[8] = __DATE__[5];
 }
 
-
-/*********************************************************************
- * @fn      zcl_appAttrsInit
- *
- * @brief
- *
- * @param   None
- *
- * @return
- */
-void zcl_appAttrsInit(void)
-{
-	populate_date_code();
-	load_config_on_off();
-#if USE_SENSOR_MY18B20
-    init_my18b20();
-#endif
-#if USE_METERING
-    app_sensor_init();
-#endif
-    dev_relay_init();
-}

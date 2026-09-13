@@ -184,7 +184,8 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg)
         }
 #endif
         sws_printf("bdb:bind\n");
-        light_blink_start(7, 200, 200);
+        light_blink_stop();
+        light_blink_start(15, 150, 150);
         break;
     case BDB_COMMISSION_STA_IN_PROGRESS:
         break;
@@ -204,7 +205,7 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg)
                 TL_ZB_TIMER_CANCEL(&steerTimerEvt);
             }
             steerTimerEvt = TL_ZB_TIMER_SCHEDULE(app_bdbNetworkSteerStart, NULL, jitter);
-            light_blink_start(5, 500, 500);
+            light_blink_start(11, 500, 500);
         }
         break;
     case BDB_COMMISSION_STA_FORMATION_FAILURE:
@@ -222,7 +223,7 @@ void zb_bdbCommissioningCb(uint8_t status, void *arg)
         if (!rejoinBackoffTimerEvt) {
             rejoinBackoffTimerEvt = TL_ZB_TIMER_SCHEDULE(app_rejoinBackoff, NULL, 60 * 1000);
         }
-        light_blink_start(5, 500, 500);
+        light_blink_start(11, 500, 500);
         break;
     case BDB_COMMISSION_STA_FORMATION_DONE:
 #ifndef ZBHCI_EN
@@ -284,10 +285,8 @@ void app_otaProcessMsgHandler(uint8_t evt, uint8_t status)
 }
 #endif
 
-s32 app_softReset(void *arg)
-{
+s32 app_softReset(void *arg) {
     SYSTEM_RESET();
-
     return -1;
 }
 
@@ -304,7 +303,6 @@ void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf)
 {
     if(pLeaveCnf->status == SUCCESS){
     	light_blink_start(3, 200, 200);
-
     	//waiting blink over
     	TL_ZB_TIMER_SCHEDULE(app_softReset, NULL, 2 * 1000);
     }
