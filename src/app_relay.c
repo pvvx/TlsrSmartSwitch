@@ -87,9 +87,10 @@ void set_relay_status(bool status) {
 #if USE_METERING || USE_SENSOR_MY18B20
 	if(ev_wrk.relay_bits_blocking_events
 	|| ev_wrk.tik_reload != 0xffff
-	|| ev_wrk.tik_start != 0xffff)
+	|| ev_wrk.tik_start != 0xffff) {
 		status = false;
-	light_blink_start(3, 100, 100);
+		light_blink_start(3, 100, 100);
+	}
 #endif
 	if(status)
 		light_on();
