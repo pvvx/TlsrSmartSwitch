@@ -89,6 +89,7 @@ void set_relay_status(bool status) {
 	|| ev_wrk.tik_reload != 0xffff
 	|| ev_wrk.tik_start != 0xffff)
 		status = false;
+	light_blink_start(3, 100, 100);
 #endif
 	if(status)
 		light_on();

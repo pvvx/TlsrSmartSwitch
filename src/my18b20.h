@@ -18,7 +18,7 @@ typedef struct _my18b20_coef_t {
 
 extern zcl_thermostatAttr_save_t thr_cfg_saved;
 
-// extern my18b20_coef_t def_coef_my18b20;
+#define USE_AVERAGE_TEMP_SHL	0 // Calculate the average value from (1<<USE_AVERAGE_TEMP_SHL) measurements
 
 typedef enum {
 	MY18B20_BIT_ERR_INIT = 0,
@@ -38,6 +38,11 @@ typedef struct {
 	uint32_t timeout;
 	uint8_t errors; // AC_ERROR_CODE?
 	uint8_t cnt_errors;
+	uint8_t reserved;
+#if USE_AVERAGE_TEMP_SHL
+	uint8_t summ_cnt;
+	int32_t summ_temp;
+#endif
 } my18b20_t;
 
 extern my18b20_t my18b20;

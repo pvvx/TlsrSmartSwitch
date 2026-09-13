@@ -441,6 +441,17 @@ void task_my18b20(void) {
                		set_relay_status(cfg_on_off.onOff);
 #endif // USE_THERMOSTAT
 					my18b20.cnt_errors = 0;
+#if USE_AVERAGE_TEMP_SHL
+					// Calculate the average value from (1<<USE_AVERAGE_TEMP_SHL) measurements
+					my18b20.summ_temp += temp;
+					if(++my18b20.summ_cnt >= (1<<USE_AVERAGE_TEMP_SHL)) {
+						temp = my18b20.summ_temp >> USE_AVERAGE_TEMP_SHL;
+						my18b20.summ_temp -= temp;
+						my18b20.summ_cnt--;
+					} else {
+						temp = my18b20.summ_temp / my18b20.summ_cnt;
+					}
+#endif
 				}
 #ifdef ZCL_TEMPERATURE_MEASUREMENT
 				g_zcl_temperatureAttrs.measuredValue = temp;
